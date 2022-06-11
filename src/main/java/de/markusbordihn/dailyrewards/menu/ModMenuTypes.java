@@ -17,30 +17,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.dailyrewards;
+package de.markusbordihn.dailyrewards.menu;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import de.markusbordihn.dailyrewards.Constants;
+import net.minecraft.world.inventory.MenuType;
 
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.common.extensions.IForgeMenuType;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
-import de.markusbordihn.dailyrewards.data.RewardData;
-import de.markusbordihn.dailyrewards.data.RewardUserData;
+public class ModMenuTypes {
 
-public class ServerSetup {
+  protected ModMenuTypes() {
 
-  protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
-
-  protected ServerSetup() {}
-
-  public static void handleServerStartingEvent(ServerStartingEvent event) {
-    MinecraftServer server = event.getServer();
-    log.info("{} Server Starting setup on {} ...", Constants.LOG_REGISTER_PREFIX, server);
-    RewardData.prepare(server);
-    RewardUserData.prepare(server);
-
-    log.info("Rewards for this Month: {}", RewardData.get().getRewardsForCurrentMonth());
   }
+
+  public static final DeferredRegister<MenuType<?>> MENU_TYPES =
+      DeferredRegister.create(ForgeRegistries.CONTAINERS, Constants.MOD_ID);
+
+  public static final RegistryObject<MenuType<RewardMenu>> REWARD_MENU =
+      MENU_TYPES.register("reward_menu", () -> IForgeMenuType.create(RewardMenu::new));
 
 }

@@ -19,12 +19,25 @@
 
 package de.markusbordihn.dailyrewards.commands;
 
+import javax.annotation.Nullable;
+
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+
+import net.minecraftforge.network.NetworkHooks;
+
+import de.markusbordihn.dailyrewards.menu.RewardMenu;
 
 public class ClaimCommand extends CustomCommand {
   private static final ClaimCommand command = new ClaimCommand();
@@ -36,6 +49,22 @@ public class ClaimCommand extends CustomCommand {
   @Override
   public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     sendFeedback(context, "Hello World");
+    ServerPlayer player = context.getSource().getPlayerOrException();
+    MenuProvider provider = new MenuProvider() {
+      @Override
+      public Component getDisplayName() {
+        return new TextComponent("Rewards");
+      }
+
+      @Nullable
+      @Override
+      public AbstractContainerMenu createMenu(int windowId, Inventory inventory, Player player) {
+        return new RewardMenu(windowId, inventory);
+      }
+    };
+    NetworkHooks.openGui(player, provider, buffer -> {
+    });
+
     return 0;
   }
 }

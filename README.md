@@ -12,7 +12,8 @@ The reward data are separated by year month and will be calculated at the beginn
 
 Data structure:
 
-- - Year - Month
+- Rewards
+  - Year - Month (key)
   - Rewards 1-31 [ItemStacks ...]
 
 ### Reward User Data (daily_rewards_user.dat)
@@ -21,9 +22,7 @@ The reward user data tracking the given rewards to the user, they have no direct
 
 Data structure:
 
-- - Year - Month
-    - UUID
-      - Awards 1-31 (takeable) [ItemStacks ...]
-      - Awards History 1-31 (locked) [ItemStacks ...]
-      - Rewarded days [int]
-      - Rewards days [Dates ...]
+- Rewards User
+  - Year - Month - UUID (key)
+  - Rewards 1-31 (takeable) [ItemStacks ...]
+  - Last rewarded day [String ...]

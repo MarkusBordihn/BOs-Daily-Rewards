@@ -17,30 +17,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.dailyrewards;
+package de.markusbordihn.dailyrewards.client.screen;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraft.client.gui.screens.MenuScreens;
 
-import de.markusbordihn.dailyrewards.data.RewardData;
-import de.markusbordihn.dailyrewards.data.RewardUserData;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
-public class ServerSetup {
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.menu.ModMenuTypes;
+
+public class ClientScreens {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  protected ServerSetup() {}
+  protected ClientScreens() {}
 
-  public static void handleServerStartingEvent(ServerStartingEvent event) {
-    MinecraftServer server = event.getServer();
-    log.info("{} Server Starting setup on {} ...", Constants.LOG_REGISTER_PREFIX, server);
-    RewardData.prepare(server);
-    RewardUserData.prepare(server);
+  public static void registerScreens(final FMLClientSetupEvent event) {
+    log.info("{} Client Screens ...", Constants.LOG_REGISTER_PREFIX);
 
-    log.info("Rewards for this Month: {}", RewardData.get().getRewardsForCurrentMonth());
+    event.enqueueWork(() -> {
+      MenuScreens.register(ModMenuTypes.REWARD_MENU.get(), RewardScreen::new);
+    });
   }
-
 }

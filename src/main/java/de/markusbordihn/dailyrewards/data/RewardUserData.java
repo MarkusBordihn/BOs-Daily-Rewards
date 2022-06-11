@@ -19,11 +19,18 @@
 
 package de.markusbordihn.dailyrewards.data;
 
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 
@@ -34,11 +41,19 @@ import de.markusbordihn.dailyrewards.Constants;
 public class RewardUserData extends SavedData {
 
   public static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
+  public static final String ITEMS_TAG = "RewardItems";
+  public static final String USER_REWARDS_TAG = "UserRewards";
+  public static final String YEAR_MONTH_TAG = "Year-Month";
+
+  private static final String FILE_ID = Constants.MOD_ID + "_user";
 
   private static MinecraftServer server;
   private static RewardUserData data;
 
-  private static final String FILE_ID = Constants.MOD_ID + "_user";
+  private static ConcurrentHashMap<String, List<ItemStack>> rewardItemsMap =
+      new ConcurrentHashMap<>();
+  private static ConcurrentHashMap<String, Integer> rewardedDaysMap = new ConcurrentHashMap<>();
+  private static ConcurrentHashMap<String, String> lastRewardedDayMap = new ConcurrentHashMap<>();
 
   public RewardUserData() {
     this.setDirty();
@@ -74,6 +89,23 @@ public class RewardUserData extends SavedData {
     return FILE_ID;
   }
 
+  public static String getKeyId(int year, int month, UUID uuid) {
+    return year + "-" + month + ":" + uuid.toString();
+  }
+
+
+  public void addRewardFor(int year, int month, UUID uuid) {
+    String key = getKeyId(year, month, uuid);
+  }
+
+  public List<ItemStack> getRewardsFor(int year, int month, UUID uuid) {
+    String key = getKeyId(year, month, uuid);
+    return rewardItemsMap.computeIfAbsent(key, id -> {
+      return null;
+      // return Rewards.calculateRewardItemsForMonth(month);
+    });
+  }
+
   public static RewardUserData load(CompoundTag compoundTag) {
     RewardUserData rewardData = new RewardUserData();
     log.info("{} loading reward user data ... {}", Constants.LOG_NAME, compoundTag);
@@ -83,6 +115,30 @@ public class RewardUserData extends SavedData {
   @Override
   public CompoundTag save(CompoundTag compoundTag) {
     log.info("{} saving reward user data ... {}", Constants.LOG_NAME, this);
+
+    ListTag listTag = new ListTag();
+
+    compoundTag.put(USER_REWARDS_TAG, listTag);
+    for (Map.Entry<String, List<ItemStack>> reward : rewardItemsMap.entrySet()) {
+
+      CompoundTag rewardTag = new CompoundTag();
+      List<ItemStack> rewardItems = reward.getValue();
+
+      // Storing rewards items per year-month
+      ListTag itemListTag = new ListTag();
+      for (int i = 0; i < rewardItems.size(); ++i) {
+        ItemStack itemStack = rewardItems.get(i);
+        CompoundTag itemStackTag = new CompoundTag();
+        itemStack.save(itemStackTag);
+        itemListTag.add(itemStackTag);
+      }
+      if (!itemListTag.isEmpty()) {
+        rewardTag.putString(YEAR_MONTH_TAG, reward.getKey());
+        rewardTag.put(ITEMS_TAG, itemListTag);
+        listTag.add(rewardTag);
+      }
+    }
+
     return compoundTag;
   }
 

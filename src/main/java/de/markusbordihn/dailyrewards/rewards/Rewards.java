@@ -65,6 +65,7 @@ public class Rewards {
   }
 
   public static List<ItemStack> calculateRewardItemsForMonth(int month) {
+    log.info("Calculate Reward items for month {} ...", month);
     YearMonth yearMonth = YearMonth.of(getCurrentYear(), month);
     int numberOfDays = yearMonth.lengthOfMonth();
     List<ItemStack> rewardItemsForMonth = getRewardItemForMonth(month);

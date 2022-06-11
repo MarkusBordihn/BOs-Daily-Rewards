@@ -30,7 +30,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import de.markusbordihn.dailyrewards.block.ModBlocks;
+import de.markusbordihn.dailyrewards.client.screen.ClientScreens;
 import de.markusbordihn.dailyrewards.item.ModItems;
+import de.markusbordihn.dailyrewards.menu.ModMenuTypes;
 
 @Mod(Constants.MOD_ID)
 public class DailyRewards {
@@ -49,10 +51,13 @@ public class DailyRewards {
     log.info("Register Blocks ...");
     ModBlocks.BLOCKS.register(modEventBus);
 
+    log.info("{} Menu Types ...", Constants.LOG_REGISTER_PREFIX);
+    ModMenuTypes.MENU_TYPES.register(modEventBus);
+
     forgeEventBus.addListener(ServerSetup::handleServerStartingEvent);
 
     DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-
+      modEventBus.addListener(ClientScreens::registerScreens);
     });
   }
 }
