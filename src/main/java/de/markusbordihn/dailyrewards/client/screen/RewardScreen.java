@@ -28,18 +28,22 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.menu.RewardMenu;
+import de.markusbordihn.dailyrewards.rewards.Rewards;
 
 public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  private static final ResourceLocation TEXTURE =
+  private ResourceLocation texture =
       new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen.png");
+
+  private TranslatableComponent rewardScreenTitle;
 
   public RewardScreen(RewardMenu menu, Inventory inventory, Component component) {
     super(menu, inventory, component);
@@ -51,11 +55,36 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
 
     // Default stats
     this.imageWidth = 171;
-    this.imageHeight = 230;
+    this.imageHeight = 247;
 
-    this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2;
+    // Set Title with already rewarded days.
+    int rewardedDays = this.menu.getRewardedDays();
+    rewardScreenTitle = new TranslatableComponent(Constants.TEXT_PREFIX + "reward_screen",
+        rewardedDays);
+
+    // Set background according the number or days for the current month.
+    switch(Rewards.getDaysCurrentMonth()) {
+      case 28:
+        texture = new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen_28_days.png");
+      break;
+      case 29:
+        texture = new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen_29_days.png");
+      break;
+      case 30:
+        texture = new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen_30_days.png");
+      break;
+      case 31:
+        texture = new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen_31_days.png");
+      break;
+      default:
+        texture = new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen.png");
+    }
+
+    this.titleLabelX = (this.imageWidth - this.font.width(rewardScreenTitle)) / 2;
+    this.titleLabelY = 6;
     this.topPos = (this.height - this.imageHeight) / 2;
-    this.inventoryLabelY = this.imageHeight - 93;
+    this.inventoryLabelX = 6;
+    this.inventoryLabelY = this.imageHeight - 90;
   }
 
   @Override
@@ -66,10 +95,17 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
   }
 
   @Override
+  protected void renderLabels(PoseStack poseStack, int x, int y) {
+    this.font.draw(poseStack, rewardScreenTitle, this.titleLabelX, this.titleLabelY, 4210752);
+    this.font.draw(poseStack, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY,
+        4210752);
+  }
+
+  @Override
   protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
     RenderSystem.setShader(GameRenderer::getPositionTexShader);
     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-    RenderSystem.setShaderTexture(0, TEXTURE);
+    RenderSystem.setShaderTexture(0, texture);
 
     // Main screen
     this.blit(poseStack, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);

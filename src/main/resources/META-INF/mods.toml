@@ -24,12 +24,11 @@ license="MIT"
     # A URL to query for updates for this mod. See the JSON update specification https://mcforge.readthedocs.io/en/latest/gettingstarted/autoupdate/
     #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
     # A URL for the "homepage" for this mod, displayed in the mod UI
-    #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
-    # A file name (in the root of the mod JAR) containing a logo for display
+    displayURL="https://www.curseforge.com/minecraft/mc-mods/daily-rewards"
     logoFile="logo.png"
     credits=""
     authors="Markus Bordihn"
-    description='''This is the description for a new Forge mod'''
+    description='''Daily rewards is a very lightweight and simple Forge mod that rewards players daily.'''
 
 [[dependencies.daily_rewards]] #optional
     # the modid of the dependency

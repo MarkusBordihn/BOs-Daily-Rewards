@@ -20,6 +20,7 @@
 package de.markusbordihn.dailyrewards.menu.slots;
 
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -27,7 +28,7 @@ import de.markusbordihn.dailyrewards.menu.RewardMenu;
 
 public class RewardSlot extends Slot {
 
-  private RewardMenu menu;
+  protected RewardMenu menu;
 
   public RewardSlot(Container container, int index, int x, int y) {
     super(container, index, x, y);
@@ -38,6 +39,17 @@ public class RewardSlot extends Slot {
     this.menu = menu;
   }
 
+  @Override
+  public boolean mayPickup(Player player) {
+    return false;
+  }
+
+  @Override
+  public boolean isActive() {
+    return true;
+  }
+
+  @Override
   public boolean mayPlace(ItemStack itemStack) {
     return false;
   }

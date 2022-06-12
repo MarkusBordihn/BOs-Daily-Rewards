@@ -1,4 +1,7 @@
 {
-  "block.placeholder.text": "Template placeholder do not remove!",
-  "item.placeholder.text": "Template placeholder do not remove!"
+  "text.daily_rewards.claim_rewards": "Claim your daily rewards with %1$s !",
+  "text.daily_rewards.reward_screen": "Rewarded Days: %1$s day(s)",
+  "text.daily_rewards.rewarded_item": "Congratulation %1$s you got %2$s as regonization for %3$s day(s) in this world for this month.",
+
+  "item.daily_rewards.taken_reward": "Taken reward."
 }

@@ -48,7 +48,6 @@ public class ClaimCommand extends CustomCommand {
 
   @Override
   public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-    sendFeedback(context, "Hello World");
     ServerPlayer player = context.getSource().getPlayerOrException();
     MenuProvider provider = new MenuProvider() {
       @Override

@@ -42,9 +42,11 @@ import de.markusbordihn.dailyrewards.rewards.Rewards;
 public class RewardData extends SavedData {
 
   public static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
+
   public static final String ITEMS_TAG = "RewardItems";
+  public static final String ITEM_LIST_TAG = "ItemList";
   public static final String REWARDS_TAG = "Rewards";
-  public static final String YEAR_MONTH_TAG = "Year-Month";
+  public static final String YEAR_MONTH_TAG = "YearMonth";
 
   private static final String FILE_ID = Constants.MOD_ID;
 
@@ -94,13 +96,34 @@ public class RewardData extends SavedData {
 
   public List<ItemStack> getRewardsFor(int year, int month) {
     String key = getKeyId(year, month);
-    return rewardItemsMap.computeIfAbsent(key, id -> {
-      return Rewards.calculateRewardItemsForMonth(month);
-    });
+    return rewardItemsMap.computeIfAbsent(key, id -> Rewards.calculateRewardItemsForMonth(month));
   }
 
   public List<ItemStack> getRewardsForCurrentMonth() {
     return getRewardsFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth());
+  }
+
+  public CompoundTag getRewardsForCurrentMonthSyncData() {
+    List<ItemStack> rewardItems = getRewardsForCurrentMonth();
+    CompoundTag syncData = new CompoundTag();
+    ListTag itemListTag = new ListTag();
+    for (int i = 0; i < rewardItems.size(); ++i) {
+      ItemStack itemStack = rewardItems.get(i);
+      CompoundTag itemStackTag = new CompoundTag();
+      itemStack.save(itemStackTag);
+      itemListTag.add(itemStackTag);
+    }
+    syncData.put(ITEM_LIST_TAG, itemListTag);
+    return syncData;
+  }
+
+  public ItemStack getRewardForCurrentMonth(int day) {
+    List<ItemStack> rewards = getRewardsForCurrentMonth();
+    int rewardIndex = --day;
+    if (rewardIndex >= 0 && rewards.size() > rewardIndex) {
+      return rewards.get(rewardIndex).copy();
+    }
+    return ItemStack.EMPTY;
   }
 
   public static RewardData load(CompoundTag compoundTag) {
@@ -122,8 +145,7 @@ public class RewardData extends SavedData {
         rewardItemsMap.put(yearMonthKey, rewardItems);
       }
     }
-    log.debug("{} Loaded following stored rewards data from disk: {}", Constants.LOG_NAME,
-        rewardItemsMap);
+    log.debug("{} Loaded stored rewards data from disk: {}", Constants.LOG_NAME, rewardItemsMap);
 
     return rewardData;
   }

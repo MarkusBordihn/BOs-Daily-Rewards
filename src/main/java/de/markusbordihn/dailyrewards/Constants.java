@@ -29,8 +29,10 @@ public final class Constants {
   public static final String LOG_ICON = "💰";
   public static final String LOG_ICON_NAME = LOG_ICON + " " + LOG_NAME;
   public static final String LOG_REGISTER_PREFIX = LOG_ICON + " Register Daily Rewards";
-
   public static final String MOD_COMMAND = "DailyRewards";
   public static final String MOD_ID = "daily_rewards";
   public static final String MOD_NAME = "Daily Rewards";
+
+  // Prefixes
+  public static final String TEXT_PREFIX = "text.daily_rewards.";
 }

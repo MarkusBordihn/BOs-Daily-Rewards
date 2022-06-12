@@ -17,43 +17,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.dailyrewards;
+package de.markusbordihn.dailyrewards.network.message;
+
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.nbt.CompoundTag;
+
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.network.NetworkEvent;
 
-import de.markusbordihn.dailyrewards.client.screen.ClientScreens;
-import de.markusbordihn.dailyrewards.item.ModItems;
-import de.markusbordihn.dailyrewards.menu.ModMenuTypes;
-import de.markusbordihn.dailyrewards.network.NetworkHandler;
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.data.RewardClientData;
 
-@Mod(Constants.MOD_ID)
-public class DailyRewards {
+public class MessageGeneralRewardsForCurrentMonth {
 
-  public static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
+  protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  public DailyRewards() {
-    final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-    final IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
+  protected final CompoundTag data;
 
-    modEventBus.addListener(NetworkHandler::registerNetworkHandler);
-
-    log.info("Register Items ...");
-    ModItems.ITEMS.register(modEventBus);
-
-    log.info("{} Menu Types ...", Constants.LOG_REGISTER_PREFIX);
-    ModMenuTypes.MENU_TYPES.register(modEventBus);
-
-    forgeEventBus.addListener(ServerSetup::handleServerStartingEvent);
-
-    DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
-        () -> () -> modEventBus.addListener(ClientScreens::registerScreens));
+  public MessageGeneralRewardsForCurrentMonth(CompoundTag data) {
+    this.data = data;
   }
+
+  public CompoundTag getData() {
+    return this.data;
+  }
+
+  public static void handle(
+      MessageGeneralRewardsForCurrentMonth message,
+      Supplier<NetworkEvent.Context> contextSupplier) {
+    NetworkEvent.Context context = contextSupplier.get();
+    context.enqueueWork(
+        () -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(message)));
+    context.setPacketHandled(true);
+  }
+
+  public static void handlePacket(MessageGeneralRewardsForCurrentMonth message) {
+    RewardClientData.setGeneralRewardsForCurrentMonth(message.getData());
+  }
+
 }

@@ -185,8 +185,8 @@ curseforge {
   apiKey = "${credentials.curseforge_api_token}"
   project {
     id = "${curseforge_project_id}"
-    changelog = '[[ --Change Log-- ]]'
-    releaseType = 'release'
+    changelog = 'See https://github.com/MarkusBordihn/BOs-Daily-Rewards/commits/main'
+    releaseType = 'beta'
     addGameVersion("1.18.2")
     addGameVersion("Forge")
   }

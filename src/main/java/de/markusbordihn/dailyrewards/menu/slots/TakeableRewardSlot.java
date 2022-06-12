@@ -17,42 +17,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.dailyrewards;
+package de.markusbordihn.dailyrewards.menu.slots;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.ThrownItemRenderer;
-import net.minecraft.client.renderer.item.ItemProperties;
-
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.item.ModItems;
+import de.markusbordihn.dailyrewards.menu.RewardMenu;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public class ClientSetup {
+public class TakeableRewardSlot extends Slot {
 
-  public static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
+  protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  public ClientSetup(final FMLClientSetupEvent event) {
-    log.info("Client Setup ...");
+  private RewardMenu menu;
 
-    event.enqueueWork(() -> {
-
-      //@TemplateEntryPoint("Register Item Properties")
-
-      //@TemplateEntryPoint("Set Render Layer")
-
-    });
+  public TakeableRewardSlot(Container container, int index, int x, int y) {
+    super(container, index, x, y);
   }
+
+  public TakeableRewardSlot(Container container, int index, int x, int y, RewardMenu menu) {
+    super(container, index, x, y);
+    this.menu = menu;
+  }
+
+  @Override
+  public void onTake(Player player, ItemStack itemStack) {
+    if (!getItem().is(ModItems.TAKEN_REWARD.get())) {
+      set(new ItemStack(ModItems.TAKEN_REWARD.get()));
+      this.menu.syncRewardsUserContainer(player);
+    } else {
+      this.setChanged();
+    }
+  }
+
+  @Override
+  public boolean mayPickup(Player player) {
+    return !getItem().is(ModItems.TAKEN_REWARD.get());
+  }
+
+  @Override
+  public boolean mayPlace(ItemStack itemStack) {
+    return false;
+  }
+
 }

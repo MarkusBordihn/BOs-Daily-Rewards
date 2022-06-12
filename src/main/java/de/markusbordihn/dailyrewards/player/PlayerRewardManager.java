@@ -20,12 +20,21 @@
 package de.markusbordihn.dailyrewards.player;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -36,9 +45,12 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.config.CommonConfig;
+import de.markusbordihn.dailyrewards.data.RewardData;
+import de.markusbordihn.dailyrewards.data.RewardUserData;
+import de.markusbordihn.dailyrewards.network.NetworkHandler;
 
 @EventBusSubscriber
-public class PlayerManager {
+public class PlayerRewardManager {
 
   private static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
@@ -46,12 +58,15 @@ public class PlayerManager {
   private static int rewardTimePerDay = COMMON.rewardTimePerDay.get();
   private static int rewardTimePerDayTicks = rewardTimePerDay * 60 * 20;
 
-  private static final short REWARD_CHECK_TICK = 20 * 60;
+  private static final short REWARD_CHECK_TICK = 20 * 60; // every 1 Minute
+  private static final MutableComponent claimCommand = new TextComponent("/DailyRewards claim")
+        .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(
+            ClickEvent.Action.SUGGEST_COMMAND, "/DailyRewards claim")));
 
   private static short ticker = 0;
   private static Set<ServerPlayer> playerList = ConcurrentHashMap.newKeySet();
 
-  protected PlayerManager() {}
+  protected PlayerRewardManager() {}
 
   @SubscribeEvent
   public static void onServerAboutToStartEvent(ServerAboutToStartEvent event) {
@@ -72,7 +87,11 @@ public class PlayerManager {
     }
     ServerPlayer player =
         ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayerByName(username);
-    log.info("{} Player {} {} logged in.", Constants.LOG_NAME, username, player);
+    log.debug("{} Player {} {} logged in.", Constants.LOG_NAME, username, player);
+
+    // Sync data and add Player to reward.
+    NetworkHandler.syncGeneralRewardForCurrentMonth(player);
+    NetworkHandler.syncUserRewardForCurrentMonth(player);
     playerList.add(player);
   }
 
@@ -95,9 +114,31 @@ public class PlayerManager {
       return;
     }
     for (ServerPlayer player : playerList) {
-      log.info("Test {}", player.tickCount);
       if (player.tickCount > rewardTimePerDayTicks) {
-        log.info("Reward player {} daily reward for today ...", player);
+        UUID uuid = player.getUUID();
+        RewardUserData rewardUserData = RewardUserData.get();
+        if (!rewardUserData.hasRewardedToday(uuid)) {
+          // Update stored data
+          rewardUserData.setLastRewardedDayForCurrentMonth(uuid);
+          int rewardedDays = rewardUserData.increaseRewardedDaysForCurrentMonth(uuid);
+
+          // Add reward for rewarded Days.
+          ItemStack itemStack = RewardData.get().getRewardForCurrentMonth(rewardedDays);
+          if (itemStack.isEmpty()) {
+            log.error("Reward {} for day {} for current month was empty!", itemStack, rewardedDays);
+          } else {
+            rewardUserData.addRewardForCurrentMonth(rewardedDays, uuid, itemStack);
+            player.sendMessage(new TranslatableComponent(Constants.TEXT_PREFIX + "rewarded_item",
+                player.getName(), itemStack, rewardedDays), Util.NIL_UUID);
+            player.sendMessage(new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards",
+                claimCommand),
+                Util.NIL_UUID);
+            NetworkHandler.syncUserRewardForCurrentMonth(player);
+          }
+
+          log.info("Reward player {} daily reward for {} days with {} ...", player, rewardedDays,
+              itemStack);
+        }
       }
     }
     ticker = 0;

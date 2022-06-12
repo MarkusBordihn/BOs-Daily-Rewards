@@ -60,8 +60,6 @@ public class Rewards {
   public static void handleServerAboutToStartEvent(ServerAboutToStartEvent event) {
     log.info("Will use the following normal fill items: {}", getNormalFillItems());
     log.info("Will use the following rare fill items: {}", getRareFillItems());
-    log.info("Monthly rewards for {}: {}", getCurrentMonth(),
-        getRewardItemForMonth(getCurrentMonth()));
   }
 
   public static List<ItemStack> calculateRewardItemsForMonth(int month) {
@@ -157,6 +155,10 @@ public class Rewards {
 
   public static int getCurrentYear() {
     return LocalDate.now().getYear();
+  }
+
+  public static String getCurrentYearMonthDay() {
+    return getCurrentYear() + "-" + getCurrentMonth() + "-" + getCurrentDay();
   }
 
   public static int getDaysCurrentMonth() {

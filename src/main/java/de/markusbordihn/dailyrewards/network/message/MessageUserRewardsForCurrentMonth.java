@@ -17,28 +17,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.dailyrewards.client.screen;
+package de.markusbordihn.dailyrewards.network.message;
+
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.nbt.CompoundTag;
 
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.network.NetworkEvent;
 
 import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.menu.ModMenuTypes;
+import de.markusbordihn.dailyrewards.data.RewardClientData;
 
-public class ClientScreens {
+public class MessageUserRewardsForCurrentMonth {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  protected ClientScreens() {}
+  protected final CompoundTag data;
+  protected final int rewardedDays;
 
-  public static void registerScreens(final FMLClientSetupEvent event) {
-    log.info("{} Client Screens ...", Constants.LOG_REGISTER_PREFIX);
-
-    event
-        .enqueueWork(() -> MenuScreens.register(ModMenuTypes.REWARD_MENU.get(), RewardScreen::new));
+  public MessageUserRewardsForCurrentMonth(CompoundTag data, int rewardedDays) {
+    this.rewardedDays = rewardedDays;
+    this.data = data;
   }
+
+  public CompoundTag getData() {
+    return this.data;
+  }
+
+  public int getRewardedDays() {
+    return this.rewardedDays;
+  }
+
+  public static void handle(
+      MessageUserRewardsForCurrentMonth message,
+      Supplier<NetworkEvent.Context> contextSupplier) {
+    NetworkEvent.Context context = contextSupplier.get();
+    context.enqueueWork(
+        () -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(message)));
+    context.setPacketHandled(true);
+  }
+
+  public static void handlePacket(MessageUserRewardsForCurrentMonth message) {
+    RewardClientData.setRewardedDaysForCurrentMonth(message.getRewardedDays());
+    RewardClientData.setUserRewardsForCurrentMonth(message.getData());
+  }
+
 }
