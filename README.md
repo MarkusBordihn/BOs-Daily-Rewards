@@ -19,11 +19,11 @@ This version is currently in beta and is used for testing.
 
 Please report issues over the issue link above.
 
-### Internal Data Structure
+## Internal Data Structure
 
 This section covers the internal data structure used inside the corresponding .dat files.
 
-#### Reward Data (daily_rewards.dat)
+### Reward Data (daily_rewards.dat)
 
 The reward data are separated by year month and will be calculated at the beginning of the month based on the provided config.
 
@@ -33,7 +33,7 @@ Data structure:
   - Year - Month (key)
   - Rewards 1-31 [ItemStack ...]
 
-#### Reward User Data (daily_rewards_user.dat)
+### Reward User Data (daily_rewards_user.dat)
 
 The reward user data tracking the given rewards to the user, they have no direct relationship to the reward data to make sure updates will not make former rewards invalid and are only relevant for further items.
 
