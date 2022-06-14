@@ -5,11 +5,15 @@
 
 Daily rewards is a very lightweight and simple Forge mod that rewards players daily.
 
+![Daily Rewards Screenshot](examples/daily_rewards_screen.png)
+
 ## Features
 
 - Server and client friendly
 - Easy Customization over configuration file
 - Extra UI to collect rewarded items and to see upcoming rewards
+- Grant daily rewards after some minutes online and not immediately
+- Supports mod items
 
 ## Beta Note
 
@@ -49,6 +53,6 @@ Data structure:
 
 Please only download the mod from the official CurseForge page or with the official CurseForge launcher like:
 
-🚀 https://www.curseforge.com/minecraft/mc-mods/daily-rewards
+🚀 <https://www.curseforge.com/minecraft/mc-mods/daily-rewards>
 
 If you are downloading this mod from other sources we could not make sure that it works as expected or does not includes any unwanted modification (e.g. adware, malware, ...).

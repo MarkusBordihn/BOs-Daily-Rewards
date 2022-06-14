@@ -141,8 +141,18 @@ public class Rewards {
     return parseConfigItems(COMMON.normalFillItems.get());
   }
 
+  public static ItemStack getNormalFillItem() {
+    List<ItemStack> normalFillItems = getNormalFillItems();
+    return normalFillItems.get(random.nextInt(normalFillItems.size()));
+  }
+
   public static List<ItemStack> getRareFillItems() {
     return parseConfigItems(COMMON.rareFillItems.get());
+  }
+
+  public static ItemStack getRareFillItem() {
+    List<ItemStack> rareFillItems = getRareFillItems();
+    return rareFillItems.get(random.nextInt(rareFillItems.size()));
   }
 
   public static int getCurrentDay() {

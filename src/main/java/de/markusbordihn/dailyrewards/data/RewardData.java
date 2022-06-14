@@ -164,7 +164,10 @@ public class RewardData extends SavedData {
       for (int i = 0; i < rewardItems.size(); ++i) {
         ItemStack itemStack = rewardItems.get(i);
         if (itemStack.isEmpty()) {
-          log.error("Reward item for month {} and day {} is empty!", reward.getKey(), i);
+
+          log.error("Reward item for month {} and day {} is empty, will fill item!",
+              reward.getKey(), i);
+          itemStack = Rewards.getNormalFillItem();
         }
         CompoundTag itemStackTag = new CompoundTag();
         itemStack.save(itemStackTag);

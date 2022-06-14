@@ -33,15 +33,18 @@ import de.markusbordihn.dailyrewards.client.screen.ClientScreens;
 import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.menu.ModMenuTypes;
 import de.markusbordihn.dailyrewards.network.NetworkHandler;
+import de.markusbordihn.dailyrewards.utils.StopModReposts;
 
 @Mod(Constants.MOD_ID)
 public class DailyRewards {
 
-  public static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
+  protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
   public DailyRewards() {
     final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
     final IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
+
+    StopModReposts.checkStopModReposts();
 
     modEventBus.addListener(NetworkHandler::registerNetworkHandler);
 

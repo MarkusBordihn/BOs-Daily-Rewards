@@ -32,6 +32,7 @@ public final class Constants {
   public static final String MOD_COMMAND = "DailyRewards";
   public static final String MOD_ID = "daily_rewards";
   public static final String MOD_NAME = "Daily Rewards";
+  public static final String MOD_URL = "https://www.curseforge.com/minecraft/mc-mods/daily-rewards";
 
   // Prefixes
   public static final String TEXT_PREFIX = "text.daily_rewards.";
