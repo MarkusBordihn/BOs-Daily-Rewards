@@ -1,4 +1,4 @@
-# Daily Rewards (Beta)
+# Daily Rewards
 
 [![Daily Rewards Downloads](http://cf.way2muchnoise.eu/full_628798_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/daily-rewards)
 [![Daily Rewards Versions](http://cf.way2muchnoise.eu/versions/Minecraft_628798_all.svg)](https://www.curseforge.com/minecraft/mc-mods/daily-rewards)
