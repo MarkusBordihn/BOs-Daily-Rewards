@@ -28,7 +28,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -52,7 +51,7 @@ public class ClaimCommand extends CustomCommand {
     MenuProvider provider = new MenuProvider() {
       @Override
       public Component getDisplayName() {
-        return new TextComponent("Rewards");
+        return Component.literal("Rewards");
       }
 
       @Nullable

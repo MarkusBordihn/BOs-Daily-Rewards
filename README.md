@@ -49,6 +49,21 @@ Data structure:
   - Last rewarded day (String)
   - Number of rewarded days (int)
 
+## Version Status Overview 🛠️
+
+| Version        | Status                |
+| -------------- | --------------------- |
+| Fabric Version | ❌ Not planned        |
+| Forge 1.16.5   | ❌ Not planned        |
+| Forge 1.17.1   | ❌ Not planned        |
+| Forge 1.18.1   | ❌ Not planned        |
+| Forge 1.18.2   | ⚠️ Maintenance only   |
+| Forge 1.19     | ✔️ Active development |
+
+## License
+
+The MIT [LICENSE.md](LICENSE.md) applies only to the code in this repository. Images, models and other assets are explicitly excluded.
+
 ## Note
 
 Please only download the mod from the official CurseForge page or with the official CurseForge launcher like:

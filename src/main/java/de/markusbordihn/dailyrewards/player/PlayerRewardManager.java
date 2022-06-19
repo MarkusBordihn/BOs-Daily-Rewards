@@ -27,12 +27,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
@@ -55,14 +53,14 @@ public class PlayerRewardManager {
   private static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
   private static final CommonConfig.Config COMMON = CommonConfig.COMMON;
-  private static int rewardTimePerDay = COMMON.rewardTimePerDay.get();
-  private static int rewardTimePerDayTicks = rewardTimePerDay * 60 * 20;
 
   private static final short REWARD_CHECK_TICK = 20 * 60; // every 1 Minute
-  private static final MutableComponent claimCommand = new TextComponent("/DailyRewards claim")
-        .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(
-            ClickEvent.Action.SUGGEST_COMMAND, "/DailyRewards claim")));
 
+  private static final MutableComponent claimCommand = Component.literal("/DailyRewards claim")
+      .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(
+          new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/DailyRewards claim")));
+
+  private static int rewardTimePerDayTicks = 30 * 60 * 20;
   private static short ticker = 0;
   private static Set<ServerPlayer> playerList = ConcurrentHashMap.newKeySet();
 
@@ -71,12 +69,10 @@ public class PlayerRewardManager {
   @SubscribeEvent
   public static void onServerAboutToStartEvent(ServerAboutToStartEvent event) {
     playerList = ConcurrentHashMap.newKeySet();
-
-    rewardTimePerDay = COMMON.rewardTimePerDay.get();
-    rewardTimePerDayTicks = rewardTimePerDay * 60 * 20;
+    rewardTimePerDayTicks = COMMON.rewardTimePerDay.get() * 60 * 20;
 
     log.info("Daily rewards will be granted after {} min ({} ticks) a player is online.",
-        rewardTimePerDay, rewardTimePerDayTicks);
+        COMMON.rewardTimePerDay.get(), rewardTimePerDayTicks);
   }
 
   @SubscribeEvent
@@ -128,11 +124,10 @@ public class PlayerRewardManager {
             log.error("Reward {} for day {} for current month was empty!", itemStack, rewardedDays);
           } else {
             rewardUserData.addRewardForCurrentMonth(rewardedDays, uuid, itemStack);
-            player.sendMessage(new TranslatableComponent(Constants.TEXT_PREFIX + "rewarded_item",
-                player.getName(), itemStack, rewardedDays), Util.NIL_UUID);
-            player.sendMessage(new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards",
-                claimCommand),
-                Util.NIL_UUID);
+            player.sendSystemMessage(Component.translatable(Constants.TEXT_PREFIX + "rewarded_item",
+                player.getName(), itemStack, rewardedDays));
+            player.sendSystemMessage(
+                Component.translatable(Constants.TEXT_PREFIX + "claim_rewards", claimCommand));
             NetworkHandler.syncUserRewardForCurrentMonth(player);
           }
 

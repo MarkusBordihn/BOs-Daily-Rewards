@@ -26,7 +26,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 
 import de.markusbordihn.dailyrewards.Constants;
 
@@ -37,6 +37,6 @@ public abstract class CustomCommand implements Command<CommandSourceStack> {
 
   public static void sendFeedback(CommandContext<CommandSourceStack> context, String feedback) {
     CommandSourceStack commandSource = context.getSource();
-    commandSource.sendSuccess(new TextComponent(feedback), false);
+    commandSource.sendSuccess(Component.literal(feedback), false);
   }
 }

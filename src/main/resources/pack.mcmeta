@@ -1,6 +1,8 @@
 {
   "pack": {
-    "description": "Daily Rewards resources",
-    "pack_format": 9
+    "description": "Bo's Player Companions resources",
+    "pack_format": 9,
+    "forge:resource_pack_format": 9,
+    "forge:data_pack_format": 10
   }
 }

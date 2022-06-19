@@ -28,7 +28,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -47,7 +47,7 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
   private ResourceLocation texture =
       new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen.png");
 
-  private TranslatableComponent rewardScreenTitle;
+  private MutableComponent rewardScreenTitle;
 
   public RewardScreen(RewardMenu menu, Inventory inventory, Component component) {
     super(menu, inventory, component);
@@ -79,7 +79,7 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
     // Set Title with already rewarded days.
     int rewardedDays = this.menu.getRewardedDays();
     rewardScreenTitle =
-        new TranslatableComponent(Constants.TEXT_PREFIX + "reward_screen", rewardedDays);
+        Component.translatable(Constants.TEXT_PREFIX + "reward_screen", rewardedDays);
 
     // Set background according the number or days for the current month.
     switch (Rewards.getDaysCurrentMonth()) {
