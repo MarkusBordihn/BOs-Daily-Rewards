@@ -34,7 +34,7 @@ public class ModMenuTypes {
   }
 
   public static final DeferredRegister<MenuType<?>> MENU_TYPES =
-      DeferredRegister.create(ForgeRegistries.CONTAINERS, Constants.MOD_ID);
+      DeferredRegister.create(ForgeRegistries.MENU_TYPES, Constants.MOD_ID);
 
   public static final RegistryObject<MenuType<RewardMenu>> REWARD_MENU =
       MENU_TYPES.register("reward_menu", () -> IForgeMenuType.create(RewardMenu::new));

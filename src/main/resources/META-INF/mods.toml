@@ -33,7 +33,7 @@ license="MIT"
 [[dependencies.daily_rewards]] #optional
     modId="forge" #mandatory
     mandatory=true #mandatory
-    versionRange="[41.0.38,)" #mandatory
+    versionRange="[41.0.96,)" #mandatory
     ordering="NONE"
     side="BOTH"
 

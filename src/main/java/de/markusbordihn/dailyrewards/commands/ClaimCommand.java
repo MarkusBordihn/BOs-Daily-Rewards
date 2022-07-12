@@ -60,7 +60,7 @@ public class ClaimCommand extends CustomCommand {
         return new RewardMenu(windowId, inventory);
       }
     };
-    NetworkHooks.openGui(player, provider, buffer -> {
+    NetworkHooks.openScreen(player, provider, buffer -> {
     });
 
     return 0;

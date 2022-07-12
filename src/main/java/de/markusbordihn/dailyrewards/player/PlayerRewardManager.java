@@ -77,7 +77,7 @@ public class PlayerRewardManager {
 
   @SubscribeEvent
   public static void handlePlayerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event) {
-    String username = event.getPlayer().getName().getString();
+    String username = event.getEntity().getName().getString();
     if (username.isEmpty()) {
       return;
     }
@@ -93,7 +93,7 @@ public class PlayerRewardManager {
 
   @SubscribeEvent
   public static void handlePlayerLoggedOutEvent(PlayerEvent.PlayerLoggedOutEvent event) {
-    String username = event.getPlayer().getName().getString();
+    String username = event.getEntity().getName().getString();
     if (username.isEmpty()) {
       return;
     }
