@@ -94,13 +94,17 @@ public class PlayerRewardManager {
   @SubscribeEvent
   public static void handlePlayerLoggedOutEvent(PlayerEvent.PlayerLoggedOutEvent event) {
     String username = event.getEntity().getName().getString();
-    if (username.isEmpty()) {
+    if (username.isEmpty() || playerList.isEmpty()) {
       return;
     }
     ServerPlayer player =
         ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayerByName(username);
-    log.debug("{} Player {} {} logged out.", Constants.LOG_NAME, username, player);
-    playerList.remove(player);
+    if (player != null) {
+      log.debug("{} Player {} {} logged out.", Constants.LOG_NAME, username, player);
+      playerList.remove(player);
+    } else {
+      log.debug("{} Player {} timed out.", Constants.LOG_NAME, username);
+    }
   }
 
   @SubscribeEvent
