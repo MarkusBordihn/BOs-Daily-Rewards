@@ -26,22 +26,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Util;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.event.ClickEvent;
 
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.config.CommonConfig;
@@ -59,17 +57,17 @@ public class PlayerRewardManager {
   private static int rewardTimePerDayTicks = rewardTimePerDay * 60 * 20;
 
   private static final short REWARD_CHECK_TICK = 20 * 60; // every 1 Minute
-  private static final MutableComponent claimCommand = new TextComponent("/DailyRewards claim")
+  private static final TextComponent claimCommand = new TextComponent("/DailyRewards claim")
         .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(
             ClickEvent.Action.SUGGEST_COMMAND, "/DailyRewards claim")));
 
   private static short ticker = 0;
-  private static Set<ServerPlayer> playerList = ConcurrentHashMap.newKeySet();
+  private static Set<ServerPlayerEntity> playerList = ConcurrentHashMap.newKeySet();
 
   protected PlayerRewardManager() {}
 
   @SubscribeEvent
-  public static void onServerAboutToStartEvent(ServerAboutToStartEvent event) {
+  public static void onFMLServerAboutToStartEvent(FMLServerAboutToStartEvent event) {
     playerList = ConcurrentHashMap.newKeySet();
 
     rewardTimePerDay = COMMON.rewardTimePerDay.get();
@@ -85,7 +83,7 @@ public class PlayerRewardManager {
     if (username.isEmpty()) {
       return;
     }
-    ServerPlayer player =
+    ServerPlayerEntity player =
         ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayerByName(username);
     log.debug("{} Player {} {} logged in.", Constants.LOG_NAME, username, player);
 
@@ -101,7 +99,7 @@ public class PlayerRewardManager {
     if (username.isEmpty()) {
       return;
     }
-    ServerPlayer player =
+    ServerPlayerEntity player =
         ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayerByName(username);
     log.debug("{} Player {} {} logged out.", Constants.LOG_NAME, username, player);
     playerList.remove(player);
@@ -113,7 +111,7 @@ public class PlayerRewardManager {
         || playerList.isEmpty()) {
       return;
     }
-    for (ServerPlayer player : playerList) {
+    for (ServerPlayerEntity player : playerList) {
       if (player.tickCount > rewardTimePerDayTicks) {
         UUID uuid = player.getUUID();
         RewardUserData rewardUserData = RewardUserData.get();
@@ -128,9 +126,9 @@ public class PlayerRewardManager {
             log.error("Reward {} for day {} for current month was empty!", itemStack, rewardedDays);
           } else {
             rewardUserData.addRewardForCurrentMonth(rewardedDays, uuid, itemStack);
-            player.sendMessage(new TranslatableComponent(Constants.TEXT_PREFIX + "rewarded_item",
+            player.sendMessage(new TranslationTextComponent(Constants.TEXT_PREFIX + "rewarded_item",
                 player.getName(), itemStack, rewardedDays), Util.NIL_UUID);
-            player.sendMessage(new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards",
+            player.sendMessage(new TranslationTextComponent(Constants.TEXT_PREFIX + "claim_rewards",
                 claimCommand),
                 Util.NIL_UUID);
             NetworkHandler.syncUserRewardForCurrentMonth(player);

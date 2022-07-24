@@ -54,7 +54,7 @@ public class DailyRewards {
     log.info("{} Menu Types ...", Constants.LOG_REGISTER_PREFIX);
     ModMenuTypes.MENU_TYPES.register(modEventBus);
 
-    forgeEventBus.addListener(ServerSetup::handleServerStartingEvent);
+    forgeEventBus.addListener(ServerSetup::handleFMLServerStartingEvent);
 
     DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
         () -> () -> modEventBus.addListener(ClientScreens::registerScreens));

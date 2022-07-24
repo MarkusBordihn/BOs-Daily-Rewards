@@ -22,8 +22,6 @@ package de.markusbordihn.dailyrewards.client.screen;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.client.gui.screens.MenuScreens;
-
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 import de.markusbordihn.dailyrewards.Constants;

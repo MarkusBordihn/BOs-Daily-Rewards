@@ -32,13 +32,14 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.util.ResourceLocation;
+
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import de.markusbordihn.dailyrewards.Constants;
@@ -57,7 +58,7 @@ public class Rewards {
   protected Rewards() {}
 
   @SubscribeEvent
-  public static void handleServerAboutToStartEvent(ServerAboutToStartEvent event) {
+  public static void handleFMLServerAboutToStartEvent(FMLServerAboutToStartEvent event) {
     log.info("Will use the following normal fill items: {}", getNormalFillItems());
     log.info("Will use the following rare fill items: {}", getRareFillItems());
   }

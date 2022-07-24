@@ -29,18 +29,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.minecraft.world.World;
+import net.minecraft.world.storage.WorldSavedData;
+
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 
-public class RewardUserData extends SavedData {
+public class RewardUserData extends WorldSavedData {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
@@ -63,6 +64,7 @@ public class RewardUserData extends SavedData {
   private static ConcurrentHashMap<String, String> lastRewardedDayMap = new ConcurrentHashMap<>();
 
   public RewardUserData() {
+    super(FILE_ID);
     this.setDirty();
   }
 
@@ -76,8 +78,8 @@ public class RewardUserData extends SavedData {
     RewardUserData.server = server;
 
     // Using a global approach and storing relevant data in the overworld only!
-    RewardUserData.data = server.getLevel(Level.OVERWORLD).getDataStorage()
-        .computeIfAbsent(RewardUserData::load, RewardUserData::new, RewardUserData.getFileId());
+    RewardUserData.data = server.getLevel(World.OVERWORLD).getDataStorage()
+        .computeIfAbsent(RewardUserData::new, RewardUserData.getFileId());
   }
 
   public static boolean available() {
@@ -125,17 +127,17 @@ public class RewardUserData extends SavedData {
     return getRewardsFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth(), uuid);
   }
 
-  public CompoundTag getRewardsForCurrentMonthSyncData(UUID uuid) {
+  public CompoundNBT getRewardsForCurrentMonthSyncData(UUID uuid) {
     List<ItemStack> rewardItems = getRewardsForCurrentMonth(uuid);
-    CompoundTag syncData = new CompoundTag();
-    ListTag itemListTag = new ListTag();
+    CompoundNBT syncData = new CompoundNBT();
+    ListNBT itemListNBT = new ListNBT();
     for (int i = 0; i < rewardItems.size(); ++i) {
       ItemStack itemStack = rewardItems.get(i);
-      CompoundTag itemStackTag = new CompoundTag();
+      CompoundNBT itemStackTag = new CompoundNBT();
       itemStack.save(itemStackTag);
-      itemListTag.add(itemStackTag);
+      itemListNBT.add(itemStackTag);
     }
-    syncData.put(ITEM_LIST_TAG, itemListTag);
+    syncData.put(ITEM_LIST_TAG, itemListNBT);
     return syncData;
   }
 
@@ -198,24 +200,25 @@ public class RewardUserData extends SavedData {
     return increaseRewardedDays(Rewards.getCurrentYear(), Rewards.getCurrentMonth(), uuid);
   }
 
-  public static RewardUserData load(CompoundTag compoundTag) {
+  @Override
+  public void load(CompoundNBT compoundTag) {
     RewardUserData rewardData = new RewardUserData();
     log.info("{} loading reward user data ... {}", Constants.LOG_NAME, compoundTag);
 
     // Restoring rewards items per year-month:uuid
     if (compoundTag.contains(USER_REWARDS_TAG)) {
-      ListTag listTag = compoundTag.getList(USER_REWARDS_TAG, 10);
+      ListNBT listTag = compoundTag.getList(USER_REWARDS_TAG, 10);
       for (int i = 0; i < listTag.size(); ++i) {
-        CompoundTag rewardUserTag = listTag.getCompound(i);
+        CompoundNBT rewardUserTag = listTag.getCompound(i);
 
         // Get Reward key
         String rewardKey = rewardUserTag.getString(YEAR_MONTH_USER_TAG);
 
         // Restoring rewards items per year-month:uuid
         List<ItemStack> rewardItems = new ArrayList<>();
-        ListTag itemListTag = rewardUserTag.getList(ITEMS_TAG, 10);
-        for (int i2 = 0; i2 < itemListTag.size(); ++i2) {
-          ItemStack itemStack = ItemStack.of(itemListTag.getCompound(i2));
+        ListNBT itemListNBT = rewardUserTag.getList(ITEMS_TAG, 10);
+        for (int i2 = 0; i2 < itemListNBT.size(); ++i2) {
+          ItemStack itemStack = ItemStack.of(itemListNBT.getCompound(i2));
           rewardItems.add(itemStack);
         }
         rewardItemsMap.put(rewardKey, rewardItems);
@@ -226,12 +229,10 @@ public class RewardUserData extends SavedData {
       }
     }
     log.debug("{} Loaded stored rewards user data from disk: {}", Constants.LOG_NAME, rewardData);
-
-    return rewardData;
   }
 
   @Override
-  public CompoundTag save(CompoundTag compoundTag) {
+  public CompoundNBT save(CompoundNBT compoundTag) {
     // Get a list of all keys which needs to be stored.
     Set<String> rewardKeys = new HashSet<>();
     rewardKeys.addAll(rewardItemsMap.keySet());
@@ -245,25 +246,25 @@ public class RewardUserData extends SavedData {
     log.info("{} saving reward user data for {} ...", Constants.LOG_NAME, rewardKeys);
 
     // Iterate trough the stored keys to make sure we don't forget anything.
-    ListTag listTag = new ListTag();
+    ListNBT listTag = new ListNBT();
 
     compoundTag.put(USER_REWARDS_TAG, listTag);
     for (String rewardKey : rewardKeys) {
-      CompoundTag rewardUserTag = new CompoundTag();
+      CompoundNBT rewardUserTag = new CompoundNBT();
 
       // Using year month uuid as key
       rewardUserTag.putString(YEAR_MONTH_USER_TAG, rewardKey);
 
       // Storing rewards items per year-month:uuid
-      ListTag itemListTag = new ListTag();
+      ListNBT itemListNBT = new ListNBT();
       List<ItemStack> rewardItems = rewardItemsMap.get(rewardKey);
       for (int i = 0; i < rewardItems.size(); ++i) {
         ItemStack itemStack = rewardItems.get(i);
-        CompoundTag itemStackTag = new CompoundTag();
+        CompoundNBT itemStackTag = new CompoundNBT();
         itemStack.save(itemStackTag);
-        itemListTag.add(itemStackTag);
+        itemListNBT.add(itemStackTag);
       }
-      rewardUserTag.put(ITEMS_TAG, itemListTag);
+      rewardUserTag.put(ITEMS_TAG, itemListNBT);
 
       // Adding last rewarded day and totally rewarded days for the month.
       rewardUserTag.putInt(REWARDED_DAYS_TAG, rewardedDaysMap.getOrDefault(rewardKey, 0));

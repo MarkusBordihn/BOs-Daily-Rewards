@@ -27,19 +27,18 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.saveddata.SavedData;
-
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.minecraft.world.World;
+import net.minecraft.world.storage.WorldSavedData;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 
-public class RewardData extends SavedData {
+public class RewardData extends WorldSavedData {
 
   public static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
@@ -57,6 +56,7 @@ public class RewardData extends SavedData {
       new ConcurrentHashMap<>();
 
   public RewardData() {
+    super(FILE_ID);
     this.setDirty();
   }
 
@@ -70,8 +70,8 @@ public class RewardData extends SavedData {
     RewardData.server = server;
 
     // Using a global approach and storing relevant data in the overworld only!
-    RewardData.data = server.getLevel(Level.OVERWORLD).getDataStorage()
-        .computeIfAbsent(RewardData::load, RewardData::new, RewardData.getFileId());
+    RewardData.data = server.getLevel(World.OVERWORLD).getDataStorage()
+        .computeIfAbsent(RewardData::new, RewardData.getFileId());
   }
 
   public static boolean available() {
@@ -103,17 +103,17 @@ public class RewardData extends SavedData {
     return getRewardsFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth());
   }
 
-  public CompoundTag getRewardsForCurrentMonthSyncData() {
+  public CompoundNBT getRewardsForCurrentMonthSyncData() {
     List<ItemStack> rewardItems = getRewardsForCurrentMonth();
-    CompoundTag syncData = new CompoundTag();
-    ListTag itemListTag = new ListTag();
+    CompoundNBT syncData = new CompoundNBT();
+    ListNBT itemListNBT = new ListNBT();
     for (int i = 0; i < rewardItems.size(); ++i) {
       ItemStack itemStack = rewardItems.get(i);
-      CompoundTag itemStackTag = new CompoundTag();
+      CompoundNBT itemStackTag = new CompoundNBT();
       itemStack.save(itemStackTag);
-      itemListTag.add(itemStackTag);
+      itemListNBT.add(itemStackTag);
     }
-    syncData.put(ITEM_LIST_TAG, itemListTag);
+    syncData.put(ITEM_LIST_TAG, itemListNBT);
     return syncData;
   }
 
@@ -126,41 +126,39 @@ public class RewardData extends SavedData {
     return ItemStack.EMPTY;
   }
 
-  public static RewardData load(CompoundTag compoundTag) {
-    RewardData rewardData = new RewardData();
+  @Override
+  public void load(CompoundNBT compoundTag) {
     log.info("{} loading reward data ... {}", Constants.LOG_NAME, compoundTag);
 
     // Restoring rewards items per year-month
     if (compoundTag.contains(REWARDS_TAG)) {
-      ListTag listTag = compoundTag.getList(REWARDS_TAG, 10);
+      ListNBT listTag = compoundTag.getList(REWARDS_TAG, 10);
       for (int i = 0; i < listTag.size(); ++i) {
-        CompoundTag rewardTag = listTag.getCompound(i);
+        CompoundNBT rewardTag = listTag.getCompound(i);
         List<ItemStack> rewardItems = new ArrayList<>();
-        ListTag itemListTag = rewardTag.getList(ITEMS_TAG, 10);
+        ListNBT itemListNBT = rewardTag.getList(ITEMS_TAG, 10);
         String yearMonthKey = rewardTag.getString(YEAR_MONTH_TAG);
-        for (int i2 = 0; i2 < itemListTag.size(); ++i2) {
-          ItemStack itemStack = ItemStack.of(itemListTag.getCompound(i2));
+        for (int i2 = 0; i2 < itemListNBT.size(); ++i2) {
+          ItemStack itemStack = ItemStack.of(itemListNBT.getCompound(i2));
           rewardItems.add(itemStack);
         }
         rewardItemsMap.put(yearMonthKey, rewardItems);
       }
     }
     log.debug("{} Loaded stored rewards data from disk: {}", Constants.LOG_NAME, rewardItemsMap);
-
-    return rewardData;
   }
 
   @Override
-  public CompoundTag save(CompoundTag compoundTag) {
+  public CompoundNBT save(CompoundNBT compoundTag) {
     log.info("{} saving reward data ... {}", Constants.LOG_NAME, rewardItemsMap);
 
-    ListTag listTag = new ListTag();
+    ListNBT listTag = new ListNBT();
     for (Map.Entry<String, List<ItemStack>> reward : rewardItemsMap.entrySet()) {
-      CompoundTag rewardTag = new CompoundTag();
+      CompoundNBT rewardTag = new CompoundNBT();
       List<ItemStack> rewardItems = reward.getValue();
 
       // Storing rewards items per year-month
-      ListTag itemListTag = new ListTag();
+      ListNBT itemListNBT = new ListNBT();
       for (int i = 0; i < rewardItems.size(); ++i) {
         ItemStack itemStack = rewardItems.get(i);
         if (itemStack.isEmpty()) {
@@ -169,13 +167,13 @@ public class RewardData extends SavedData {
               reward.getKey(), i);
           itemStack = Rewards.getNormalFillItem();
         }
-        CompoundTag itemStackTag = new CompoundTag();
+        CompoundNBT itemStackTag = new CompoundNBT();
         itemStack.save(itemStackTag);
-        itemListTag.add(itemStackTag);
+        itemListNBT.add(itemStackTag);
       }
-      if (!itemListTag.isEmpty()) {
+      if (!itemListNBT.isEmpty()) {
         rewardTag.putString(YEAR_MONTH_TAG, reward.getKey());
-        rewardTag.put(ITEMS_TAG, itemListTag);
+        rewardTag.put(ITEMS_TAG, itemListNBT);
         listTag.add(rewardTag);
       }
     }

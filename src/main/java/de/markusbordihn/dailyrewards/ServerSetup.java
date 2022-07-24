@@ -23,7 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
 import de.markusbordihn.dailyrewards.data.RewardData;
 import de.markusbordihn.dailyrewards.data.RewardUserData;
@@ -34,7 +34,7 @@ public class ServerSetup {
 
   protected ServerSetup() {}
 
-  public static void handleServerStartingEvent(ServerStartingEvent event) {
+  public static void handleFMLServerStartingEvent(FMLServerStartingEvent event) {
     MinecraftServer server = event.getServer();
     log.info("{} Server Starting setup on {} ...", Constants.LOG_REGISTER_PREFIX, server);
     RewardData.prepare(server);

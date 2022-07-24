@@ -31,8 +31,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.server.ServerLifecycleHooks;
-
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import de.markusbordihn.dailyrewards.Constants;
 
 @EventBusSubscriber

@@ -24,12 +24,11 @@ import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.CompoundNBT;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
-
+import net.minecraftforge.fml.network.NetworkEvent;
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.data.RewardClientData;
 
@@ -37,13 +36,13 @@ public class MessageGeneralRewardsForCurrentMonth {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  protected final CompoundTag data;
+  protected final CompoundNBT data;
 
-  public MessageGeneralRewardsForCurrentMonth(CompoundTag data) {
+  public MessageGeneralRewardsForCurrentMonth(CompoundNBT data) {
     this.data = data;
   }
 
-  public CompoundTag getData() {
+  public CompoundNBT getData() {
     return this.data;
   }
 

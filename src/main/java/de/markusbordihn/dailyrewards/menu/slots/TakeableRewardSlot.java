@@ -21,12 +21,10 @@ package de.markusbordihn.dailyrewards.menu.slots;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import net.minecraft.world.Container;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
-
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ItemStack;
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.menu.RewardMenu;
@@ -37,28 +35,29 @@ public class TakeableRewardSlot extends Slot {
 
   private RewardMenu menu;
 
-  public TakeableRewardSlot(Container container, int index, int x, int y) {
+  public TakeableRewardSlot(IInventory container, int index, int x, int y) {
     super(container, index, x, y);
   }
 
-  public TakeableRewardSlot(Container container, int index, int x, int y, RewardMenu menu) {
+  public TakeableRewardSlot(IInventory container, int index, int x, int y, RewardMenu menu) {
     super(container, index, x, y);
     this.menu = menu;
   }
 
   @Override
-  public void onTake(Player player, ItemStack itemStack) {
-    if (!getItem().is(ModItems.TAKEN_REWARD.get())) {
+  public ItemStack onTake(PlayerEntity player, ItemStack itemStack) {
+    if (getItem().getItem() != ModItems.TAKEN_REWARD.get()) {
       set(new ItemStack(ModItems.TAKEN_REWARD.get()));
       this.menu.syncRewardsUserContainer(player);
     } else {
       this.setChanged();
     }
+    return getItem();
   }
 
   @Override
-  public boolean mayPickup(Player player) {
-    return !getItem().is(ModItems.TAKEN_REWARD.get());
+  public boolean mayPickup(PlayerEntity player) {
+    return getItem().getItem() != ModItems.TAKEN_REWARD.get();
   }
 
   @Override

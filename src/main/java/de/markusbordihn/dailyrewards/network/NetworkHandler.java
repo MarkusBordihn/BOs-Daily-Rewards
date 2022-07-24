@@ -20,18 +20,19 @@
 package de.markusbordihn.dailyrewards.network;
 
 import java.util.UUID;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.data.RewardData;
@@ -75,8 +76,8 @@ public class NetworkHandler {
   }
 
   /** Send general rewards for current month to player. */
-  public static void syncGeneralRewardForCurrentMonth(ServerPlayer serverPlayer) {
-    CompoundTag data = RewardData.get().getRewardsForCurrentMonthSyncData();
+  public static void syncGeneralRewardForCurrentMonth(ServerPlayerEntity serverPlayer) {
+    CompoundNBT data = RewardData.get().getRewardsForCurrentMonthSyncData();
     if (serverPlayer != null && serverPlayer.getUUID() != null && data != null && !data.isEmpty()) {
       log.debug("Sending general reward for current month to {}: {}", serverPlayer, data);
       INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
@@ -85,12 +86,12 @@ public class NetworkHandler {
   }
 
   /** Send user rewards for current month to player. */
-  public static void syncUserRewardForCurrentMonth(ServerPlayer serverPlayer) {
+  public static void syncUserRewardForCurrentMonth(ServerPlayerEntity serverPlayer) {
     if (serverPlayer == null || serverPlayer.getUUID() == null) {
       return;
     }
     UUID uuid = serverPlayer.getUUID();
-    CompoundTag data = RewardUserData.get().getRewardsForCurrentMonthSyncData(uuid);
+    CompoundNBT data = RewardUserData.get().getRewardsForCurrentMonthSyncData(uuid);
     int rewardedDays = RewardUserData.get().getRewardedDaysForCurrentMonth(uuid);
     if (data != null && !data.isEmpty()) {
       log.debug("Sending user reward for current month to {}: {}", serverPlayer, data);

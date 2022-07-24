@@ -22,16 +22,15 @@ package de.markusbordihn.dailyrewards.client.screen;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.item.ModItems;
@@ -40,30 +39,30 @@ import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.TakeableRewardSlot;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 
-public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
+public class RewardScreen extends ContainerScreen<RewardMenu> {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
   private ResourceLocation texture =
       new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen.png");
 
-  private TranslatableComponent rewardScreenTitle;
+  private TranslationTextComponent rewardScreenTitle;
 
   public RewardScreen(RewardMenu menu, Inventory inventory, Component component) {
     super(menu, inventory, component);
   }
 
-  public void rendererTakeableRewardSlot(PoseStack poseStack, int x, int y) {
+  public void rendererTakeableRewardSlot(MatrixStack poseStack, int x, int y) {
     RenderSystem.setShaderTexture(0, this.texture);
     poseStack.pushPose();
     this.blit(poseStack, x + 11, y - 4, 430, 17, 16, 16);
     poseStack.popPose();
   }
 
-  public void renderRewardSlot(PoseStack poseStack, int x, int y, int blitOffset) {
+  public void renderRewardSlot(MatrixStack poseStack, int x, int y, int blitOffset) {
     RenderSystem.disableDepthTest();
     RenderSystem.colorMask(true, true, true, false);
-    fillGradient(poseStack, x, y, x + 16, y + 16, -2130706433, 0, blitOffset);
+    this.fillGradient(poseStack, x, y, x + 16, y + 16, -2130706433, 0);
     RenderSystem.colorMask(true, true, true, true);
     RenderSystem.enableDepthTest();
   }
@@ -79,7 +78,7 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
     // Set Title with already rewarded days.
     int rewardedDays = this.menu.getRewardedDays();
     rewardScreenTitle =
-        new TranslatableComponent(Constants.TEXT_PREFIX + "reward_screen", rewardedDays);
+        new TranslationTextComponent(Constants.TEXT_PREFIX + "reward_screen", rewardedDays);
 
     // Set background according the number or days for the current month.
     switch (Rewards.getDaysCurrentMonth()) {
@@ -111,7 +110,7 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
   }
 
   @Override
-  public void render(PoseStack poseStack, int x, int y, float partialTicks) {
+  public void render(MatrixStack poseStack, int x, int y, float partialTicks) {
     this.renderBackground(poseStack);
     super.render(poseStack, x, y, partialTicks);
 
@@ -129,16 +128,16 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
   }
 
   @Override
-  protected void renderLabels(PoseStack poseStack, int x, int y) {
+  protected void renderLabels(MatrixStack poseStack, int x, int y) {
     this.font.draw(poseStack, rewardScreenTitle, this.titleLabelX, this.titleLabelY, 4210752);
     this.font.draw(poseStack, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY,
         4210752);
   }
 
   @Override
-  protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
+  protected void renderBg(MatrixStack poseStack, float partialTicks, int mouseX, int mouseY) {
     RenderSystem.setShader(GameRenderer::getPositionTexShader);
-    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
     RenderSystem.setShaderTexture(0, this.texture);
 
     // Main screen

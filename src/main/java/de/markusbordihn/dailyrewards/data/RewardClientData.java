@@ -29,10 +29,9 @@ import com.google.gson.JsonSyntaxException;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.TagParser;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 
 import de.markusbordihn.dailyrewards.Constants;
 
@@ -65,7 +64,7 @@ public class RewardClientData {
   }
 
   public static void setGeneralRewardsForCurrentMonth(String data) {
-    CompoundTag compoundTag;
+    CompoundNBT compoundTag;
     try {
       compoundTag = TagParser.parseTag(data);
     } catch (CommandSyntaxException commandSyntaxException) {
@@ -76,12 +75,12 @@ public class RewardClientData {
     }
   }
 
-  public static void setGeneralRewardsForCurrentMonth(CompoundTag compoundTag) {
+  public static void setGeneralRewardsForCurrentMonth(CompoundNBT compoundTag) {
     if (compoundTag.contains(RewardData.ITEM_LIST_TAG)) {
-      ListTag itemListTag = compoundTag.getList(RewardData.ITEM_LIST_TAG, 10);
+      ListNBT itemListNBT = compoundTag.getList(RewardData.ITEM_LIST_TAG, 10);
       generalRewardItems = new ArrayList<>();
-      for (int i = 0; i < itemListTag.size(); ++i) {
-        generalRewardItems.add(ItemStack.of(itemListTag.getCompound(i)));
+      for (int i = 0; i < itemListNBT.size(); ++i) {
+        generalRewardItems.add(ItemStack.of(itemListNBT.getCompound(i)));
       }
     } else {
       log.error("Unable to load general rewards for current month data from {}!", compoundTag);
@@ -97,7 +96,7 @@ public class RewardClientData {
   }
 
   public static void setUserRewardsForCurrentMonth(String data) {
-    CompoundTag compoundTag;
+    CompoundNBT compoundTag;
     try {
       compoundTag = TagParser.parseTag(data);
     } catch (CommandSyntaxException commandSyntaxException) {
@@ -108,12 +107,12 @@ public class RewardClientData {
     }
   }
 
-  public static void setUserRewardsForCurrentMonth(CompoundTag compoundTag) {
+  public static void setUserRewardsForCurrentMonth(CompoundNBT compoundTag) {
     if (compoundTag.contains(RewardData.ITEM_LIST_TAG)) {
-      ListTag itemListTag = compoundTag.getList(RewardData.ITEM_LIST_TAG, 10);
+      ListNBT itemListNBT = compoundTag.getList(RewardData.ITEM_LIST_TAG, 10);
       userRewardItems = new ArrayList<>();
-      for (int i = 0; i < itemListTag.size(); ++i) {
-        userRewardItems.add(ItemStack.of(itemListTag.getCompound(i)));
+      for (int i = 0; i < itemListNBT.size(); ++i) {
+        userRewardItems.add(ItemStack.of(itemListNBT.getCompound(i)));
       }
     } else {
       log.error("Unable to load user rewards for current month data from {}!", compoundTag);

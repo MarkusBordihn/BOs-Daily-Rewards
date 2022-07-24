@@ -19,13 +19,14 @@
 
 package de.markusbordihn.dailyrewards.menu;
 
-import de.markusbordihn.dailyrewards.Constants;
-import net.minecraft.world.inventory.MenuType;
+import net.minecraft.inventory.container.ContainerType;
 
-import net.minecraftforge.common.extensions.IForgeMenuType;
+import net.minecraftforge.common.extensions.IForgeContainerType;
+import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+
+import de.markusbordihn.dailyrewards.Constants;
 
 public class ModMenuTypes {
 
@@ -33,10 +34,10 @@ public class ModMenuTypes {
 
   }
 
-  public static final DeferredRegister<MenuType<?>> MENU_TYPES =
+  public static final DeferredRegister<ContainerType<?>> MENU_TYPES =
       DeferredRegister.create(ForgeRegistries.CONTAINERS, Constants.MOD_ID);
 
-  public static final RegistryObject<MenuType<RewardMenu>> REWARD_MENU =
-      MENU_TYPES.register("reward_menu", () -> IForgeMenuType.create(RewardMenu::new));
+  public static final RegistryObject<ContainerType<RewardMenu>> REWARD_MENU =
+      MENU_TYPES.register("reward_menu", () -> IForgeContainerType.create(RewardMenu::new));
 
 }

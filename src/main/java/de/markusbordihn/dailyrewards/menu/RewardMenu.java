@@ -25,16 +25,12 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.data.RewardClientData;
@@ -43,7 +39,7 @@ import de.markusbordihn.dailyrewards.data.RewardUserData;
 import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.TakeableRewardSlot;
 
-public class RewardMenu extends AbstractContainerMenu {
+public class RewardMenu extends Container {
 
   public static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
@@ -67,8 +63,8 @@ public class RewardMenu extends AbstractContainerMenu {
   private int rewardedDays = 0;
 
   // Misc
-  protected final Level level;
-  protected final Player player;
+  protected final World level;
+  protected final PlayerEntity player;
 
   public RewardMenu(final int windowId, final Inventory playerInventory) {
     this(windowId, playerInventory, ModMenuTypes.REWARD_MENU.get());
@@ -148,7 +144,7 @@ public class RewardMenu extends AbstractContainerMenu {
     }
   }
 
-  public void syncRewardsUserContainer(Player player) {
+  public void syncRewardsUserContainer(PlayerEntity player) {
     List<ItemStack> userRewards = new ArrayList<>();
     for (int index = 0; index < this.rewardsUserContainer.getContainerSize(); index++) {
       ItemStack itemStack = this.rewardsUserContainer.getItem(index);
@@ -168,7 +164,7 @@ public class RewardMenu extends AbstractContainerMenu {
   }
 
   @Override
-  public ItemStack quickMoveStack(Player player, int slotIndex) {
+  public ItemStack quickMoveStack(PlayerEntity player, int slotIndex) {
     Slot slot = this.slots.get(slotIndex);
     if (!slot.hasItem()) {
       return ItemStack.EMPTY;
@@ -187,7 +183,7 @@ public class RewardMenu extends AbstractContainerMenu {
   }
 
   @Override
-  public boolean stillValid(Player player) {
+  public boolean stillValid(PlayerEntity player) {
     return true;
   }
 
