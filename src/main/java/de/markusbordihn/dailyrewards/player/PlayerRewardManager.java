@@ -60,8 +60,8 @@ public class PlayerRewardManager {
 
   private static final short REWARD_CHECK_TICK = 20 * 60; // every 1 Minute
   private static final MutableComponent claimCommand = new TextComponent("/DailyRewards claim")
-        .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(
-            ClickEvent.Action.SUGGEST_COMMAND, "/DailyRewards claim")));
+      .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(
+          new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/DailyRewards claim")));
 
   private static short ticker = 0;
   private static Set<ServerPlayer> playerList = ConcurrentHashMap.newKeySet();
@@ -98,13 +98,17 @@ public class PlayerRewardManager {
   @SubscribeEvent
   public static void handlePlayerLoggedOutEvent(PlayerEvent.PlayerLoggedOutEvent event) {
     String username = event.getPlayer().getName().getString();
-    if (username.isEmpty()) {
+    if (username.isEmpty() || playerList.isEmpty()) {
       return;
     }
     ServerPlayer player =
         ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayerByName(username);
-    log.debug("{} Player {} {} logged out.", Constants.LOG_NAME, username, player);
-    playerList.remove(player);
+    if (player != null) {
+      log.debug("{} Player {} {} logged out.", Constants.LOG_NAME, username, player);
+      playerList.remove(player);
+    } else {
+      log.debug("{} Player {} timed out.", Constants.LOG_NAME, username);
+    }
   }
 
   @SubscribeEvent
@@ -113,6 +117,7 @@ public class PlayerRewardManager {
         || playerList.isEmpty()) {
       return;
     }
+
     for (ServerPlayer player : playerList) {
       if (player.tickCount > rewardTimePerDayTicks) {
         UUID uuid = player.getUUID();
@@ -130,8 +135,8 @@ public class PlayerRewardManager {
             rewardUserData.addRewardForCurrentMonth(rewardedDays, uuid, itemStack);
             player.sendMessage(new TranslatableComponent(Constants.TEXT_PREFIX + "rewarded_item",
                 player.getName(), itemStack, rewardedDays), Util.NIL_UUID);
-            player.sendMessage(new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards",
-                claimCommand),
+            player.sendMessage(
+                new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
                 Util.NIL_UUID);
             NetworkHandler.syncUserRewardForCurrentMonth(player);
           }
@@ -141,6 +146,7 @@ public class PlayerRewardManager {
         }
       }
     }
+
     ticker = 0;
   }
 
