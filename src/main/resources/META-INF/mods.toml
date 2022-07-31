@@ -18,28 +18,27 @@ license="MIT"
 
 # A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]] #mandatory
-    modId="daily_rewards"
-    version="${file.jarVersion}"
-    displayName="Daily Rewards"
-    # A URL to query for updates for this mod. See the JSON update specification https://mcforge.readthedocs.io/en/latest/gettingstarted/autoupdate/
-    #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
-    # A URL for the "homepage" for this mod, displayed in the mod UI
-    displayURL="https://www.curseforge.com/minecraft/mc-mods/daily-rewards"
-    logoFile="logo.png"
-    credits=""
-    authors="Markus Bordihn"
-    description='''Daily rewards is a very lightweight and simple Forge mod that rewards players daily.'''
-
-[[dependencies.daily_rewards]] #optional
-    modId="forge" #mandatory
-    mandatory=true #mandatory
-    versionRange="[41.0.96,)" #mandatory
-    ordering="NONE"
-    side="BOTH"
+  modId="daily_rewards"
+  version="${file.jarVersion}"
+  displayName="Daily Rewards"
+  # A URL to query for updates for this mod. See the JSON update specification https://mcforge.readthedocs.io/en/latest/gettingstarted/autoupdate/
+  #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
+  displayURL="https://www.curseforge.com/minecraft/mc-mods/daily-rewards"
+  logoFile="logo.png"
+  credits=""
+  authors="Markus Bordihn"
+  description='''Daily rewards is a very lightweight and simple Forge mod that rewards players daily.'''
 
 [[dependencies.daily_rewards]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="[1.19,1.20)"
-    ordering="NONE"
-    side="BOTH"
+  modId="forge"
+  mandatory=true
+  versionRange="[41.0.96,)"
+  ordering="NONE"
+  side="BOTH"
+
+[[dependencies.daily_rewards]]
+  modId="minecraft"
+  mandatory=true
+  versionRange="[1.19,1.20)"
+  ordering="NONE"
+  side="BOTH"
