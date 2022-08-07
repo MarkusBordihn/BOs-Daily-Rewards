@@ -25,18 +25,18 @@ import org.apache.logging.log4j.Logger;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.command.CommandSource;
+import net.minecraft.util.text.StringTextComponent;
 
 import de.markusbordihn.dailyrewards.Constants;
 
-public abstract class CustomCommand implements Command<CommandSourceStack> {
+public abstract class CustomCommand implements Command<CommandSource> {
   protected CustomCommand() {}
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  public static void sendFeedback(CommandContext<CommandSourceStack> context, String feedback) {
-    CommandSourceStack commandSource = context.getSource();
-    commandSource.sendSuccess(new TextComponent(feedback), false);
+  public static void sendFeedback(CommandContext<CommandSource> context, String feedback) {
+    CommandSource commandSource = context.getSource();
+    commandSource.sendSuccess(new StringTextComponent(feedback), false);
   }
 }

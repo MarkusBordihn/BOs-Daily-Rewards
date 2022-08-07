@@ -29,8 +29,10 @@ import org.apache.logging.log4j.Logger;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Util;
+import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 
@@ -57,8 +59,8 @@ public class PlayerRewardManager {
   private static int rewardTimePerDayTicks = rewardTimePerDay * 60 * 20;
 
   private static final short REWARD_CHECK_TICK = 20 * 60; // every 1 Minute
-  private static final TextComponent claimCommand = new TextComponent("/DailyRewards claim")
-        .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(
+  private static final IFormattableTextComponent claimCommand = new StringTextComponent("/DailyRewards claim")
+        .setStyle(Style.EMPTY.withColor(TextFormatting.GREEN).withClickEvent(new ClickEvent(
             ClickEvent.Action.SUGGEST_COMMAND, "/DailyRewards claim")));
 
   private static short ticker = 0;
@@ -102,6 +104,9 @@ public class PlayerRewardManager {
     ServerPlayerEntity player =
         ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayerByName(username);
     log.debug("{} Player {} {} logged out.", Constants.LOG_NAME, username, player);
+
+    // Make sure changes are store to disk.
+    RewardUserData.get().setDirty();
     playerList.remove(player);
   }
 

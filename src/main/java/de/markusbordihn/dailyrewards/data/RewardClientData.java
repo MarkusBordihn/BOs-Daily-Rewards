@@ -31,6 +31,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.ListNBT;
 
 import de.markusbordihn.dailyrewards.Constants;
@@ -66,7 +67,7 @@ public class RewardClientData {
   public static void setGeneralRewardsForCurrentMonth(String data) {
     CompoundNBT compoundTag;
     try {
-      compoundTag = TagParser.parseTag(data);
+      compoundTag = JsonToNBT.parseTag(data);
     } catch (CommandSyntaxException commandSyntaxException) {
       throw new JsonSyntaxException("Invalid nbt tag: " + commandSyntaxException.getMessage());
     }
@@ -98,7 +99,7 @@ public class RewardClientData {
   public static void setUserRewardsForCurrentMonth(String data) {
     CompoundNBT compoundTag;
     try {
-      compoundTag = TagParser.parseTag(data);
+      compoundTag = JsonToNBT.parseTag(data);
     } catch (CommandSyntaxException commandSyntaxException) {
       throw new JsonSyntaxException("Invalid nbt tag: " + commandSyntaxException.getMessage());
     }

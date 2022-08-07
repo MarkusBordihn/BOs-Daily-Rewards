@@ -59,7 +59,7 @@ public class StopModReposts {
     try {
       jarFilePath =
           DailyRewards.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-    } catch (URISyntaxException exception) {
+    } catch (SecurityException | URISyntaxException | NullPointerException exception) {
       log.error("Unable to get jar file path: {}", exception);
     }
     if (jarFilePath == null || jarFilePath.isEmpty()) {

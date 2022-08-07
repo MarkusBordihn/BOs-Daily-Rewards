@@ -25,39 +25,39 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
-import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 import de.markusbordihn.dailyrewards.menu.RewardMenu;
 
 public class ClaimCommand extends CustomCommand {
   private static final ClaimCommand command = new ClaimCommand();
 
-  public static ArgumentBuilder<CommandSourceStack, ?> register() {
+  public static ArgumentBuilder<CommandSource, ?> register() {
     return Commands.literal("claim").requires(cs -> cs.hasPermission(0)).executes(command);
   }
 
   @Override
-  public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+  public int run(CommandContext<CommandSource> context) throws CommandSyntaxException {
     ServerPlayerEntity player = context.getSource().getPlayerOrException();
-    MenuProvider provider = new MenuProvider() {
+    INamedContainerProvider provider = new INamedContainerProvider() {
       @Override
-      public Component getDisplayName() {
-        return new TextComponent("Rewards");
+      public ITextComponent getDisplayName() {
+        return new StringTextComponent("Rewards");
       }
 
       @Nullable
       @Override
-      public AbstractContainerMenu createMenu(int windowId, Inventory inventory, Player player) {
+      public Container createMenu(int windowId, PlayerInventory inventory, PlayerEntity player) {
         return new RewardMenu(windowId, inventory);
       }
     };

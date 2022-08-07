@@ -3,7 +3,7 @@
 [![Daily Rewards Downloads](http://cf.way2muchnoise.eu/full_628798_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/daily-rewards)
 [![Daily Rewards Versions](http://cf.way2muchnoise.eu/versions/Minecraft_628798_all.svg)](https://www.curseforge.com/minecraft/mc-mods/daily-rewards)
 
-**Note: This version is unfinished and will not run!**
+**Note: This version will only receive maintenance updates!**
 
 Daily rewards is a very lightweight and simple Forge mod that rewards players daily.
 
@@ -50,6 +50,19 @@ Data structure:
   - Rewards 1-31 (takeable) [ItemStack ...]
   - Last rewarded day (String)
   - Number of rewarded days (int)
+
+## Version Status Overview 🛠️
+
+| Version        | Status                |
+| -------------- | --------------------- |
+| Fabric Version | ❌ Not planned        |
+| Forge 1.16.5   | ⚠️ Maintenance only   |
+| Forge 1.17.1   | ❌ Not planned        |
+| Forge 1.18.1   | ⚠️ Deprecated         |
+| Forge 1.18.2   | ⚠️ Maintenance only   |
+| Forge 1.19     | ⚠️ Deprecated         |
+| Forge 1.19.1   | ⚠️ Deprecated         |
+| Forge 1.19.2   | ✔️ Active development |
 
 ## Note
 

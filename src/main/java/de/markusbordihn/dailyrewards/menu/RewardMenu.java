@@ -26,10 +26,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
 
 import de.markusbordihn.dailyrewards.Constants;
@@ -56,8 +59,8 @@ public class RewardMenu extends Container {
   private static int rewardSlotSizeY = 28;
 
   // Container
-  private Container rewardsContainer = new SimpleContainer(containerSize);
-  private Container rewardsUserContainer = new SimpleContainer(containerSize);
+  private Inventory rewardsContainer = new Inventory(containerSize);
+  private Inventory rewardsUserContainer = new Inventory(containerSize);
 
   // Meta data
   private int rewardedDays = 0;
@@ -66,28 +69,28 @@ public class RewardMenu extends Container {
   protected final World level;
   protected final PlayerEntity player;
 
-  public RewardMenu(final int windowId, final Inventory playerInventory) {
+  public RewardMenu(final int windowId, final PlayerInventory playerInventory) {
     this(windowId, playerInventory, ModMenuTypes.REWARD_MENU.get());
   }
 
-  public RewardMenu(int windowId, Inventory playerInventory, FriendlyByteBuf data) {
+  public RewardMenu(int windowId, PlayerInventory playerInventory, PacketBuffer data) {
     this(windowId, playerInventory);
   }
 
-  public RewardMenu(final int windowId, final Inventory playerInventory, MenuType<?> menuType) {
+  public RewardMenu(final int windowId, final PlayerInventory playerInventory, ContainerType<?> menuType) {
     super(menuType, windowId);
 
-    // Other
+    // Others
     this.player = playerInventory.player;
-    this.level = this.player.getLevel();
+    this.level = this.player.level;
 
     // Sync rewarded days
-    this.rewardedDays = level.isClientSide ? RewardClientData.getRewardedDaysForCurrentMonth()
-        : RewardUserData.get().getRewardedDaysForCurrentMonth(player.getUUID());
+    this.rewardedDays = this.level.isClientSide ? RewardClientData.getRewardedDaysForCurrentMonth()
+        : RewardUserData.get().getRewardedDaysForCurrentMonth(this.player.getUUID());
 
     // Sync possible rewards items for current month
     List<ItemStack> rewardsForCurrentMonth =
-        level.isClientSide ? RewardClientData.getGeneralRewardsForCurrentMonth()
+        this.level.isClientSide ? RewardClientData.getGeneralRewardsForCurrentMonth()
             : RewardData.get().getRewardsForCurrentMonth();
     if (!rewardsForCurrentMonth.isEmpty()) {
       for (int index = 0; index < rewardsForCurrentMonth.size(); index++) {

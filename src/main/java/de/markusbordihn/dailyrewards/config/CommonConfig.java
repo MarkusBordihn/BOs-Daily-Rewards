@@ -95,8 +95,8 @@ public class CommonConfig {
 
       rareFillItems = builder.comment(
           "List of rare fill items which are used in the case we have not enough valid items for a month.")
-          .define("rareFillItems", new ArrayList<String>(
-              Arrays.asList("minecraft:diamond", "minecraft:quartz:3", "minecraft:spyglass")));
+          .define("rareFillItems", new ArrayList<String>(Arrays.asList("minecraft:diamond",
+              "minecraft:quartz:3", "minecraft:compass", "minecraft:fishing_rod")));
       builder.pop();
 
       builder.push("Rewards Items");
@@ -133,8 +133,9 @@ public class CommonConfig {
       rewardsNovemberItems = builder.comment("List of rewards items for November.")
           .define("rewardsNovemberItems", new ArrayList<String>(Arrays.asList()));
 
-      rewardsDecemberItems = builder.comment("List of rewards items for December.")
-          .define("rewardsDecemberItems", new ArrayList<String>(Arrays.asList()));
+      rewardsDecemberItems =
+          builder.comment("List of rewards items for December.").define("rewardsDecemberItems",
+              new ArrayList<String>(Arrays.asList("minecraft:firework_rocket:16")));
 
       builder.pop();
     }

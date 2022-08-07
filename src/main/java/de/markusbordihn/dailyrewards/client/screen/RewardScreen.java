@@ -26,10 +26,10 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 import de.markusbordihn.dailyrewards.Constants;
@@ -48,12 +48,12 @@ public class RewardScreen extends ContainerScreen<RewardMenu> {
 
   private TranslationTextComponent rewardScreenTitle;
 
-  public RewardScreen(RewardMenu menu, Inventory inventory, Component component) {
+  public RewardScreen(RewardMenu menu, PlayerInventory inventory, ITextComponent component) {
     super(menu, inventory, component);
   }
 
   public void rendererTakeableRewardSlot(MatrixStack poseStack, int x, int y) {
-    RenderSystem.setShaderTexture(0, this.texture);
+    this.minecraft.getTextureManager().bind(this.texture);
     poseStack.pushPose();
     this.blit(poseStack, x + 11, y - 4, 430, 17, 16, 16);
     poseStack.popPose();
@@ -117,7 +117,8 @@ public class RewardScreen extends ContainerScreen<RewardMenu> {
     // Additional styling for the different kind of slots and slot states.
     for (int k = 0; k < this.menu.slots.size(); ++k) {
       Slot slot = this.menu.slots.get(k);
-      if (slot instanceof TakeableRewardSlot && !slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
+      if (slot instanceof TakeableRewardSlot
+          && !slot.getItem().getItem().equals(ModItems.TAKEN_REWARD.get())) {
         rendererTakeableRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
       } else if (slot instanceof RewardSlot) {
         renderRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y, this.getBlitOffset());
@@ -129,16 +130,14 @@ public class RewardScreen extends ContainerScreen<RewardMenu> {
 
   @Override
   protected void renderLabels(MatrixStack poseStack, int x, int y) {
-    this.font.draw(poseStack, rewardScreenTitle, this.titleLabelX, this.titleLabelY, 4210752);
-    this.font.draw(poseStack, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY,
-        4210752);
+    this.font.draw(poseStack, this.rewardScreenTitle, this.titleLabelX, this.titleLabelY, 4210752);
+    this.font.draw(poseStack, this.title, this.inventoryLabelX, this.inventoryLabelY, 4210752);
   }
 
   @Override
   protected void renderBg(MatrixStack poseStack, float partialTicks, int mouseX, int mouseY) {
-    RenderSystem.setShader(GameRenderer::getPositionTexShader);
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-    RenderSystem.setShaderTexture(0, this.texture);
+    this.minecraft.getTextureManager().bind(this.texture);
 
     // Main screen
     this.blit(poseStack, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);

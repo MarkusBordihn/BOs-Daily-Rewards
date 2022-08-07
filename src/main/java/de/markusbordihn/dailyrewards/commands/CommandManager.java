@@ -24,14 +24,15 @@ import org.apache.logging.log4j.Logger;
 
 import com.mojang.brigadier.CommandDispatcher;
 
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
 import net.minecraft.server.MinecraftServer;
 
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
+
 import de.markusbordihn.dailyrewards.Constants;
 
 @EventBusSubscriber
@@ -44,7 +45,7 @@ public class CommandManager {
   @SubscribeEvent
   public static void handleRegisterCommandsEvent(RegisterCommandsEvent event) {
     log.info("Registering {} commands ...", Constants.MOD_COMMAND);
-    CommandDispatcher<CommandSourceStack> commandDispatcher = event.getDispatcher();
+    CommandDispatcher<CommandSource> commandDispatcher = event.getDispatcher();
     commandDispatcher.register(Commands.literal(Constants.MOD_COMMAND)
     // @formatter:off
         .then(ClaimCommand.register())
@@ -59,7 +60,7 @@ public class CommandManager {
     }
     log.debug("Execute Server Command: {}", command);
     Commands commands = minecraftServer.getCommands();
-    CommandSourceStack commandSourceStack =
+    CommandSource commandSourceStack =
         minecraftServer.createCommandSourceStack().withSuppressedOutput();
     commands.performCommand(commandSourceStack, command);
   }
@@ -71,7 +72,7 @@ public class CommandManager {
     }
     log.debug("Execute User Command: {}", command);
     Commands commands = minecraftServer.getCommands();
-    CommandSourceStack commandSourceStack = minecraftServer.createCommandSourceStack();
+    CommandSource commandSourceStack = minecraftServer.createCommandSourceStack();
     commands.performCommand(commandSourceStack, command);
   }
 }
