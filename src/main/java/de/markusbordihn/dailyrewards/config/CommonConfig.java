@@ -62,6 +62,9 @@ public class CommonConfig {
 
     public final ForgeConfigSpec.ConfigValue<List<String>> normalFillItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> rareFillItems;
+    public final ForgeConfigSpec.IntValue rareFillItemsChance;
+    public final ForgeConfigSpec.ConfigValue<List<String>> lootBagFillItems;
+    public final ForgeConfigSpec.IntValue lootBagFillItemsChance;
 
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJanuaryItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsFebruaryItems;
@@ -97,6 +100,16 @@ public class CommonConfig {
           "List of rare fill items which are used in the case we have not enough valid items for a month.")
           .define("rareFillItems", new ArrayList<String>(Arrays.asList("minecraft:diamond",
               "minecraft:quartz:3", "minecraft:compass", "minecraft:fishing_rod")));
+      rareFillItemsChance = builder.comment(
+          "The chance to use a rare item instead of a regular one. e.g. 7 means every 7th items could be a rare item. (0 = disabled)")
+          .defineInRange("rareFillItemsChance", 7, 0, 100);
+
+      lootBagFillItems = builder.comment(
+          "List of loot bag fill items which are used in the case we have not enough valid items for a month.")
+          .define("lootBagFillItems", new ArrayList<String>(Arrays.asList("lootbagmod:lootbag")));
+      lootBagFillItemsChance = builder.comment(
+          "The chance to use a loot bag item instead of a regular one. e.g. 15 means every 15th items could be a loot bag item. (0 = disabled)")
+          .defineInRange("lootBagFillItemsChance", 15, 0, 100);
       builder.pop();
 
       builder.push("Rewards Items");
@@ -135,7 +148,7 @@ public class CommonConfig {
 
       rewardsDecemberItems =
           builder.comment("List of rewards items for December.").define("rewardsDecemberItems",
-              new ArrayList<String>(Arrays.asList("minecraft:firework_rocket:16")));
+              new ArrayList<String>(Arrays.asList("minecraft:firework_rocket:32")));
 
       builder.pop();
     }

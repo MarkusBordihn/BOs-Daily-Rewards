@@ -64,9 +64,9 @@ public class Rewards {
   }
 
   public static List<ItemStack> calculateRewardItemsForMonth(int month) {
-    log.info("Calculate Reward items for month {} ...", month);
     YearMonth yearMonth = YearMonth.of(getCurrentYear(), month);
     int numberOfDays = yearMonth.lengthOfMonth();
+    log.info("Calculate Reward items for month {} with {} days ...", month, numberOfDays);
     List<ItemStack> rewardItemsForMonth = getRewardItemForMonth(month);
 
     // Early return if we have matching items without shuffle.
@@ -79,18 +79,35 @@ public class Rewards {
     int numMissingRewardItems = numberOfDays - numRewardItems;
     List<ItemStack> normalFillItems = getNormalFillItems();
     List<ItemStack> rareFillItems = getRareFillItems();
+    List<ItemStack> lootBagFillItems = getLootBagFillItems();
     Set<ItemStack> rareDuplicates = new HashSet<>();
+    Set<ItemStack> lootBagDuplicates = new HashSet<>();
+
+    // Chances for different items types
+    int rareFillItemsChance = rareFillItems.isEmpty() ? 0 : COMMON.rareFillItemsChance.get();
+    int lootBackFillItemChance =
+        lootBagFillItems.isEmpty() ? 0 : COMMON.lootBagFillItemsChance.get();
 
     for (int i = 0; i < numMissingRewardItems; i++) {
       ItemStack fillItem = null;
 
-      // There is a 1:7 change to get an rare item instead of an normal item.
-      if (random.nextInt(7) == 0) {
+      // There is a 1:x (1:7) chance to get an rare item instead of an normal item.
+      if (rareFillItemsChance > 0 && random.nextInt(rareFillItemsChance) == 0) {
         ItemStack rareFillItem = rareFillItems.get(random.nextInt(rareFillItems.size()));
         // Make sure we avoid duplicates of rare fill items.
         if (!rareDuplicates.contains(rareFillItem)) {
           fillItem = rareFillItem;
           rareDuplicates.add(rareFillItem);
+        }
+      }
+
+      // There is a 1:x (1:15) chance to get an loot bag item instead of an normal item.
+      else if (lootBackFillItemChance > 0 && random.nextInt(lootBackFillItemChance) == 0) {
+        ItemStack lootBagFillItem = lootBagFillItems.get(random.nextInt(lootBagFillItems.size()));
+        // Make sure we avoid duplicates of lootBag fill items.
+        if (!lootBagDuplicates.contains(lootBagFillItem)) {
+          fillItem = lootBagFillItem;
+          lootBagDuplicates.add(lootBagFillItem);
         }
       }
 
@@ -156,6 +173,15 @@ public class Rewards {
     return rareFillItems.get(random.nextInt(rareFillItems.size()));
   }
 
+  public static List<ItemStack> getLootBagFillItems() {
+    return parseConfigItems(COMMON.lootBagFillItems.get());
+  }
+
+  public static ItemStack getLootBagFillItem() {
+    List<ItemStack> lootBagFillItems = getRareFillItems();
+    return lootBagFillItems.get(random.nextInt(lootBagFillItems.size()));
+  }
+
   public static int getCurrentDay() {
     return LocalDate.now().getDayOfMonth();
   }
@@ -190,7 +216,7 @@ public class Rewards {
       }
       Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName));
       if (item == null || item == Items.AIR) {
-        log.error("Unable to find reward item {} in the registry!", itemName);
+        log.warn("Unable to find reward item {} in the registry!", itemName);
       } else {
         ItemStack itemStack = new ItemStack(item);
         itemStack.setCount(itemCount);

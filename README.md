@@ -15,7 +15,7 @@ Daily rewards is a very lightweight and simple Forge mod that rewards players da
 - Easy Customization over configuration file
 - Extra UI to collect rewarded items and to see upcoming rewards
 - Grant daily rewards after some minutes online and not immediately
-- Supports mod items
+- Supports mod items and loot bags
 
 ## Beta Note
 

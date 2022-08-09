@@ -128,6 +128,8 @@ dependencies {
   // The userdev artifact is a special name and will get all sorts of transformations applied to it.
   minecraft 'net.minecraftforge:forge:1.16.5-36.2.39'
 
+  // Compability Tests
+  runtimeOnly fg.deobf("curse.maven:loot-bag-mod-356236:3509228")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
