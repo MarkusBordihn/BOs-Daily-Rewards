@@ -99,6 +99,11 @@ public class RewardData extends SavedData {
     return rewardItemsMap.computeIfAbsent(key, id -> Rewards.calculateRewardItemsForMonth(month));
   }
 
+  public List<ItemStack> getRewardsForMonth(int month) {
+    String key = getKeyId(Rewards.getCurrentYear(), month);
+    return rewardItemsMap.computeIfAbsent(key, id -> Rewards.calculateRewardItemsForMonth(month));
+  }
+
   public List<ItemStack> getRewardsForCurrentMonth() {
     return getRewardsFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth());
   }

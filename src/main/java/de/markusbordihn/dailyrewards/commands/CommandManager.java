@@ -49,6 +49,7 @@ public class CommandManager {
     commandDispatcher.register(Commands.literal(Constants.MOD_COMMAND)
     // @formatter:off
         .then(ClaimCommand.register())
+        .then(PreviewCommand.register())
       // @formatter:on
     );
   }
