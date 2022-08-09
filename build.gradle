@@ -123,11 +123,14 @@ dependencies {
   // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
   // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
   // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-  minecraft 'net.minecraftforge:forge:1.19.2-43.0.0'
+  minecraft 'net.minecraftforge:forge:1.19.2-43.0.2'
 
   // Additional helpful Mods for development (dev depenedency)
   // runtimeOnly fg.deobf("curse.maven:jei-238222:3835406")
   // runtimeOnly fg.deobf("curse.maven:jade-324717:3834997")
+
+  // Compability Tests
+  // runtimeOnly fg.deobf("curse.maven:loot-bag-mod-356236:3699372")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
