@@ -149,6 +149,7 @@ public class CommonConfig {
       rewardsDecemberItems =
           builder.comment("List of rewards items for December.").define("rewardsDecemberItems",
               new ArrayList<String>(Arrays.asList("minecraft:firework_rocket:32")));
+      builder.pop();
     }
   }
 

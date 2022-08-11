@@ -202,6 +202,10 @@ public class Rewards {
     return yearMonth.lengthOfMonth();
   }
 
+  public static int getDaysLeftCurrentMonth() {
+    return getDaysCurrentMonth() - getCurrentDay();
+  }
+
   public static List<ItemStack> parseConfigItems(List<String> configItems) {
     List<ItemStack> items = new ArrayList<>();
 
