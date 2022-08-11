@@ -46,6 +46,7 @@ import de.markusbordihn.dailyrewards.config.CommonConfig;
 import de.markusbordihn.dailyrewards.data.RewardData;
 import de.markusbordihn.dailyrewards.data.RewardUserData;
 import de.markusbordihn.dailyrewards.network.NetworkHandler;
+import de.markusbordihn.dailyrewards.rewards.Rewards;
 
 @EventBusSubscriber
 public class PlayerRewardManager {
@@ -89,6 +90,15 @@ public class PlayerRewardManager {
     NetworkHandler.syncGeneralRewardForCurrentMonth(player);
     NetworkHandler.syncUserRewardForCurrentMonth(player);
     playerList.add(player);
+
+    // Check if player has any unclaimed rewards
+    if (RewardUserData.get().hasUnclaimedRewardsForCurrentMonth(player.getUUID())) {
+      player.sendSystemMessage(
+          Component.translatable(Constants.TEXT_PREFIX + "unclaimed_rewarded_item",
+              player.getName(), Rewards.getDaysLeftCurrentMonth()));
+      player.sendSystemMessage(
+          Component.translatable(Constants.TEXT_PREFIX + "claim_rewards", claimCommand));
+    }
   }
 
   @SubscribeEvent
