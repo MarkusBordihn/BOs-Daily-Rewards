@@ -17,13 +17,30 @@ Daily rewards is a very lightweight and simple Forge mod that rewards players da
 - Grant daily rewards after some minutes online and not immediately
 - Supports mod items and loot bags
 
-## Beta Note
-
-This version is currently in beta and is used for testing.
-
 ## Report Issues
 
 Please report issues over the issue link above.
+
+## Daily Rewards Configuration
+
+All rewards could be customized over the configuration file under `config/daily_rewards_common.toml`.
+
+### Preview reward data
+
+You can preview the configured rewards for each month based on the configuration over the `/DailyRewards preview ...` command.
+Example: `DailyRewards preview April`
+
+Please keep in mind that the preview could be different from the actually result if you haven't define a reward for each single day.
+
+### Reset reward data
+
+If you want to reset the rewards for the current month, the easiest way is to delete the reward data files inside your world folder under:
+
+- `data/daily_rewards_user.dat`
+- `data/daily_rewards.dat`
+
+Alternative you could use an NBT editor to directly edit the files for a specific day.
+After the change you need to restart the server, to re-calculate the current daily rewards based on your configuration.
 
 ## Internal Data Structure
 
@@ -58,11 +75,15 @@ Data structure:
 | Fabric Version | ❌ Not planned        |
 | Forge 1.16.5   | ⚠️ Maintenance only   |
 | Forge 1.17.1   | ❌ Not planned        |
-| Forge 1.18.1   | ⚠️ Deprecated         |
+| Forge 1.18.1   | ❌ Not planned        |
 | Forge 1.18.2   | ⚠️ Maintenance only   |
 | Forge 1.19     | ⚠️ Deprecated         |
 | Forge 1.19.1   | ⚠️ Deprecated         |
 | Forge 1.19.2   | ✔️ Active development |
+
+## License
+
+The MIT [LICENSE.md](LICENSE.md) applies only to the code in this repository. Images, models and other assets are explicitly excluded.
 
 ## Note
 

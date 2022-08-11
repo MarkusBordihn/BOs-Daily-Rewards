@@ -48,6 +48,7 @@ import de.markusbordihn.dailyrewards.config.CommonConfig;
 import de.markusbordihn.dailyrewards.data.RewardData;
 import de.markusbordihn.dailyrewards.data.RewardUserData;
 import de.markusbordihn.dailyrewards.network.NetworkHandler;
+import de.markusbordihn.dailyrewards.rewards.Rewards;
 
 @EventBusSubscriber
 public class PlayerRewardManager {
@@ -59,9 +60,10 @@ public class PlayerRewardManager {
   private static int rewardTimePerDayTicks = rewardTimePerDay * 60 * 20;
 
   private static final short REWARD_CHECK_TICK = 20 * 60; // every 1 Minute
-  private static final IFormattableTextComponent claimCommand = new StringTextComponent("/DailyRewards claim")
-        .setStyle(Style.EMPTY.withColor(TextFormatting.GREEN).withClickEvent(new ClickEvent(
-            ClickEvent.Action.SUGGEST_COMMAND, "/DailyRewards claim")));
+  private static final IFormattableTextComponent claimCommand =
+      new StringTextComponent("/DailyRewards claim")
+          .setStyle(Style.EMPTY.withColor(TextFormatting.GREEN).withClickEvent(
+              new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/DailyRewards claim")));
 
   private static short ticker = 0;
   private static Set<ServerPlayerEntity> playerList = ConcurrentHashMap.newKeySet();
@@ -93,6 +95,17 @@ public class PlayerRewardManager {
     NetworkHandler.syncGeneralRewardForCurrentMonth(player);
     NetworkHandler.syncUserRewardForCurrentMonth(player);
     playerList.add(player);
+
+    // Check if player has any unclaimed rewards
+    if (RewardUserData.get().hasUnclaimedRewardsForCurrentMonth(player.getUUID())) {
+      player.sendMessage(
+          new TranslationTextComponent(Constants.TEXT_PREFIX + "unclaimed_rewarded_item",
+              player.getName(), Rewards.getDaysLeftCurrentMonth()),
+          Util.NIL_UUID);
+      player.sendMessage(
+          new TranslationTextComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
+          Util.NIL_UUID);
+    }
   }
 
   @SubscribeEvent
@@ -133,8 +146,8 @@ public class PlayerRewardManager {
             rewardUserData.addRewardForCurrentMonth(rewardedDays, uuid, itemStack);
             player.sendMessage(new TranslationTextComponent(Constants.TEXT_PREFIX + "rewarded_item",
                 player.getName(), itemStack, rewardedDays), Util.NIL_UUID);
-            player.sendMessage(new TranslationTextComponent(Constants.TEXT_PREFIX + "claim_rewards",
-                claimCommand),
+            player.sendMessage(
+                new TranslationTextComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
                 Util.NIL_UUID);
             NetworkHandler.syncUserRewardForCurrentMonth(player);
           }

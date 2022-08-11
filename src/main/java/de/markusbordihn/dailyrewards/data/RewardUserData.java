@@ -39,6 +39,7 @@ import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 
 public class RewardUserData extends WorldSavedData {
@@ -125,6 +126,16 @@ public class RewardUserData extends WorldSavedData {
 
   public List<ItemStack> getRewardsForCurrentMonth(UUID uuid) {
     return getRewardsFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth(), uuid);
+  }
+
+  public boolean hasUnclaimedRewardsForCurrentMonth(UUID uuid) {
+    List<ItemStack> rewardItemStack = getRewardsForCurrentMonth(uuid);
+    for (ItemStack itemStack : rewardItemStack) {
+      if (!itemStack.isEmpty() && !itemStack.getItem().equals(ModItems.TAKEN_REWARD.get())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public CompoundNBT getRewardsForCurrentMonthSyncData(UUID uuid) {
