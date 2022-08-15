@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import de.markusbordihn.dailyrewards.commands.ClaimCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -98,13 +99,19 @@ public class PlayerRewardManager {
 
     // Check if player has any unclaimed rewards
     if (RewardUserData.get().hasUnclaimedRewardsForCurrentMonth(player.getUUID())) {
-      player.sendMessage(
-          new TranslationTextComponent(Constants.TEXT_PREFIX + "unclaimed_rewarded_item",
-              player.getName(), Rewards.getDaysLeftCurrentMonth()),
-          Util.NIL_UUID);
-      player.sendMessage(
-          new TranslationTextComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
-          Util.NIL_UUID);
+
+      if (COMMON.showRewardMenuOnPlayerJoin.get()) {
+        ClaimCommand.openRewardMenuForPlayer(player);
+
+      } else {
+        player.sendMessage(
+                new TranslationTextComponent(Constants.TEXT_PREFIX + "unclaimed_rewarded_item",
+                        player.getName(), Rewards.getDaysLeftCurrentMonth()),
+                Util.NIL_UUID);
+        player.sendMessage(
+                new TranslationTextComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
+                Util.NIL_UUID);
+      }
     }
   }
 
