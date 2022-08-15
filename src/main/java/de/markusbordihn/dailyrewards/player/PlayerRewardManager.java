@@ -97,20 +97,18 @@ public class PlayerRewardManager {
     NetworkHandler.syncUserRewardForCurrentMonth(player);
     playerList.add(player);
 
-    // Check if player has any unclaimed rewards
+    // Check if player has any unclaimed rewards.
     if (RewardUserData.get().hasUnclaimedRewardsForCurrentMonth(player.getUUID())) {
-
-      if (COMMON.showRewardMenuOnPlayerJoin.get()) {
+      if (Boolean.TRUE.equals(COMMON.showRewardMenuOnPlayerJoin.get())) {
         ClaimCommand.openRewardMenuForPlayer(player);
-
       } else {
         player.sendMessage(
-                new TranslationTextComponent(Constants.TEXT_PREFIX + "unclaimed_rewarded_item",
-                        player.getName(), Rewards.getDaysLeftCurrentMonth()),
-                Util.NIL_UUID);
+            new TranslationTextComponent(Constants.TEXT_PREFIX + "unclaimed_rewarded_item",
+                player.getName(), Rewards.getDaysLeftCurrentMonth()),
+            Util.NIL_UUID);
         player.sendMessage(
-                new TranslationTextComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
-                Util.NIL_UUID);
+            new TranslationTextComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
+            Util.NIL_UUID);
       }
     }
   }

@@ -49,9 +49,7 @@ public class ClaimCommand extends CustomCommand {
   @Override
   public int run(CommandContext<CommandSource> context) throws CommandSyntaxException {
     ServerPlayerEntity player = context.getSource().getPlayerOrException();
-
     openRewardMenuForPlayer(player);
-
     return 0;
   }
 

@@ -57,7 +57,6 @@ public class CommonConfig {
 
   public static class Config {
 
-
     public final ForgeConfigSpec.IntValue rewardTimePerDay;
     public final ForgeConfigSpec.BooleanValue showRewardMenuOnPlayerJoin;
 
@@ -87,10 +86,9 @@ public class CommonConfig {
       rewardTimePerDay = builder.comment(
           "Time in minutes the players needs to be online on the server before receiving a reward for the day.")
           .defineInRange("rewardTimePerDay", 30, 1, 1440);
-
       showRewardMenuOnPlayerJoin = builder.comment(
-                      "Show the rewards menu when a player joins the server (if he has unclaimed rewards).")
-              .define("showRewardMenuOnPlayerJoin", true);
+          "Shows the rewards menu when a player joins the server (if there are unclaimed rewards).")
+          .define("showRewardMenuOnPlayerJoin", false);
       builder.pop();
 
       builder.push("Fill Items");
