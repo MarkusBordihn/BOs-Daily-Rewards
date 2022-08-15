@@ -44,6 +44,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.commands.ClaimCommand;
 import de.markusbordihn.dailyrewards.config.CommonConfig;
 import de.markusbordihn.dailyrewards.data.RewardData;
 import de.markusbordihn.dailyrewards.data.RewardUserData;
@@ -95,14 +96,18 @@ public class PlayerRewardManager {
     NetworkHandler.syncUserRewardForCurrentMonth(player);
     playerList.add(player);
 
-    // Check if player has any unclaimed rewards
+    // Check if player has any unclaimed rewards.
     if (RewardUserData.get().hasUnclaimedRewardsForCurrentMonth(player.getUUID())) {
+            if (Boolean.TRUE.equals(COMMON.showRewardMenuOnPlayerJoin.get())) {
+        ClaimCommand.openRewardMenuForPlayer(player);
+      } else {
       player
           .sendMessage(new TranslatableComponent(Constants.TEXT_PREFIX + "unclaimed_rewarded_item",
               player.getName(), Rewards.getDaysLeftCurrentMonth()), Util.NIL_UUID);
       player.sendMessage(
           new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
           Util.NIL_UUID);
+      }
     }
   }
 
