@@ -48,6 +48,11 @@ public class ClaimCommand extends CustomCommand {
   @Override
   public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     ServerPlayer player = context.getSource().getPlayerOrException();
+    openRewardMenuForPlayer(player);
+    return 0;
+  }
+
+  public static void openRewardMenuForPlayer(ServerPlayer player) {
     MenuProvider provider = new MenuProvider() {
       @Override
       public Component getDisplayName() {
@@ -62,7 +67,5 @@ public class ClaimCommand extends CustomCommand {
     };
     NetworkHooks.openScreen(player, provider, buffer -> {
     });
-
-    return 0;
   }
 }
