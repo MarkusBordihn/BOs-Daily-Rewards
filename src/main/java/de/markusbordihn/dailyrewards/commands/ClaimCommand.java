@@ -49,6 +49,13 @@ public class ClaimCommand extends CustomCommand {
   @Override
   public int run(CommandContext<CommandSource> context) throws CommandSyntaxException {
     ServerPlayerEntity player = context.getSource().getPlayerOrException();
+
+    openRewardMenuForPlayer(player);
+
+    return 0;
+  }
+
+  public static void openRewardMenuForPlayer(ServerPlayerEntity player) {
     INamedContainerProvider provider = new INamedContainerProvider() {
       @Override
       public ITextComponent getDisplayName() {
@@ -61,9 +68,8 @@ public class ClaimCommand extends CustomCommand {
         return new RewardMenu(windowId, inventory);
       }
     };
+
     NetworkHooks.openGui(player, provider, buffer -> {
     });
-
-    return 0;
   }
 }
