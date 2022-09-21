@@ -58,6 +58,10 @@ minecraft {
             source sourceSets.main
         }
       }
+
+      // Optional: Mixin Support
+      property 'mixin.env.remapRefMap', 'true'
+      property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
     }
 
     server {
@@ -126,7 +130,7 @@ dependencies {
   // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
   // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
   // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-  minecraft 'net.minecraftforge:forge:1.18.2-40.1.73'
+  minecraft 'net.minecraftforge:forge:1.18.2-40.1.80'
 
   // Compability Tests
   runtimeOnly fg.deobf("curse.maven:loot-bag-mod-356236:3699372")

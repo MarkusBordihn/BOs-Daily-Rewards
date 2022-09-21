@@ -82,11 +82,14 @@ public class Rewards {
     Set<ItemStack> rareDuplicates = new HashSet<>();
     Set<ItemStack> lootBagDuplicates = new HashSet<>();
 
-    // Chances for different items types
+    // Chances for different items types.
     int rareFillItemsChance = rareFillItems.isEmpty() ? 0 : COMMON.rareFillItemsChance.get();
     int lootBackFillItemChance =
         lootBagFillItems.isEmpty() ? 0 : COMMON.lootBagFillItemsChance.get();
 
+    // Fill missing reward items.
+    log.info("Found {} missing days without any items, will try to use fill items ...",
+        numMissingRewardItems);
     for (int i = 0; i < numMissingRewardItems; i++) {
       ItemStack fillItem = null;
 
@@ -112,7 +115,13 @@ public class Rewards {
 
       // Make sure we have filled something.
       if (fillItem == null) {
-        fillItem = normalFillItems.get(random.nextInt(normalFillItems.size()));
+        if (!normalFillItems.isEmpty()) {
+          fillItem = normalFillItems.get(random.nextInt(normalFillItems.size()));
+        } else {
+          log.error("Unable to find any fill item for {} of {} missing days, will use {} instead!",
+              i + 1, numMissingRewardItems, Items.DIRT);
+          fillItem = new ItemStack(Items.DIRT);
+        }
       }
 
       rewardItemsForMonth.add(fillItem);
