@@ -58,6 +58,10 @@ minecraft {
             source sourceSets.main
         }
       }
+
+      // Optional: Mixin Support
+      property 'mixin.env.remapRefMap', 'true'
+      property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
     }
 
     server {
@@ -130,6 +134,10 @@ dependencies {
 
   // Compability Tests
   runtimeOnly fg.deobf("curse.maven:loot-bag-mod-356236:3509228")
+
+  // Bug Tests
+  runtimeOnly fg.deobf("curse.maven:autoreglib-250363:3326041")
+  runtimeOnly fg.deobf("curse.maven:quark-243121:3642325")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
