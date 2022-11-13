@@ -32,6 +32,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.menu.RewardMenu;
@@ -39,6 +42,7 @@ import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.TakeableRewardSlot;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 
+@OnlyIn(Dist.CLIENT)
 public class RewardScreen extends ContainerScreen<RewardMenu> {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
@@ -47,6 +51,7 @@ public class RewardScreen extends ContainerScreen<RewardMenu> {
       new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen.png");
 
   private TranslationTextComponent rewardScreenTitle;
+  private TranslationTextComponent inventoryTitle;
 
   public RewardScreen(RewardMenu menu, PlayerInventory inventory, ITextComponent component) {
     super(menu, inventory, component);
@@ -59,7 +64,7 @@ public class RewardScreen extends ContainerScreen<RewardMenu> {
     poseStack.popPose();
   }
 
-  public void renderRewardSlot(MatrixStack poseStack, int x, int y, int blitOffset) {
+  public void renderRewardSlot(MatrixStack poseStack, int x, int y) {
     RenderSystem.disableDepthTest();
     RenderSystem.colorMask(true, true, true, false);
     this.fillGradient(poseStack, x, y, x + 16, y + 16, -2130706433, 0);
@@ -79,6 +84,7 @@ public class RewardScreen extends ContainerScreen<RewardMenu> {
     int rewardedDays = this.menu.getRewardedDays();
     rewardScreenTitle =
         new TranslationTextComponent(Constants.TEXT_PREFIX + "reward_screen", rewardedDays);
+    inventoryTitle = new TranslationTextComponent("container.inventory");
 
     // Set background according the number or days for the current month.
     switch (Rewards.getDaysCurrentMonth()) {
@@ -121,7 +127,7 @@ public class RewardScreen extends ContainerScreen<RewardMenu> {
           && !slot.getItem().getItem().equals(ModItems.TAKEN_REWARD.get())) {
         rendererTakeableRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
       } else if (slot instanceof RewardSlot) {
-        renderRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y, this.getBlitOffset());
+        renderRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
       }
     }
 
@@ -131,7 +137,8 @@ public class RewardScreen extends ContainerScreen<RewardMenu> {
   @Override
   protected void renderLabels(MatrixStack poseStack, int x, int y) {
     this.font.draw(poseStack, this.rewardScreenTitle, this.titleLabelX, this.titleLabelY, 4210752);
-    this.font.draw(poseStack, this.title, this.inventoryLabelX, this.inventoryLabelY, 4210752);
+    this.font.draw(poseStack, this.inventoryTitle, this.inventoryLabelX, this.inventoryLabelY,
+        4210752);
   }
 
   @Override

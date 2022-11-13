@@ -34,6 +34,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.WorldSavedData;
 
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
@@ -79,8 +80,14 @@ public class RewardUserData extends WorldSavedData {
     RewardUserData.server = server;
 
     // Using a global approach and storing relevant data in the overworld only!
-    RewardUserData.data = server.getLevel(World.OVERWORLD).getDataStorage()
-        .computeIfAbsent(RewardUserData::new, RewardUserData.getFileId());
+    ServerWorld serverWorld = server.getLevel(World.OVERWORLD);
+    if (serverWorld != null) {
+      RewardUserData.data = serverWorld.getDataStorage().computeIfAbsent(RewardUserData::new,
+          RewardUserData.getFileId());
+    } else {
+      log.error("{} unable to get server world {} for storing data!", Constants.LOG_NAME,
+          serverWorld);
+    }
   }
 
   public static boolean available() {

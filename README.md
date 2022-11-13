@@ -68,12 +68,22 @@ Data structure:
   - Last rewarded day (String)
   - Number of rewarded days (int)
 
+## Using with Quark 1.16.5
+
+The inventory sort feature from Quark 1.16.5 is not handling the corresponding slot information correctly like locked slots.
+This could be miss-used to cheat, for this reason you should deactivate the feature or adding the following change to your `quark-common.toml` file:
+
+```toml
+  #A list of screens that don't play well with quark's buttons. Use "Print Screen Classnames" to find the names of any others you'd want to add.
+  "Ignored Screens" = ["de.markusbordihn.dailyrewards.client.screen.RewardScreen"]
+```
+
 ## Version Status Overview 🛠️
 
 | Version        | Status                |
 | -------------- | --------------------- |
 | Fabric Version | ❌ Not planned        |
-| Forge 1.16.5   | ⚠️ Maintenance only   |
+| Forge 1.16.5   | ⚠️ Deprecated         |
 | Forge 1.17.1   | ❌ Not planned        |
 | Forge 1.18.1   | ❌ Not planned        |
 | Forge 1.18.2   | ⚠️ Maintenance only   |
