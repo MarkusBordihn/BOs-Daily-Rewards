@@ -85,6 +85,10 @@ public class PlayerRewardManager {
     }
     ServerPlayer player =
         ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayerByName(username);
+    if (player == null) {
+      log.error("{} Unable to get Player for username {}", Constants.LOG_NAME, username);
+      return;
+    }
     log.debug("{} Player {} {} logged in.", Constants.LOG_NAME, username, player);
 
     // Sync data and add Player to reward.
