@@ -111,7 +111,7 @@ public class RewardMenu extends AbstractContainerMenu {
 
     // Rewards Slots
     int rewardStartPositionY = 17;
-    int rewardStartPositionX = 9;
+    int rewardStartPositionX = 6;
     for (int rewardRow = 0; rewardRow < 5; ++rewardRow) {
       for (int rewardColumn = 0; rewardColumn < 7; ++rewardColumn) {
         int rewardSlotIndex = rewardColumn + rewardRow * 7;

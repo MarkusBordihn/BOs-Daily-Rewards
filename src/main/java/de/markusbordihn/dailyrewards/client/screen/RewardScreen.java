@@ -33,6 +33,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+
+import org.anti_ad.mc.ipn.api.IPNIgnore;
+
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.menu.RewardMenu;
@@ -40,6 +45,8 @@ import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.TakeableRewardSlot;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 
+@IPNIgnore
+@OnlyIn(Dist.CLIENT)
 public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
@@ -60,10 +67,10 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
     poseStack.popPose();
   }
 
-  public void renderRewardSlot(PoseStack poseStack, int x, int y, int blitOffset) {
+  public void renderRewardSlot(PoseStack poseStack, int x, int y) {
     RenderSystem.disableDepthTest();
     RenderSystem.colorMask(true, true, true, false);
-    fillGradient(poseStack, x, y, x + 16, y + 16, -2130706433, 0, blitOffset);
+    fill(poseStack, x, y, x + 16, y + 16, 0x80AAAAAA);
     RenderSystem.colorMask(true, true, true, true);
     RenderSystem.enableDepthTest();
   }
@@ -103,7 +110,7 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
         texture = new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen.png");
     }
 
-    this.titleLabelX = 8;
+    this.titleLabelX = 6;
     this.titleLabelY = 6;
     this.topPos = (this.height - this.imageHeight) / 2;
     this.inventoryLabelX = 6;
@@ -121,7 +128,7 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
       if (slot instanceof TakeableRewardSlot && !slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
         rendererTakeableRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
       } else if (slot instanceof RewardSlot) {
-        renderRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y, this.getBlitOffset());
+        renderRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
       }
     }
 

@@ -71,7 +71,7 @@ Data structure:
 | Version        | Status                |
 | -------------- | --------------------- |
 | Fabric Version | ❌ Not planned        |
-| Forge 1.16.5   | ⚠️ Maintenance only   |
+| Forge 1.16.5   | ⚠️ Deprecated         |
 | Forge 1.17.1   | ❌ Not planned        |
 | Forge 1.18.1   | ❌ Not planned        |
 | Forge 1.18.2   | ⚠️ Maintenance only   |

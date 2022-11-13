@@ -32,9 +32,11 @@ import org.apache.logging.log4j.Logger;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
+
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 import de.markusbordihn.dailyrewards.Constants;
@@ -77,8 +79,14 @@ public class RewardUserData extends SavedData {
     RewardUserData.server = server;
 
     // Using a global approach and storing relevant data in the overworld only!
-    RewardUserData.data = server.getLevel(Level.OVERWORLD).getDataStorage()
-        .computeIfAbsent(RewardUserData::load, RewardUserData::new, RewardUserData.getFileId());
+    ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
+    if (serverLevel != null) {
+      RewardUserData.data = serverLevel.getDataStorage().computeIfAbsent(RewardUserData::load,
+          RewardUserData::new, RewardUserData.getFileId());
+    } else {
+      log.error("{} unable to get server level {} for storing data!", Constants.LOG_NAME,
+          serverLevel);
+    }
   }
 
   public static boolean available() {
