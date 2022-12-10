@@ -65,6 +65,7 @@ public class RewardMenu extends AbstractContainerMenu {
 
   // Meta data
   private int rewardedDays = 0;
+  private String lastRewardedDay;
 
   // Misc
   protected final Level level;
@@ -88,6 +89,8 @@ public class RewardMenu extends AbstractContainerMenu {
     // Sync rewarded days
     this.rewardedDays = level.isClientSide ? RewardClientData.getRewardedDaysForCurrentMonth()
         : RewardUserData.get().getRewardedDaysForCurrentMonth(player.getUUID());
+    this.lastRewardedDay = level.isClientSide ? RewardClientData.getLastRewardedDayForCurrentMonth()
+        : RewardUserData.get().getLastRewardedDayForCurrentMonth(player.getUUID());
 
     // Sync possible rewards items for current month
     List<ItemStack> rewardsForCurrentMonth =
@@ -165,6 +168,10 @@ public class RewardMenu extends AbstractContainerMenu {
 
   public int getRewardedDays() {
     return this.rewardedDays;
+  }
+
+  public String getLastRewardedDay() {
+    return this.lastRewardedDay;
   }
 
   @Override

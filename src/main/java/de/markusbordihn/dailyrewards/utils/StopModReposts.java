@@ -44,7 +44,7 @@ public class StopModReposts {
   private static boolean isDevEnvironment =
       version.isPresent() && version.get() != null && "MOD_DEV".equals(version.get());
 
-  private static String modFileFormatRegEx = Constants.MOD_ID + "_1.18.2-\\d.\\d.\\d.jar";
+  private static String modFileFormatRegEx = Constants.MOD_ID + "_1.18.2-\\d+.\\d+.\\d+.jar";
 
   private static Pattern expectedFilePattern = Pattern.compile(modFileFormatRegEx);
 
@@ -59,7 +59,7 @@ public class StopModReposts {
     try {
       jarFilePath =
           DailyRewards.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-    } catch (URISyntaxException exception) {
+    } catch (SecurityException | URISyntaxException | NullPointerException exception) {
       log.error("Unable to get jar file path: {}", exception);
     }
     if (jarFilePath == null || jarFilePath.isEmpty()) {
@@ -75,7 +75,7 @@ public class StopModReposts {
       log.error("=                                             =");
       log.error("===============================================");
       log.error("");
-      log.error("It's seems that the mod file you are using was modified!");
+      log.error("It's seems that the mod file {} you are using was modified!", jarFilePath);
       log.error(
           "Please make sure to download the latest {} mod only from the original source at {}",
           Constants.MOD_NAME, Constants.MOD_URL);

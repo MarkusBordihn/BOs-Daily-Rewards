@@ -19,13 +19,19 @@
 
 package de.markusbordihn.dailyrewards.client.screen;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -36,20 +42,28 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import org.anti_ad.mc.ipn.api.IPNIgnore;
-
 import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.config.CommonConfig;
 import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.menu.RewardMenu;
 import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.TakeableRewardSlot;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 
-@IPNIgnore
 @OnlyIn(Dist.CLIENT)
 public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
 
+  private static final CommonConfig.Config COMMON = CommonConfig.COMMON;
+
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
+
+  private int rewardedDays = 0;
+  private int rewardTimePerDay = 30;
+  private int rewardTimePerDayInSeconds = rewardTimePerDay * 60;
+  private int updateTicker = 0;
+  private String nextRewardTimeString;
+  private LocalPlayer localPlayer;
+  private boolean reloadToClaim = false;
 
   private ResourceLocation texture =
       new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen.png");
@@ -70,9 +84,47 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
   public void renderRewardSlot(PoseStack poseStack, int x, int y) {
     RenderSystem.disableDepthTest();
     RenderSystem.colorMask(true, true, true, false);
-    fill(poseStack, x, y, x + 16, y + 16, 0x80AAAAAA);
+    fill(poseStack, x, y, x + 16, y + 16 + 8, 0x80AAAAAA);
     RenderSystem.colorMask(true, true, true, true);
     RenderSystem.enableDepthTest();
+  }
+
+  protected void renderNextTimeForReward(PoseStack poseStack, int x, int y) {
+    // Early return if the user needs to reload to claim rewards.
+    if (this.reloadToClaim) {
+      this.font.draw(poseStack,
+          new TranslatableComponent(Constants.TEXT_PREFIX + "next_reward.reload"), x, y + 4f,
+          0xFF0000);
+      return;
+    }
+
+    // Update data cache only every 20 ticks to avoid expensive operations on higher fps.
+    if ((this.updateTicker++ & (20 - 1)) == 0) {
+      int localPlayerTickCount = localPlayer != null ? localPlayer.tickCount : 0;
+      String lastRewardedDay = this.menu.getLastRewardedDay();
+      long nextRewardTime = Rewards.getCurrentYearMonthDay().equals(lastRewardedDay)
+          ? Duration
+              .between(LocalDateTime.now(),
+                  LocalDateTime.now().withHour(23).withMinute(59).withSecond(59))
+              .toSeconds() + this.rewardTimePerDayInSeconds
+          : this.rewardTimePerDayInSeconds - (localPlayerTickCount / 20);
+      this.nextRewardTimeString = LocalTime.MIN.plusSeconds(nextRewardTime).toString();
+      if (nextRewardTimeString.length() == 5) {
+        this.nextRewardTimeString += ":00";
+      }
+      if ("00:00:00".equals(nextRewardTimeString)) {
+        log.debug("Reload screen to be able to claim for day {} ...", rewardedDays + 1);
+        this.reloadToClaim = true;
+      }
+      if (this.updateTicker >= 20) {
+        this.updateTicker = 0;
+      }
+    }
+
+    this.font.draw(poseStack, new TranslatableComponent(Constants.TEXT_PREFIX + "next_reward"),
+        x + 9f, y, 0x666666);
+    this.font.draw(poseStack, new TranslatableComponent(Constants.TEXT_PREFIX + "next_reward.in",
+        this.nextRewardTimeString), x + 9f, y + font.lineHeight + 0f, 0x666666);
   }
 
   @Override
@@ -84,9 +136,14 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
     this.imageHeight = 247;
 
     // Set Title with already rewarded days.
-    int rewardedDays = this.menu.getRewardedDays();
+    this.rewardedDays = this.menu.getRewardedDays();
     rewardScreenTitle =
-        new TranslatableComponent(Constants.TEXT_PREFIX + "reward_screen", rewardedDays);
+        new TranslatableComponent(Constants.TEXT_PREFIX + "reward_screen", this.rewardedDays);
+
+    // Calculations for next reward
+    localPlayer = Minecraft.getInstance() != null ? Minecraft.getInstance().player : null;
+    rewardTimePerDay = COMMON.rewardTimePerDay.get();
+    rewardTimePerDayInSeconds = rewardTimePerDay * 60;
 
     // Set background according the number or days for the current month.
     switch (Rewards.getDaysCurrentMonth()) {
@@ -131,6 +188,8 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
         renderRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
       }
     }
+
+    this.renderNextTimeForReward(poseStack, leftPos + 78, topPos + 133);
 
     this.renderTooltip(poseStack, x, y);
   }
