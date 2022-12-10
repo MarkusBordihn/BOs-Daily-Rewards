@@ -19,7 +19,6 @@
 
 package de.markusbordihn.dailyrewards.item;
 
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 
 import net.minecraftforge.registries.DeferredRegister;
@@ -38,5 +37,5 @@ public class ModItems {
       DeferredRegister.create(ForgeRegistries.ITEMS, Constants.MOD_ID);
 
   public static final RegistryObject<Item> TAKEN_REWARD = ITEMS.register("taken_reward",
-      () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
+      () -> new Item(new Item.Properties()));
 }
