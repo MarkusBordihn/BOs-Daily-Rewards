@@ -73,6 +73,7 @@
   "java.dependency.showMembers": true,
   "java.dependency.packagePresentation": "flat",
   "editor.detectIndentation": false,
+  "java.compile.nullAnalysis.mode": "automatic",
   "java.compile.nullAnalysis.nullable": [
     "org.springframework.lang.Nullable",
     "javax.annotation.Nullable",
@@ -82,5 +83,5 @@
     "org.springframework.lang.NonNull",
     "javax.annotation.Nonnull",
     "org.eclipse.jdt.annotation.NonNull"
-  ]
+  ],
 }

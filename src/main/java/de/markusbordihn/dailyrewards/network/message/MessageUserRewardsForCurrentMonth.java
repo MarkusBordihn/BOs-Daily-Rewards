@@ -39,10 +39,12 @@ public class MessageUserRewardsForCurrentMonth {
 
   protected final CompoundTag data;
   protected final int rewardedDays;
+  protected final String lastRewardedDay;
 
-  public MessageUserRewardsForCurrentMonth(CompoundTag data, int rewardedDays) {
-    this.rewardedDays = rewardedDays;
+  public MessageUserRewardsForCurrentMonth(CompoundTag data, int rewardedDays, String lastRewardedDay) {
     this.data = data;
+    this.rewardedDays = rewardedDays;
+    this.lastRewardedDay = lastRewardedDay;
   }
 
   public CompoundTag getData() {
@@ -51,6 +53,10 @@ public class MessageUserRewardsForCurrentMonth {
 
   public int getRewardedDays() {
     return this.rewardedDays;
+  }
+
+  public String getLastRewardedDay() {
+    return this.lastRewardedDay;
   }
 
   public static void handle(
@@ -63,8 +69,9 @@ public class MessageUserRewardsForCurrentMonth {
   }
 
   public static void handlePacket(MessageUserRewardsForCurrentMonth message) {
-    RewardClientData.setRewardedDaysForCurrentMonth(message.getRewardedDays());
     RewardClientData.setUserRewardsForCurrentMonth(message.getData());
+    RewardClientData.setRewardedDaysForCurrentMonth(message.getRewardedDays());
+    RewardClientData.setLastRewardedDayForCurrentMonth(message.getLastRewardedDay());
   }
 
 }

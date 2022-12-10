@@ -43,6 +43,7 @@ public class RewardClientData {
   private static List<ItemStack> generalRewardItems = new ArrayList<>();
   private static List<ItemStack> userRewardItems = new ArrayList<>();
   private static int userRewardedDays = 0;
+  private static String userLastRewardedDay;
 
   protected RewardClientData() {
 
@@ -54,6 +55,14 @@ public class RewardClientData {
 
   public static void setRewardedDaysForCurrentMonth(int rewardedDays) {
     userRewardedDays = rewardedDays;
+  }
+
+  public static String getLastRewardedDayForCurrentMonth() {
+    return userLastRewardedDay;
+  }
+
+  public static void setLastRewardedDayForCurrentMonth(String lastRewardedDay) {
+    userLastRewardedDay = lastRewardedDay;
   }
 
   public static List<ItemStack> getGeneralRewardsForCurrentMonth() {

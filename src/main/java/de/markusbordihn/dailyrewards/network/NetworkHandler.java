@@ -20,6 +20,7 @@
 package de.markusbordihn.dailyrewards.network;
 
 import java.util.UUID;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,7 +45,7 @@ public class NetworkHandler {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  private static final String PROTOCOL_VERSION = "1";
+  private static final String PROTOCOL_VERSION = "2";
   public static final SimpleChannel INSTANCE =
       NetworkRegistry.newSimpleChannel(new ResourceLocation(Constants.MOD_ID, "network"),
           () -> PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals);
@@ -69,7 +70,8 @@ public class NetworkHandler {
       INSTANCE.registerMessage(id++, MessageUserRewardsForCurrentMonth.class, (message, buffer) -> {
         buffer.writeNbt(message.getData());
         buffer.writeInt(message.getRewardedDays());
-      }, buffer -> new MessageUserRewardsForCurrentMonth(buffer.readNbt(), buffer.readInt()),
+        buffer.writeUtf(message.getLastRewardedDay());
+      }, buffer -> new MessageUserRewardsForCurrentMonth(buffer.readNbt(), buffer.readInt(), buffer.readUtf()),
           MessageUserRewardsForCurrentMonth::handle);
     });
   }
@@ -92,10 +94,11 @@ public class NetworkHandler {
     UUID uuid = serverPlayer.getUUID();
     CompoundTag data = RewardUserData.get().getRewardsForCurrentMonthSyncData(uuid);
     int rewardedDays = RewardUserData.get().getRewardedDaysForCurrentMonth(uuid);
+    String lastRewardedDay = RewardUserData.get().getLastRewardedDayForCurrentMonth(uuid);
     if (data != null && !data.isEmpty()) {
       log.debug("Sending user reward for current month to {}: {}", serverPlayer, data);
       INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
-          new MessageUserRewardsForCurrentMonth(data, rewardedDays));
+          new MessageUserRewardsForCurrentMonth(data, rewardedDays, lastRewardedDay));
     }
   }
 
