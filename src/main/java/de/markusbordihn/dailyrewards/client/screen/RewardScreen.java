@@ -108,7 +108,8 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
                   LocalDateTime.now().withHour(23).withMinute(59).withSecond(59))
               .toSeconds() + this.rewardTimePerDayInSeconds
           : this.rewardTimePerDayInSeconds - (localPlayerTickCount / 20);
-      this.nextRewardTimeString = LocalTime.MIN.plusSeconds(nextRewardTime).toString();
+      // Adding 60 seconds, because the server is only checking every 60 seconds for rewards.
+      this.nextRewardTimeString = LocalTime.MIN.plusSeconds(nextRewardTime + 60).toString();
       if (nextRewardTimeString.length() == 5) {
         this.nextRewardTimeString += ":00";
       }
