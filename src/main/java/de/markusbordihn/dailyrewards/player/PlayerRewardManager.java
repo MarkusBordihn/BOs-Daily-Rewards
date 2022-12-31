@@ -101,9 +101,16 @@ public class PlayerRewardManager {
       if (Boolean.TRUE.equals(COMMON.showRewardMenuOnPlayerJoin.get())) {
         ClaimCommand.openRewardMenuForPlayer(player);
       } else {
-        player.sendSystemMessage(
-            Component.translatable(Constants.TEXT_PREFIX + "unclaimed_rewarded_item",
-                player.getName(), Rewards.getDaysLeftCurrentMonth()));
+        int daysLeftCurrentMonth = Rewards.getDaysLeftCurrentMonth();
+        if (daysLeftCurrentMonth > 0) {
+          player.sendSystemMessage(
+              Component.translatable(Constants.TEXT_PREFIX + "unclaimed_rewarded_item",
+                  player.getName(), Rewards.getDaysLeftCurrentMonth()));
+        } else {
+          player.sendSystemMessage(
+              Component.translatable(Constants.TEXT_PREFIX + "unclaimed_rewarded_item_today",
+                  player.getName()).withStyle(ChatFormatting.RED));
+        }
         player.sendSystemMessage(
             Component.translatable(Constants.TEXT_PREFIX + "claim_rewards", claimCommand));
       }
