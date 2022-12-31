@@ -19,6 +19,8 @@
 
 package de.markusbordihn.dailyrewards;
 
+import net.minecraft.resources.ResourceLocation;
+
 public final class Constants {
 
   protected Constants() {
@@ -35,5 +37,22 @@ public final class Constants {
   public static final String MOD_URL = "https://www.curseforge.com/minecraft/mc-mods/daily-rewards";
 
   // Prefixes
+  public static final String MINECRAFT_PREFIX = "minecraft";
   public static final String TEXT_PREFIX = "text.daily_rewards.";
+
+  // Colors
+  public static final int FONT_COLOR_BLACK = 0;
+  public static final int FONT_COLOR_DARK_GREEN = 43520;
+  public static final int FONT_COLOR_GRAY = 11184810;
+  public static final int FONT_COLOR_GREEN = 5635925;
+  public static final int FONT_COLOR_RED = 16733525;
+  public static final int FONT_COLOR_WARNING = FONT_COLOR_RED;
+  public static final int FONT_COLOR_YELLOW = 16777045;
+  public static final int FONT_COLOR_WHITE = 16777215;
+
+  // Textures
+  public static final ResourceLocation TEXTURE_GENERIC_54 =
+      new ResourceLocation(MINECRAFT_PREFIX, "textures/gui/container/generic_54.png");
+  public static final ResourceLocation TEXTURE_ICONS =
+      new ResourceLocation(Constants.MOD_ID, "textures/container/icons.png");
 }

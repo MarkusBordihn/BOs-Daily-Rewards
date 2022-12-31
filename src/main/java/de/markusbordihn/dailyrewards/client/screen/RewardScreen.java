@@ -35,7 +35,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 
@@ -57,6 +56,7 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
+  private int rewardDaysForCurrentMonth = Rewards.getDaysCurrentMonth();
   private int rewardedDays = 0;
   private int rewardTimePerDay = 30;
   private int rewardTimePerDayInSeconds = rewardTimePerDay * 60;
@@ -65,9 +65,6 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
   private LocalPlayer localPlayer;
   private boolean reloadToClaim = false;
 
-  private ResourceLocation texture =
-      new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen.png");
-
   private TranslatableComponent rewardScreenTitle;
 
   public RewardScreen(RewardMenu menu, Inventory inventory, Component component) {
@@ -75,16 +72,16 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
   }
 
   public void rendererTakeableRewardSlot(PoseStack poseStack, int x, int y) {
-    RenderSystem.setShaderTexture(0, this.texture);
+    RenderSystem.setShaderTexture(0, Constants.TEXTURE_ICONS);
     poseStack.pushPose();
-    this.blit(poseStack, x + 11, y - 4, 430, 17, 16, 16);
+    this.blit(poseStack, x + 12, y - 5, 0, 0, 16, 16);
     poseStack.popPose();
   }
 
   public void renderRewardSlot(PoseStack poseStack, int x, int y) {
     RenderSystem.disableDepthTest();
     RenderSystem.colorMask(true, true, true, false);
-    fill(poseStack, x, y, x + 16, y + 16 + 8, 0x80AAAAAA);
+    fill(poseStack, x, y, x + 16, y + 18 + 8, 0x80AAAAAA);
     RenderSystem.colorMask(true, true, true, true);
     RenderSystem.enableDepthTest();
   }
@@ -93,7 +90,7 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
     // Early return if the user needs to reload to claim rewards.
     if (this.reloadToClaim) {
       this.font.draw(poseStack,
-          new TranslatableComponent(Constants.TEXT_PREFIX + "next_reward.reload"), x, y + 4f,
+          new TranslatableComponent(Constants.TEXT_PREFIX + "next_reward.reload"), x + 15f, y,
           0xFF0000);
       return;
     }
@@ -122,10 +119,8 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
       }
     }
 
-    this.font.draw(poseStack, new TranslatableComponent(Constants.TEXT_PREFIX + "next_reward"),
-        x + 9f, y, 0x666666);
     this.font.draw(poseStack, new TranslatableComponent(Constants.TEXT_PREFIX + "next_reward.in",
-        this.nextRewardTimeString), x + 9f, y + font.lineHeight + 0f, 0x666666);
+        this.nextRewardTimeString), x, y, 0x666666);
   }
 
   @Override
@@ -133,8 +128,7 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
     super.init();
 
     // Default stats
-    this.imageWidth = 171;
-    this.imageHeight = 247;
+    this.imageHeight = 242;
 
     // Set Title with already rewarded days.
     this.rewardedDays = this.menu.getRewardedDays();
@@ -146,33 +140,12 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
     rewardTimePerDay = COMMON.rewardTimePerDay.get();
     rewardTimePerDayInSeconds = rewardTimePerDay * 60;
 
-    // Set background according the number or days for the current month.
-    switch (Rewards.getDaysCurrentMonth()) {
-      case 28:
-        texture =
-            new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen_28_days.png");
-        break;
-      case 29:
-        texture =
-            new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen_29_days.png");
-        break;
-      case 30:
-        texture =
-            new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen_30_days.png");
-        break;
-      case 31:
-        texture =
-            new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen_31_days.png");
-        break;
-      default:
-        texture = new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen.png");
-    }
-
-    this.titleLabelX = 6;
+    // Basic Position
+    this.titleLabelX = 8;
     this.titleLabelY = 6;
     this.topPos = (this.height - this.imageHeight) / 2;
-    this.inventoryLabelX = 6;
-    this.inventoryLabelY = this.imageHeight - 90;
+    this.inventoryLabelX = 8;
+    this.inventoryLabelY = this.imageHeight - 92;
   }
 
   @Override
@@ -190,7 +163,7 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
       }
     }
 
-    this.renderNextTimeForReward(poseStack, leftPos + 78, topPos + 133);
+    this.renderNextTimeForReward(poseStack, leftPos + 28, topPos + 140);
 
     this.renderTooltip(poseStack, x, y);
   }
@@ -206,10 +179,29 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
   protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
     RenderSystem.setShader(GameRenderer::getPositionTexShader);
     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-    RenderSystem.setShaderTexture(0, this.texture);
+    RenderSystem.setShaderTexture(0, Constants.TEXTURE_GENERIC_54);
 
     // Main screen
-    this.blit(poseStack, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
+    this.blit(poseStack, leftPos, topPos + 20, 0, 0, 176, 222);
+    this.blit(poseStack, leftPos, topPos, 0, 0, 176, 139);
+    blit(poseStack, leftPos + 5, topPos + 15, 3, 64, 165, 130, 255, 4096);
+
+    // Render Rewards Slots
+    int dayCounter = 1;
+    for (int i = 0; i < 4; i++) {
+      int slotTopPos = topPos + 2 + (i * 31);
+      for (int i2 = 0; i2 < 8; i2++) {
+        if (dayCounter <= rewardDaysForCurrentMonth) {
+          int slotLeftPos = leftPos + 7 + Math.round(i2 * 20.5f);
+          RenderSystem.setShaderTexture(0, Constants.TEXTURE_GENERIC_54);
+          this.blit(poseStack, slotLeftPos, slotTopPos + 26, 7, 17, 18, 18);
+          this.blit(poseStack, slotLeftPos, slotTopPos + 16, 7, 17, 18, 18);
+          this.font.draw(poseStack, dayCounter + "", slotLeftPos + (dayCounter < 10 ? 6f : 4f),
+              slotTopPos + 35f, 4210752);
+          dayCounter++;
+        }
+      }
+    }
   }
 
 }

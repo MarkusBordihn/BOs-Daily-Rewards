@@ -102,15 +102,24 @@ public class PlayerRewardManager {
 
     // Check if player has any unclaimed rewards.
     if (RewardUserData.get().hasUnclaimedRewardsForCurrentMonth(player.getUUID())) {
-            if (Boolean.TRUE.equals(COMMON.showRewardMenuOnPlayerJoin.get())) {
+      if (Boolean.TRUE.equals(COMMON.showRewardMenuOnPlayerJoin.get())) {
         ClaimCommand.openRewardMenuForPlayer(player);
       } else {
-      player
-          .sendMessage(new TranslatableComponent(Constants.TEXT_PREFIX + "unclaimed_rewarded_item",
-              player.getName(), Rewards.getDaysLeftCurrentMonth()), Util.NIL_UUID);
-      player.sendMessage(
-          new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
-          Util.NIL_UUID);
+        int daysLeftCurrentMonth = Rewards.getDaysLeftCurrentMonth();
+        if (daysLeftCurrentMonth > 0) {
+          player.sendMessage(
+              new TranslatableComponent(Constants.TEXT_PREFIX + "unclaimed_rewarded_item",
+                  player.getName(), daysLeftCurrentMonth),
+              Util.NIL_UUID);
+        } else {
+          player.sendMessage(
+              new TranslatableComponent(Constants.TEXT_PREFIX + "unclaimed_rewarded_item_today",
+                  player.getName()).withStyle(ChatFormatting.RED),
+              Util.NIL_UUID);
+        }
+        player.sendMessage(
+            new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
+            Util.NIL_UUID);
       }
     }
   }
