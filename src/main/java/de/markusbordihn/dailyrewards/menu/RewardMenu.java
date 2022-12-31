@@ -56,8 +56,6 @@ public class RewardMenu extends AbstractContainerMenu {
   // Defining basic layout options
   private static int containerSize = 32;
   private static int slotSize = 18;
-  private static int rewardSlotSizeX = 23;
-  private static int rewardSlotSizeY = 28;
 
   // Container
   private Container rewardsContainer = new SimpleContainer(containerSize);
@@ -113,27 +111,29 @@ public class RewardMenu extends AbstractContainerMenu {
     }
 
     // Rewards Slots
-    int rewardStartPositionY = 17;
-    int rewardStartPositionX = 6;
-    for (int rewardRow = 0; rewardRow < 5; ++rewardRow) {
-      for (int rewardColumn = 0; rewardColumn < 7; ++rewardColumn) {
-        int rewardSlotIndex = rewardColumn + rewardRow * 7;
+    float rewardSlotSizeX = 20.5f;
+    int rewardSlotSizeY = 31;
+    int rewardStartPositionX = 8;
+    int rewardStartPositionY = 19;
+    for (int rewardRow = 0; rewardRow < 4; ++rewardRow) {
+      for (int rewardColumn = 0; rewardColumn < 8; ++rewardColumn) {
+        int rewardSlotIndex = rewardColumn + rewardRow * 8;
         if (userRewards.size() > rewardSlotIndex && userRewards.get(rewardSlotIndex) != null
             && !userRewards.get(rewardSlotIndex).isEmpty()) {
           this.addSlot(new TakeableRewardSlot(this.rewardsUserContainer, rewardSlotIndex,
-              rewardStartPositionX + rewardColumn * rewardSlotSizeX,
+              rewardStartPositionX + Math.round(rewardColumn * rewardSlotSizeX),
               rewardStartPositionY + rewardRow * rewardSlotSizeY, this));
         } else if (rewardsForCurrentMonth.size() > rewardSlotIndex) {
           this.addSlot(new RewardSlot(this.rewardsContainer, rewardSlotIndex,
-              rewardStartPositionX + rewardColumn * rewardSlotSizeX,
+              rewardStartPositionX + Math.round(rewardColumn * rewardSlotSizeX),
               rewardStartPositionY + rewardRow * rewardSlotSizeY, this));
         }
       }
     }
 
     // Player Inventory Slots
-    int playerInventoryStartPositionY = 168;
-    int playerInventoryStartPositionX = 6;
+    int playerInventoryStartPositionY = 160;
+    int playerInventoryStartPositionX = 8;
     for (int inventoryRow = 0; inventoryRow < 3; ++inventoryRow) {
       for (int inventoryColumn = 0; inventoryColumn < 9; ++inventoryColumn) {
         this.addSlot(new Slot(playerInventory, inventoryColumn + inventoryRow * 9 + 9,
@@ -143,8 +143,8 @@ public class RewardMenu extends AbstractContainerMenu {
     }
 
     // Player Hotbar Slots
-    int hotbarStartPositionY = 226;
-    int hotbarStartPositionX = 6;
+    int hotbarStartPositionY = 218;
+    int hotbarStartPositionX = 8;
     for (int playerInventorySlot = 0; playerInventorySlot < 9; ++playerInventorySlot) {
       this.addSlot(new Slot(playerInventory, playerInventorySlot,
           hotbarStartPositionX + playerInventorySlot * slotSize, hotbarStartPositionY));
