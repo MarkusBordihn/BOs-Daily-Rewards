@@ -1,0 +1,11 @@
+{
+  "text.daily_rewards.claim_rewards": "Получай свои ежедневные награды с помощью %1$s !",
+  "text.daily_rewards.reward_screen": "Дней вознаграждения: %1$s день(ей)",
+  "text.daily_rewards.rewarded_item": "Поздравляю %1$s ты получил %2$s в качестве регонизации за %3$s дня(ей) в этом мире за этот месяц.",
+  "text.daily_rewards.unclaimed_rewarded_item": "%1$s, у тебя есть не утверждённые ежедневные награды, обязательно забери их в течении следующих %2$s дней!",
+  "text.daily_rewards.unclaimed_rewarded_item_today": "%1$s, у тебя не утверждённые ежедневные награды, обязательно сегодня их забери!!!",
+  "text.daily_rewards.next_reward.in": "Следующая награда через %1$s",
+  "text.daily_rewards.next_reward.reload": "Перезагрузи, чтобы утвердить!",
+
+  "item.daily_rewards.taken_reward": "Взял награду."
+}
