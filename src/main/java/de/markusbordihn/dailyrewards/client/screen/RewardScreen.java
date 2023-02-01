@@ -89,8 +89,11 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
   protected void renderNextTimeForReward(PoseStack poseStack, int x, int y) {
     // Early return if the user needs to reload to claim rewards.
     if (this.reloadToClaim) {
-      this.font.draw(poseStack,
-          Component.translatable(Constants.TEXT_PREFIX + "next_reward.reload"), x + 15f, y,
+      MutableComponent component =
+          Component.translatable(Constants.TEXT_PREFIX + "next_reward.reload");
+      int componentWidth = this.font.width(component);
+      this.font.draw(poseStack, component,
+          x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2f) : 0), y,
           0xFF0000);
       return;
     }
@@ -119,9 +122,13 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
       }
     }
 
-    this.font.draw(poseStack,
-        Component.translatable(Constants.TEXT_PREFIX + "next_reward.in", this.nextRewardTimeString),
-        x, y, 0x666666);
+    // Display next reward time.
+    MutableComponent component =
+        Component.translatable(Constants.TEXT_PREFIX + "next_reward.in", this.nextRewardTimeString);
+    int componentWidth = this.font.width(component);
+    this.font.draw(poseStack, component,
+        x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2f) : 0), y,
+        0x666666);
   }
 
   @Override
@@ -165,7 +172,7 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
       }
     }
 
-    this.renderNextTimeForReward(poseStack, leftPos + 28, topPos + 140);
+    this.renderNextTimeForReward(poseStack, leftPos + 2, topPos + 140);
 
     this.renderTooltip(poseStack, x, y);
   }
