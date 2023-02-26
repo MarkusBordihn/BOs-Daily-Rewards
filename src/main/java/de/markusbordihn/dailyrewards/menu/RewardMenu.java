@@ -40,8 +40,10 @@ import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.data.RewardClientData;
 import de.markusbordihn.dailyrewards.data.RewardData;
 import de.markusbordihn.dailyrewards.data.RewardUserData;
+import de.markusbordihn.dailyrewards.menu.slots.EmptyRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.TakeableRewardSlot;
+import de.markusbordihn.dailyrewards.rewards.Rewards;
 
 public class RewardMenu extends AbstractContainerMenu {
 
@@ -84,13 +86,13 @@ public class RewardMenu extends AbstractContainerMenu {
     this.player = playerInventory.player;
     this.level = this.player.getLevel();
 
-    // Sync rewarded days
+    // Sync rewarded days.
     this.rewardedDays = level.isClientSide ? RewardClientData.getRewardedDaysForCurrentMonth()
         : RewardUserData.get().getRewardedDaysForCurrentMonth(player.getUUID());
     this.lastRewardedDay = level.isClientSide ? RewardClientData.getLastRewardedDayForCurrentMonth()
         : RewardUserData.get().getLastRewardedDayForCurrentMonth(player.getUUID());
 
-    // Sync possible rewards items for current month
+    // Sync possible rewards items for current month.
     List<ItemStack> rewardsForCurrentMonth =
         level.isClientSide ? RewardClientData.getGeneralRewardsForCurrentMonth()
             : RewardData.get().getRewardsForCurrentMonth();
@@ -100,7 +102,7 @@ public class RewardMenu extends AbstractContainerMenu {
       }
     }
 
-    // Sync user rewarded items for current month
+    // Sync user rewarded items for current month.
     List<ItemStack> userRewards =
         level.isClientSide ? RewardClientData.getUserRewardsForCurrentMonth()
             : RewardUserData.get().getRewardsForCurrentMonth(player.getUUID());
@@ -110,7 +112,8 @@ public class RewardMenu extends AbstractContainerMenu {
       }
     }
 
-    // Rewards Slots
+    // Define Rewards Slots and render takeable rewards, upcoming rewards and empty rewards.
+    int numberOfDays = Rewards.getDaysCurrentMonth();
     float rewardSlotSizeX = 20.5f;
     int rewardSlotSizeY = 31;
     int rewardStartPositionX = 8;
@@ -125,6 +128,10 @@ public class RewardMenu extends AbstractContainerMenu {
               rewardStartPositionY + rewardRow * rewardSlotSizeY, this));
         } else if (rewardsForCurrentMonth.size() > rewardSlotIndex) {
           this.addSlot(new RewardSlot(this.rewardsContainer, rewardSlotIndex,
+              rewardStartPositionX + Math.round(rewardColumn * rewardSlotSizeX),
+              rewardStartPositionY + rewardRow * rewardSlotSizeY, this));
+        } else if (numberOfDays > rewardSlotIndex) {
+          this.addSlot(new EmptyRewardSlot(this.rewardsContainer, rewardSlotIndex,
               rewardStartPositionX + Math.round(rewardColumn * rewardSlotSizeX),
               rewardStartPositionY + rewardRow * rewardSlotSizeY, this));
         }

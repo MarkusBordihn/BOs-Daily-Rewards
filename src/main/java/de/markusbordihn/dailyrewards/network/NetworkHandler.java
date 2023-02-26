@@ -70,8 +70,8 @@ public class NetworkHandler {
         buffer.writeNbt(message.getData());
         buffer.writeInt(message.getRewardedDays());
         buffer.writeUtf(message.getLastRewardedDay());
-      }, buffer -> new MessageUserRewardsForCurrentMonth(buffer.readNbt(), buffer.readInt(), buffer.readUtf()),
-          MessageUserRewardsForCurrentMonth::handle);
+      }, buffer -> new MessageUserRewardsForCurrentMonth(buffer.readNbt(), buffer.readInt(),
+          buffer.readUtf()), MessageUserRewardsForCurrentMonth::handle);
     });
   }
 
@@ -79,7 +79,6 @@ public class NetworkHandler {
   public static void syncGeneralRewardForCurrentMonth(ServerPlayer serverPlayer) {
     CompoundTag data = RewardData.get().getRewardsForCurrentMonthSyncData();
     if (serverPlayer != null && serverPlayer.getUUID() != null && data != null && !data.isEmpty()) {
-      log.debug("Sending general reward for current month to {}: {}", serverPlayer, data);
       INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
           new MessageGeneralRewardsForCurrentMonth(data));
     }
@@ -95,7 +94,6 @@ public class NetworkHandler {
     int rewardedDays = RewardUserData.get().getRewardedDaysForCurrentMonth(uuid);
     String lastRewardedDay = RewardUserData.get().getLastRewardedDayForCurrentMonth(uuid);
     if (data != null && !data.isEmpty()) {
-      log.debug("Sending user reward for current month to {}: {}", serverPlayer, data);
       INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
           new MessageUserRewardsForCurrentMonth(data, rewardedDays, lastRewardedDay));
     }

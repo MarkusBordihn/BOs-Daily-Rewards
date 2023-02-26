@@ -47,8 +47,7 @@ public class MessageGeneralRewardsForCurrentMonth {
     return this.data;
   }
 
-  public static void handle(
-      MessageGeneralRewardsForCurrentMonth message,
+  public static void handle(MessageGeneralRewardsForCurrentMonth message,
       Supplier<NetworkEvent.Context> contextSupplier) {
     NetworkEvent.Context context = contextSupplier.get();
     context.enqueueWork(

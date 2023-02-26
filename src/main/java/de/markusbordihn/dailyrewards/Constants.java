@@ -23,8 +23,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public final class Constants {
 
-  protected Constants() {
-  }
+  protected Constants() {}
 
   // General Mod definitions
   public static final String LOG_NAME = "Daily Rewards";

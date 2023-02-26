@@ -7,5 +7,6 @@
   "text.daily_rewards.next_reward.in": "Следующая награда через %1$s",
   "text.daily_rewards.next_reward.reload": "Перезагрузи, чтобы утвердить!",
 
+  "item.daily_rewards.empty_reward": "Без вознаграждения.",
   "item.daily_rewards.taken_reward": "Взял награду."
 }
