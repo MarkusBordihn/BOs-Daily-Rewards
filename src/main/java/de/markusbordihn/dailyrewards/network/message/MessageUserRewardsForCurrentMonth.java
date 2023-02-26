@@ -41,7 +41,8 @@ public class MessageUserRewardsForCurrentMonth {
   protected final int rewardedDays;
   protected final String lastRewardedDay;
 
-  public MessageUserRewardsForCurrentMonth(CompoundTag data, int rewardedDays, String lastRewardedDay) {
+  public MessageUserRewardsForCurrentMonth(CompoundTag data, int rewardedDays,
+      String lastRewardedDay) {
     this.data = data;
     this.rewardedDays = rewardedDays;
     this.lastRewardedDay = lastRewardedDay;
@@ -59,8 +60,7 @@ public class MessageUserRewardsForCurrentMonth {
     return this.lastRewardedDay;
   }
 
-  public static void handle(
-      MessageUserRewardsForCurrentMonth message,
+  public static void handle(MessageUserRewardsForCurrentMonth message,
       Supplier<NetworkEvent.Context> contextSupplier) {
     NetworkEvent.Context context = contextSupplier.get();
     context.enqueueWork(

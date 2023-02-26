@@ -58,8 +58,12 @@ public class Rewards {
 
   @SubscribeEvent
   public static void handleServerAboutToStartEvent(ServerAboutToStartEvent event) {
-    log.info("Will use the following normal fill items: {}", getNormalFillItems());
-    log.info("Will use the following rare fill items: {}", getRareFillItems());
+    if (Boolean.TRUE.equals(COMMON.useFillItems.get())) {
+      log.info("Will use the following normal fill items: {}", getNormalFillItems());
+      log.info("Will use the following rare fill items: {}", getRareFillItems());
+    } else {
+      log.info("Fill items are disabled, will use only reward items.");
+    }
   }
 
   public static List<ItemStack> calculateRewardItemsForMonth(int month) {
@@ -69,8 +73,22 @@ public class Rewards {
     List<ItemStack> rewardItemsForMonth = getRewardItemForMonth(month);
 
     // Early return if we have matching items without shuffle.
-    if (rewardItemsForMonth.size() >= numberOfDays) {
-      return rewardItemsForMonth.stream().limit(numberOfDays).collect(Collectors.toList());
+    if (Boolean.TRUE.equals(!COMMON.useFillItems.get())
+        || rewardItemsForMonth.size() >= numberOfDays) {
+      if (Boolean.FALSE.equals(COMMON.useFillItems.get())) {
+        log.info("Fill items are disabled, will use {} reward items for month {} with {} days ...",
+            rewardItemsForMonth.size(), month, numberOfDays);
+      } else {
+        log.info("Found {} reward items for month {} with {} days ...", rewardItemsForMonth.size(),
+            month, numberOfDays);
+      }
+      List<ItemStack> rewardItems =
+          rewardItemsForMonth.stream().limit(numberOfDays).collect(Collectors.toList());
+      if (Boolean.TRUE.equals(COMMON.shuffleRewardsItems.get())) {
+        log.info("Shuffle reward items for month {} ...", month);
+        Collections.shuffle(rewardItems);
+      }
+      return rewardItems;
     }
 
     // Fill missing days with fill items.
@@ -88,7 +106,7 @@ public class Rewards {
         lootBagFillItems.isEmpty() ? 0 : COMMON.lootBagFillItemsChance.get();
 
     // Fill missing reward items.
-    log.info("Found {} missing days without any items, will try to use fill items ...",
+    log.warn("Found {} missing days without any items, will try to use fill items ...",
         numMissingRewardItems);
     for (int i = 0; i < numMissingRewardItems; i++) {
       ItemStack fillItem = null;
@@ -103,7 +121,8 @@ public class Rewards {
         }
       }
 
-      // There is a 1:x (1:15) chance to get an loot bag item instead of an normal item.
+      // There is a 1:x (1:15) chance to get an loot bag item instead of an normal
+      // item.
       else if (lootBackFillItemChance > 0 && random.nextInt(lootBackFillItemChance) == 0) {
         ItemStack lootBagFillItem = lootBagFillItems.get(random.nextInt(lootBagFillItems.size()));
         // Make sure we avoid duplicates of lootBag fill items.
@@ -127,8 +146,11 @@ public class Rewards {
       rewardItemsForMonth.add(fillItem);
     }
 
-    // Shuffle items before returning
-    Collections.shuffle(rewardItemsForMonth);
+    // Shuffle items before returning.
+    if (Boolean.TRUE.equals(COMMON.shuffleRewardsItems.get())) {
+      log.info("Shuffle reward items for month {} ...", month);
+      Collections.shuffle(rewardItemsForMonth);
+    }
     return rewardItemsForMonth;
   }
 

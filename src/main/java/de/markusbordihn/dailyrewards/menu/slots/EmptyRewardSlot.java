@@ -17,29 +17,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.dailyrewards.item;
+package de.markusbordihn.dailyrewards.menu.slots;
 
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import de.markusbordihn.dailyrewards.item.ModItems;
+import de.markusbordihn.dailyrewards.menu.RewardMenu;
 
-import de.markusbordihn.dailyrewards.Constants;
+public class EmptyRewardSlot extends Slot {
 
-public class ModItems {
+  protected RewardMenu menu;
 
-  protected ModItems() {
-
+  public EmptyRewardSlot(Container container, int index, int x, int y) {
+    super(container, index, x, y);
   }
 
-  public static final DeferredRegister<Item> ITEMS =
-      DeferredRegister.create(ForgeRegistries.ITEMS, Constants.MOD_ID);
+  public EmptyRewardSlot(Container container, int index, int x, int y, RewardMenu menu) {
+    super(container, index, x, y);
+    this.menu = menu;
+  }
 
-  public static final RegistryObject<Item> TAKEN_REWARD = ITEMS.register("taken_reward",
-      () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
+  @Override
+  public ItemStack getItem() {
+    return new ItemStack(ModItems.EMPTY_REWARD.get());
+  }
 
-  public static final RegistryObject<Item> EMPTY_REWARD = ITEMS.register("empty_reward",
-      () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
+  @Override
+  public boolean mayPickup(Player player) {
+    return false;
+  }
+
+  @Override
+  public boolean isActive() {
+    return true;
+  }
+
+  @Override
+  public boolean mayPlace(ItemStack itemStack) {
+    return false;
+  }
+
 }
