@@ -45,6 +45,7 @@ import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.config.CommonConfig;
 import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.menu.RewardMenu;
+import de.markusbordihn.dailyrewards.menu.slots.EmptyRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.TakeableRewardSlot;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
@@ -167,7 +168,7 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
       Slot slot = this.menu.slots.get(k);
       if (slot instanceof TakeableRewardSlot && !slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
         rendererTakeableRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
-      } else if (slot instanceof RewardSlot) {
+      } else if (slot instanceof RewardSlot || slot instanceof EmptyRewardSlot) {
         renderRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
       }
     }

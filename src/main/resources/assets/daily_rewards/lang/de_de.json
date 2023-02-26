@@ -7,5 +7,6 @@
   "text.daily_rewards.next_reward.in": "Nächste Belohnung in %1$s",
   "text.daily_rewards.next_reward.reload": "Neu laden für Belohnung!",
 
+  "item.daily_rewards.empty_reward": "Keine Belohnung.",
   "item.daily_rewards.taken_reward": "Belohnung bereits beansprucht."
 }

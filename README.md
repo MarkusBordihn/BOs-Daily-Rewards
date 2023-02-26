@@ -23,6 +23,20 @@ Please report issues over the issue link above.
 
 All rewards could be customized over the configuration file under `config/daily_rewards_common.toml`.
 
+### Fill Items
+
+Fill items are used to fill the reward list to the number of days in a month.
+
+- If you provide a list of items less than the number of days in a month, the list will be extended by fill items to match the number of days in a month.
+- If you don't want to have fill items, you can set the `useFillItems` to `false`.
+- If you provide a list of items equal or greater than the number of days in a month, the list will be truncated to the number of days in a month without any fill items or randomization.
+
+### Randomization
+
+The randomization is used to randomize the reward list for each month.
+This is helpful in the case fill items are used to distribute the fill items and rewards more evenly over the month.
+The randomization could be disabled by setting `useRandomization` to `false`.
+
 ### Preview reward data
 
 You can preview the configured rewards for each month based on the configuration over the `/DailyRewards preview ...` command.

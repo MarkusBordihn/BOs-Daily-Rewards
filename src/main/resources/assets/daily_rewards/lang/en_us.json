@@ -7,5 +7,6 @@
   "text.daily_rewards.next_reward.in": "Next reward in %1$s",
   "text.daily_rewards.next_reward.reload": "Reload to claim!",
 
+  "item.daily_rewards.empty_reward": "No reward.",
   "item.daily_rewards.taken_reward": "Taken reward."
 }
