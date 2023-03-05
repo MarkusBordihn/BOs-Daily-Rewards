@@ -73,8 +73,8 @@ public class RewardData extends SavedData {
     // Using a global approach and storing relevant data in the overworld only!
     ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
     if (serverLevel != null) {
-      RewardData.data = serverLevel.getDataStorage()
-          .computeIfAbsent(RewardData::load, RewardData::new, RewardData.getFileId());
+      RewardData.data = serverLevel.getDataStorage().computeIfAbsent(RewardData::load,
+          RewardData::new, RewardData.getFileId());
     } else {
       log.error("{} unable to get server level {} for storing data!", Constants.LOG_NAME,
           serverLevel);
