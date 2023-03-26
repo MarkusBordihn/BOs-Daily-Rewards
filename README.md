@@ -15,6 +15,24 @@ Daily rewards is a very lightweight and simple Forge mod that rewards players da
 - Grant daily rewards after some minutes online and not immediately
 - Supports mod items and loot bags
 
+## Usage
+
+### Claim Rewards
+
+To claim your daily rewards you need to open the daily rewards UI by using the `/DailyRewards claim` command.
+You will get additional a notification if you have rewards to claim with a clickable message.
+
+### Using with Command Blocks
+
+If you want to use the mod with command blocks, you can need to use the `/execute as @p run DailyRewards claim` command to claim the rewards for the current day.
+
+![Daily Rewards Command Block](examples/daily_rewards_command_block.png)
+
+### Using with Easy NPCs
+
+If you want to have an NPC which is triggering the reward collection you can use the Easy NPC mod.
+You can find more information about the mod and the integration here: <https://github.com/MarkusBordihn/BOs-Easy-NPC/wiki/ModIntegration#daily-rewards>
+
 ## Report Issues
 
 Please report issues over the issue link above.
@@ -92,7 +110,7 @@ Data structure:
 | Forge 1.19     | ⚠️ Deprecated         |
 | Forge 1.19.1   | ⚠️ Deprecated         |
 | Forge 1.19.2   | ⚠️ Maintenance only   |
-| Forge 1.19.3   | ⚠️ Maintenance only |
+| Forge 1.19.3   | ⚠️ Maintenance only   |
 | Forge 1.19.4   | ✔️ Active development |
 
 ## License

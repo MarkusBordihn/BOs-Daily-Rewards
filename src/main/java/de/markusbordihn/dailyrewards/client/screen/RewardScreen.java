@@ -75,7 +75,7 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
   public void rendererTakeableRewardSlot(PoseStack poseStack, int x, int y) {
     RenderSystem.setShaderTexture(0, Constants.TEXTURE_ICONS);
     poseStack.pushPose();
-    this.blit(poseStack, x + 12, y - 5, 0, 0, 16, 16);
+    blit(poseStack, x + 12, y - 5, 0, 0, 16, 16);
     poseStack.popPose();
   }
 
@@ -192,8 +192,8 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
     RenderSystem.setShaderTexture(0, Constants.TEXTURE_GENERIC_54);
 
     // Main screen
-    this.blit(poseStack, leftPos, topPos + 20, 0, 0, 176, 222);
-    this.blit(poseStack, leftPos, topPos, 0, 0, 176, 139);
+    blit(poseStack, leftPos, topPos + 20, 0, 0, 176, 222);
+    blit(poseStack, leftPos, topPos, 0, 0, 176, 139);
     blit(poseStack, leftPos + 5, topPos + 15, 3, 64, 165, 130, 255, 4096);
 
     // Render Rewards Slots
@@ -204,8 +204,8 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
         if (dayCounter <= rewardDaysForCurrentMonth) {
           int slotLeftPos = leftPos + 7 + Math.round(i2 * 20.5f);
           RenderSystem.setShaderTexture(0, Constants.TEXTURE_GENERIC_54);
-          this.blit(poseStack, slotLeftPos, slotTopPos + 26, 7, 17, 18, 18);
-          this.blit(poseStack, slotLeftPos, slotTopPos + 16, 7, 17, 18, 18);
+          blit(poseStack, slotLeftPos, slotTopPos + 26, 7, 17, 18, 18);
+          blit(poseStack, slotLeftPos, slotTopPos + 16, 7, 17, 18, 18);
           this.font.draw(poseStack, dayCounter + "", slotLeftPos + (dayCounter < 10 ? 6f : 4f),
               slotTopPos + 35f, 4210752);
           dayCounter++;
