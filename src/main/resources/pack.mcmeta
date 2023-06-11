@@ -1,8 +1,8 @@
 {
   "pack": {
-    "description": "Bo's Daily Rewards resources",
-    "pack_format": 12,
-    "forge:resource_pack_format": 12,
-    "forge:data_pack_format": 10
+    "description": {
+      "text": "${mod_name} resources"
+    },
+    "pack_format": 15
   }
 }

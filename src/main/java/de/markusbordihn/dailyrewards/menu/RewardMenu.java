@@ -84,7 +84,7 @@ public class RewardMenu extends AbstractContainerMenu {
 
     // Other
     this.player = playerInventory.player;
-    this.level = this.player.getLevel();
+    this.level = this.player.level();
 
     // Sync rewarded days.
     this.rewardedDays = level.isClientSide ? RewardClientData.getRewardedDaysForCurrentMonth()

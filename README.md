@@ -112,6 +112,7 @@ Data structure:
 | Forge 1.19.2   | ⚠️ Maintenance only   |
 | Forge 1.19.3   | ⚠️ Maintenance only   |
 | Forge 1.19.4   | ✔️ Active development |
+| Forge 1.20     | ⚠️ Testing            |
 
 ## License
 

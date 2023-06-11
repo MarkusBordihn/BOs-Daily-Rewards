@@ -27,12 +27,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Inventory;
@@ -72,30 +72,26 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
     super(menu, inventory, component);
   }
 
-  public void rendererTakeableRewardSlot(PoseStack poseStack, int x, int y) {
-    RenderSystem.setShaderTexture(0, Constants.TEXTURE_ICONS);
-    poseStack.pushPose();
-    blit(poseStack, x + 12, y - 5, 0, 0, 16, 16);
-    poseStack.popPose();
+  public void rendererTakeableRewardSlot(GuiGraphics guiGraphics, int x, int y) {
+    guiGraphics.blit(Constants.TEXTURE_ICONS, x + 12, y - 5, 0, 0, 16, 16);
   }
 
-  public void renderRewardSlot(PoseStack poseStack, int x, int y) {
+  public void renderRewardSlot(GuiGraphics guiGraphics, int x, int y) {
     RenderSystem.disableDepthTest();
     RenderSystem.colorMask(true, true, true, false);
-    fill(poseStack, x, y, x + 16, y + 18 + 8, 0x80AAAAAA);
+    guiGraphics.fill(RenderType.guiOverlay(), x, y, x + 16, y + 18 + 8, 0x80AAAAAA);
     RenderSystem.colorMask(true, true, true, true);
     RenderSystem.enableDepthTest();
   }
 
-  protected void renderNextTimeForReward(PoseStack poseStack, int x, int y) {
+  protected void renderNextTimeForReward(GuiGraphics guiGraphics, int x, int y) {
     // Early return if the user needs to reload to claim rewards.
     if (this.reloadToClaim) {
-      MutableComponent component =
-          Component.translatable(Constants.TEXT_PREFIX + "next_reward.reload");
+      Component component = Component.translatable(Constants.TEXT_PREFIX + "next_reward.reload");
       int componentWidth = this.font.width(component);
-      this.font.draw(poseStack, component,
-          x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2f) : 0), y,
-          0xFF0000);
+      guiGraphics.drawString(this.font, component,
+          x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2) : 0), y,
+          0xFF0000, false);
       return;
     }
 
@@ -127,9 +123,9 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
     MutableComponent component =
         Component.translatable(Constants.TEXT_PREFIX + "next_reward.in", this.nextRewardTimeString);
     int componentWidth = this.font.width(component);
-    this.font.draw(poseStack, component,
-        x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2f) : 0), y,
-        0x666666);
+    guiGraphics.drawString(this.font, component,
+        x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2) : 0), y,
+        0x666666, false);
   }
 
   @Override
@@ -159,42 +155,41 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
   }
 
   @Override
-  public void render(PoseStack poseStack, int x, int y, float partialTicks) {
-    this.renderBackground(poseStack);
-    super.render(poseStack, x, y, partialTicks);
+  public void render(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+    this.renderBackground(guiGraphics);
+
+    super.render(guiGraphics, x, y, partialTicks);
 
     // Additional styling for the different kind of slots and slot states.
     for (int k = 0; k < this.menu.slots.size(); ++k) {
       Slot slot = this.menu.slots.get(k);
       if (slot instanceof TakeableRewardSlot && !slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
-        rendererTakeableRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
+        rendererTakeableRewardSlot(guiGraphics, leftPos + slot.x, topPos + slot.y);
       } else if (slot instanceof RewardSlot || slot instanceof EmptyRewardSlot) {
-        renderRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
+        renderRewardSlot(guiGraphics, leftPos + slot.x, topPos + slot.y);
       }
     }
 
-    this.renderNextTimeForReward(poseStack, leftPos + 2, topPos + 140);
+    this.renderNextTimeForReward(guiGraphics, leftPos + 2, topPos + 140);
 
-    this.renderTooltip(poseStack, x, y);
+    this.renderTooltip(guiGraphics, x, y);
   }
 
   @Override
-  protected void renderLabels(PoseStack poseStack, int x, int y) {
-    this.font.draw(poseStack, rewardScreenTitle, this.titleLabelX, this.titleLabelY, 4210752);
-    this.font.draw(poseStack, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY,
-        4210752);
+  protected void renderLabels(GuiGraphics guiGraphics, int x, int y) {
+    guiGraphics.drawString(this.font, rewardScreenTitle, this.titleLabelX, this.titleLabelY,
+        4210752, false);
+    guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX,
+        this.inventoryLabelY, 4210752, false);
   }
 
   @Override
-  protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
-    RenderSystem.setShader(GameRenderer::getPositionTexShader);
-    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-    RenderSystem.setShaderTexture(0, Constants.TEXTURE_GENERIC_54);
-
+  protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
     // Main screen
-    blit(poseStack, leftPos, topPos + 20, 0, 0, 176, 222);
-    blit(poseStack, leftPos, topPos, 0, 0, 176, 139);
-    blit(poseStack, leftPos + 5, topPos + 15, 3, 64, 165, 130, 255, 4096);
+    guiGraphics.blit(Constants.TEXTURE_GENERIC_54, leftPos, topPos + 20, 0, 0, 176, 222);
+    guiGraphics.blit(Constants.TEXTURE_GENERIC_54, leftPos, topPos, 0, 0, 176, 139);
+    guiGraphics.blit(Constants.TEXTURE_GENERIC_54, leftPos + 5, topPos + 15, 3, 64, 165, 130, 255,
+        4096);
 
     // Render Rewards Slots
     int dayCounter = 1;
@@ -203,11 +198,12 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
       for (int i2 = 0; i2 < 8; i2++) {
         if (dayCounter <= rewardDaysForCurrentMonth) {
           int slotLeftPos = leftPos + 7 + Math.round(i2 * 20.5f);
-          RenderSystem.setShaderTexture(0, Constants.TEXTURE_GENERIC_54);
-          blit(poseStack, slotLeftPos, slotTopPos + 26, 7, 17, 18, 18);
-          blit(poseStack, slotLeftPos, slotTopPos + 16, 7, 17, 18, 18);
-          this.font.draw(poseStack, dayCounter + "", slotLeftPos + (dayCounter < 10 ? 6f : 4f),
-              slotTopPos + 35f, 4210752);
+          guiGraphics.blit(Constants.TEXTURE_GENERIC_54, slotLeftPos, slotTopPos + 26, 7, 17, 18,
+              18);
+          guiGraphics.blit(Constants.TEXTURE_GENERIC_54, slotLeftPos, slotTopPos + 16, 7, 17, 18,
+              18);
+          guiGraphics.drawString(this.font, dayCounter + "",
+              slotLeftPos + (dayCounter < 10 ? 6 : 4), slotTopPos + 35, 4210752, false);
           dayCounter++;
         }
       }
