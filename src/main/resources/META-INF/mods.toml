@@ -19,7 +19,7 @@ license="${mod_license}"
 # A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]] #mandatory
   modId="daily_rewards"
-  version="${mod_version}"
+  version="${mod_version ? mod_version : '0.0.0'}"
   displayName="${mod_name}"
   # A URL to query for updates for this mod. See the JSON update specification https://mcforge.readthedocs.io/en/latest/gettingstarted/autoupdate/
   #updateJSONURL="https://change.me.example.invalid/updates.json" #optional

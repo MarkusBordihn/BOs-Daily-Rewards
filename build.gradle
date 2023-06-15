@@ -1,6 +1,7 @@
 plugins {
   id 'com.matthewprenger.cursegradle' version '1.4.0'
   id 'eclipse'
+  id 'idea'
   id 'maven-publish'
   id 'net.minecraftforge.gradle' version '[6.0,6.2)'
   id 'nu.studer.credentials' version '1.0.7'
@@ -8,6 +9,10 @@ plugins {
 
 version = "${version_major}.${version_minor}.${version_patch}"
 archivesBaseName = "${mod_id}_${minecraft_version}"
+
+base {
+    archivesName = archivesBaseName
+}
 
 // Mojang ships Java 17 to end users in 1.18+.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
