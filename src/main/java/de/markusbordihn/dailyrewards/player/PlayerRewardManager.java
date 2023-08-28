@@ -48,7 +48,6 @@ import de.markusbordihn.dailyrewards.commands.ClaimCommand;
 import de.markusbordihn.dailyrewards.config.CommonConfig;
 import de.markusbordihn.dailyrewards.data.RewardData;
 import de.markusbordihn.dailyrewards.data.RewardUserData;
-import de.markusbordihn.dailyrewards.network.NetworkHandler;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 
 @EventBusSubscriber
@@ -57,7 +56,8 @@ public class PlayerRewardManager {
   private static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
   private static final CommonConfig.Config COMMON = CommonConfig.COMMON;
-  private static int rewardTimePerDay = COMMON.rewardTimePerDay.get();
+  private static boolean automaticRewardPlayers = true;
+  private static int rewardTimePerDay = 30;
   private static int rewardTimePerDayTicks = rewardTimePerDay * 60 * 20;
 
   private static final short REWARD_CHECK_TICK = 20 * 60; // every 1 Minute
@@ -74,11 +74,18 @@ public class PlayerRewardManager {
   public static void onServerAboutToStartEvent(ServerAboutToStartEvent event) {
     playerList = ConcurrentHashMap.newKeySet();
 
+    automaticRewardPlayers = COMMON.automaticRewardPlayers.get();
     rewardTimePerDay = COMMON.rewardTimePerDay.get();
     rewardTimePerDayTicks = rewardTimePerDay * 60 * 20;
 
-    log.info("Daily rewards will be granted after {} min ({} ticks) a player is online.",
-        rewardTimePerDay, rewardTimePerDayTicks);
+    if (automaticRewardPlayers) {
+      log.info(
+          "Daily rewards will be automatically granted after {} min ({} ticks) a player is online.",
+          rewardTimePerDay, rewardTimePerDayTicks);
+    } else {
+      log.warn(
+          "Daily rewards will not be automatically granted. Use `/DailyRewards reward today <player>` to manually grant rewards.");
+    }
   }
 
   @SubscribeEvent
@@ -94,9 +101,7 @@ public class PlayerRewardManager {
       return;
     }
 
-    // Sync data and add Player to reward.
-    NetworkHandler.syncGeneralRewardForCurrentMonth(player);
-    NetworkHandler.syncUserRewardForCurrentMonth(player);
+    // Track currently logged in player.
     playerList.add(player);
 
     // Check if player has any unclaimed rewards.
@@ -138,11 +143,14 @@ public class PlayerRewardManager {
 
   @SubscribeEvent
   public static void handleServerTickEvent(TickEvent.ServerTickEvent event) {
-    if (event.phase == TickEvent.Phase.END || ticker++ < REWARD_CHECK_TICK
-        || playerList.isEmpty()) {
+    // Early return if we are not on the end of the tick, should not reward player automatically or
+    // we have no players online.
+    if (event.phase == TickEvent.Phase.END || !automaticRewardPlayers
+        || ticker++ < REWARD_CHECK_TICK || playerList.isEmpty()) {
       return;
     }
 
+    // Check if we have any players online which should be rewarded.
     for (ServerPlayer player : playerList) {
       if (player.tickCount > rewardTimePerDayTicks) {
         UUID uuid = player.getUUID();
@@ -163,7 +171,6 @@ public class PlayerRewardManager {
             player.sendMessage(
                 new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
                 Util.NIL_UUID);
-            NetworkHandler.syncUserRewardForCurrentMonth(player);
           }
 
           log.info("Reward player {} daily reward for {} days with {} ...", player, rewardedDays,

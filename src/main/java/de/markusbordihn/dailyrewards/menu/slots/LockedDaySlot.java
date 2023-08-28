@@ -17,26 +17,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.dailyrewards.menu;
+package de.markusbordihn.dailyrewards.menu.slots;
 
-import de.markusbordihn.dailyrewards.Constants;
-import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
-import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import de.markusbordihn.dailyrewards.item.ModItems;
+import de.markusbordihn.dailyrewards.menu.RewardMenu;
 
-public class ModMenuTypes {
+public class LockedDaySlot extends Slot {
 
-  protected ModMenuTypes() {
+  protected RewardMenu menu;
 
+  public LockedDaySlot(Container container, int index, int x, int y) {
+    super(container, index, x, y);
   }
 
-  public static final DeferredRegister<MenuType<?>> MENU_TYPES =
-      DeferredRegister.create(ForgeRegistries.CONTAINERS, Constants.MOD_ID);
+  public LockedDaySlot(Container container, int index, int x, int y, RewardMenu menu) {
+    super(container, index, x, y);
+    this.menu = menu;
+  }
 
-  public static final RegistryObject<MenuType<RewardOverviewMenu>> REWARD_OVERVIEW_MENU = MENU_TYPES
-      .register("reward_overview_menu", () -> IForgeMenuType.create(RewardOverviewMenu::new));
+  @Override
+  public ItemStack getItem() {
+    return new ItemStack(ModItems.LOCK_DAY.get());
+  }
+
+  @Override
+  public boolean mayPickup(Player player) {
+    return false;
+  }
+
+  @Override
+  public boolean isActive() {
+    return true;
+  }
+
+  @Override
+  public boolean mayPlace(ItemStack itemStack) {
+    return false;
+  }
 
 }

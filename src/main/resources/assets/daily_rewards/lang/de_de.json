@@ -1,12 +1,37 @@
 {
   "text.daily_rewards.claim_rewards": "Fordere deine täglichen Prämien mit %1$s ein!",
+  "text.daily_rewards.next_reward.in": "Nächste Belohnung in %1$s",
+  "text.daily_rewards.next_reward.reload": "Neu laden für Belohnung!",
+  "text.daily_rewards.player_already_rewarded_today": "Spieler %1$s hat bereits seine täglichen Belohnungen für diesen Tag erhalten.",
   "text.daily_rewards.reward_screen": "Belohnte Tage: %1$s Tag(e)",
+  "text.daily_rewards.reward_screen_none": "💰 Daily Rewards",
+  "text.daily_rewards.rewarded_item_empty": "Die Belohnung ist leer, bitte prüfe die Logfiles und die entsprechende Konfiguration!",
   "text.daily_rewards.rewarded_item": "Herzlichen Glückwunsch %1$s, du hast %2$s als Anerkenung für %3$s Tag(e) auf dieser Welt (für diesen Monat) erhalten.",
   "text.daily_rewards.unclaimed_rewarded_item": "%1$s du hast nicht eingeforderte Tagesbelohnungen, bitte stelle sicher, dass du diese in den nächsten %2$s Tagen einforderst!",
   "text.daily_rewards.unclaimed_rewarded_item_today": "%1$s, du hast nicht beanspruchte Belohnungen, bitte stelle sicher, dass du diese noch heute anforderst!!!",
-  "text.daily_rewards.next_reward.in": "Nächste Belohnung in %1$s",
-  "text.daily_rewards.next_reward.reload": "Neu laden für Belohnung!",
 
-  "item.daily_rewards.empty_reward": "Keine Belohnung.",
-  "item.daily_rewards.taken_reward": "Belohnung bereits beansprucht."
+  "text.daily_rewards.empty_reward.description": "Für diesen Tag gibt es in diesem Monat keine täglichen Belohnungen.",
+  "text.daily_rewards.lock_day.description": "Dieser Tag ist gesperrt, Sie können Ihre täglichen Belohnungen für diesen Tag für diesen Monat nicht anfordern.",
+  "text.daily_rewards.skip_day.description": "Dieser Tag wird übersprungen, Sie können Ihre täglichen Belohnungen für diesen Tag für diesen Monat nicht anfordern.",
+  "text.daily_rewards.skipped_day.description": "Dieser Tag wurde übersprungen, ein kleiner Schritt, um Ihre nächsten täglichen Belohnungen für diesen Monat zu erhalten.",
+  "text.daily_rewards.taken_reward.description": "Sie haben Ihre täglichen Belohnungen für diesen Tag für diesen Monat bereits erhalten.",
+  "text.daily_rewards.unlock_day.description": "Dieser Tag wurde freigeschaltet, ein kleiner Schritt, um Ihre nächsten täglichen Belohnungen für diesen Monat zu erhalten.",
+
+  "text.daily_rewards.claim_today.info": "\u2714 Du kannst diese Belohnung noch heute einfordern.",
+  "text.daily_rewards.claimable_in_days.info": "\u2139 Du kannst diese Belohnung in etwa %1$s Tagen beanspruchen!",
+  "text.daily_rewards.claimable_reward.info": "\u2714 Diese Belohnung kann eingefordert werden!",
+  "text.daily_rewards.claimed_reward.info": "\u2714 Diese Belohnung wurde bereits beansprucht!",
+  "text.daily_rewards.empty_reward.info": "\u2714 Dieser Tag hat keine Belohnungen!",
+  "text.daily_rewards.lock_today.info": "\u2714 Dieser Tag kann heute freigeschaltet werden.",
+  "text.daily_rewards.not_claimable_for_this_month.info": "\u274C Du kannst diese Belohnung für diesen Monat nicht mehr beanspruchen, bitte warte auf den nächsten Monat.",
+  "text.daily_rewards.skip_today.info": "\u2714 Dieser Tag kann heute übersprungen werden.",
+  "text.daily_rewards.skipped_day.info": "\u2714 Dieser Tag wurde bereits übersprungen!",
+  "text.daily_rewards.unlocked_day.info": "\u2714 Dieser Tag ist bereits freigeschaltet!",
+
+  "item.daily_rewards.empty_reward": "Keine Belohnung",
+  "item.daily_rewards.lock_day": "Gesperrter Tag",
+  "item.daily_rewards.skip_day": "Tag überspringen",
+  "item.daily_rewards.skipped_day": "Übersprungener Tag",
+  "item.daily_rewards.taken_reward": "Belohnung bereits beansprucht",
+  "item.daily_rewards.unlock_day": "Freigeschalteter Tag"
 }

@@ -50,6 +50,7 @@ public class CommandManager {
     // @formatter:off
         .then(ClaimCommand.register())
         .then(PreviewCommand.register())
+        .then(RewardCommand.register())
       // @formatter:on
     );
   }

@@ -38,12 +38,14 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.rewards.AdditionalRewards;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 
 public class RewardData extends SavedData {
 
   public static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
+  public static final String ADDITIONAL_REWARDS_TAG = "AdditionalRewards";
   public static final String ITEMS_TAG = "RewardItems";
   public static final String ITEM_LIST_TAG = "ItemList";
   public static final String REWARDS_TAG = "Rewards";
@@ -55,6 +57,8 @@ public class RewardData extends SavedData {
   private static RewardData data;
 
   private static ConcurrentHashMap<String, List<ItemStack>> rewardItemsMap =
+      new ConcurrentHashMap<>();
+  private static ConcurrentHashMap<String, List<ItemStack>> additionalRewardItemsMap =
       new ConcurrentHashMap<>();
 
   public RewardData() {
@@ -73,8 +77,8 @@ public class RewardData extends SavedData {
     // Using a global approach and storing relevant data in the overworld only!
     ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
     if (serverLevel != null) {
-      RewardData.data = serverLevel.getDataStorage()
-          .computeIfAbsent(RewardData::load, RewardData::new, RewardData.getFileId());
+      RewardData.data = serverLevel.getDataStorage().computeIfAbsent(RewardData::load,
+          RewardData::new, RewardData.getFileId());
     } else {
       log.error("{} unable to get server level {} for storing data!", Constants.LOG_NAME,
           serverLevel);
@@ -115,6 +119,15 @@ public class RewardData extends SavedData {
     return getRewardsFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth());
   }
 
+  public List<ItemStack> getRewardsForTheNextDays(int rewardedDay, int nextDays) {
+    List<ItemStack> rewardItems = getRewardsForCurrentMonth();
+    List<ItemStack> rewardItemsForNextDays = new ArrayList<>();
+    for (int i = rewardedDay; i < rewardedDay + nextDays && i < rewardItems.size(); i++) {
+      rewardItemsForNextDays.add(rewardItems.get(i));
+    }
+    return rewardItemsForNextDays;
+  }
+
   public CompoundTag getRewardsForCurrentMonthSyncData() {
     List<ItemStack> rewardItems = getRewardsForCurrentMonth();
     CompoundTag syncData = new CompoundTag();
@@ -129,8 +142,61 @@ public class RewardData extends SavedData {
     return syncData;
   }
 
+  public static List<ItemStack> getRewardsForCurrentMonthSyncData(CompoundTag compoundTag) {
+    List<ItemStack> rewardItems = new ArrayList<>();
+    if (compoundTag.contains(ITEM_LIST_TAG)) {
+      ListTag itemListTag = compoundTag.getList(ITEM_LIST_TAG, 10);
+      for (int i = 0; i < itemListTag.size(); ++i) {
+        ItemStack itemStack = ItemStack.of(itemListTag.getCompound(i));
+        rewardItems.add(itemStack);
+      }
+    } else {
+      log.error("Unable to load rewards for current month data from {}!", compoundTag);
+    }
+    return rewardItems;
+  }
+
   public ItemStack getRewardForCurrentMonth(int day) {
     List<ItemStack> rewards = getRewardsForCurrentMonth();
+    int rewardIndex = --day;
+    if (rewardIndex >= 0 && rewards.size() > rewardIndex) {
+      return rewards.get(rewardIndex).copy();
+    }
+    return ItemStack.EMPTY;
+  }
+
+  public List<ItemStack> getAdditionalRewardsFor(int year, int month) {
+    String key = getKeyId(year, month);
+    return additionalRewardItemsMap.computeIfAbsent(key,
+        id -> AdditionalRewards.calculateAdditionalRewardItemsForMonth(month));
+  }
+
+  public List<ItemStack> getAdditionalRewardsForMonth(int month) {
+    String key = getKeyId(Rewards.getCurrentYear(), month);
+    return additionalRewardItemsMap.computeIfAbsent(key,
+        id -> AdditionalRewards.calculateAdditionalRewardItemsForMonth(month));
+  }
+
+  public List<ItemStack> getAdditionalRewardsForCurrentMonth() {
+    return getAdditionalRewardsFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth());
+  }
+
+  public CompoundTag getAdditionalRewardsForCurrentMonthSyncData() {
+    List<ItemStack> rewardItems = getAdditionalRewardsForCurrentMonth();
+    CompoundTag syncData = new CompoundTag();
+    ListTag itemListTag = new ListTag();
+    for (int i = 0; i < rewardItems.size(); ++i) {
+      ItemStack itemStack = rewardItems.get(i);
+      CompoundTag itemStackTag = new CompoundTag();
+      itemStack.save(itemStackTag);
+      itemListTag.add(itemStackTag);
+    }
+    syncData.put(ITEM_LIST_TAG, itemListTag);
+    return syncData;
+  }
+
+  public ItemStack getAdditionalRewardForCurrentMonth(int day) {
+    List<ItemStack> rewards = getAdditionalRewardsForCurrentMonth();
     int rewardIndex = --day;
     if (rewardIndex >= 0 && rewards.size() > rewardIndex) {
       return rewards.get(rewardIndex).copy();
@@ -157,15 +223,41 @@ public class RewardData extends SavedData {
         rewardItemsMap.put(yearMonthKey, rewardItems);
       }
     }
-    log.debug("{} Loaded stored rewards data from disk: {}", Constants.LOG_NAME, rewardItemsMap);
+    if (rewardItemsMap.isEmpty()) {
+      log.warn("{} No stored rewards data found! This could be ignored on the first start.",
+          Constants.LOG_NAME);
+    } else {
+      log.debug("{} Loaded stored rewards data from disk: {}", Constants.LOG_NAME, rewardItemsMap);
+    }
+
+    // Restoring additional rewards items per year-month
+    if (compoundTag.contains(ADDITIONAL_REWARDS_TAG)) {
+      ListTag listTag = compoundTag.getList(ADDITIONAL_REWARDS_TAG, 10);
+      for (int i = 0; i < listTag.size(); ++i) {
+        CompoundTag rewardTag = listTag.getCompound(i);
+        List<ItemStack> rewardItems = new ArrayList<>();
+        ListTag itemListTag = rewardTag.getList(ITEMS_TAG, 10);
+        String yearMonthKey = rewardTag.getString(YEAR_MONTH_TAG);
+        for (int i2 = 0; i2 < itemListTag.size(); ++i2) {
+          ItemStack itemStack = ItemStack.of(itemListTag.getCompound(i2));
+          rewardItems.add(itemStack);
+        }
+        additionalRewardItemsMap.put(yearMonthKey, rewardItems);
+      }
+    }
+    if (!additionalRewardItemsMap.isEmpty()) {
+      log.debug("{} Loaded stored additional rewards data from disk: {}", Constants.LOG_NAME,
+          additionalRewardItemsMap);
+    }
 
     return rewardData;
   }
 
   @Override
   public CompoundTag save(CompoundTag compoundTag) {
-    log.info("{} saving reward data ... {}", Constants.LOG_NAME, rewardItemsMap);
 
+    // Saving rewards items per year-month
+    log.info("{} saving reward data ... {}", Constants.LOG_NAME, rewardItemsMap);
     ListTag listTag = new ListTag();
     for (Map.Entry<String, List<ItemStack>> reward : rewardItemsMap.entrySet()) {
       CompoundTag rewardTag = new CompoundTag();
@@ -192,6 +284,39 @@ public class RewardData extends SavedData {
       }
     }
     compoundTag.put(REWARDS_TAG, listTag);
+
+    // Early return if we have no additional rewards data.
+    if (additionalRewardItemsMap.isEmpty()) {
+      log.info("{} No additional rewards data found.", Constants.LOG_NAME);
+      return compoundTag;
+    }
+
+    // Saving additional rewards items per year-month
+    log.info("{} saving additional reward data ... {}", Constants.LOG_NAME,
+        additionalRewardItemsMap);
+    ListTag additionalListTag = new ListTag();
+    for (Map.Entry<String, List<ItemStack>> reward : additionalRewardItemsMap.entrySet()) {
+      CompoundTag rewardTag = new CompoundTag();
+      List<ItemStack> rewardItems = reward.getValue();
+
+      // Storing additional rewards items per year-month
+      ListTag itemListTag = new ListTag();
+      for (int i = 0; i < rewardItems.size(); ++i) {
+        ItemStack itemStack = rewardItems.get(i);
+        if (itemStack.isEmpty()) {
+          log.info("Additional reward item for month {} and day {} is empty.", reward.getKey(), i);
+        }
+        CompoundTag itemStackTag = new CompoundTag();
+        itemStack.save(itemStackTag);
+        itemListTag.add(itemStackTag);
+      }
+      if (!itemListTag.isEmpty()) {
+        rewardTag.putString(YEAR_MONTH_TAG, reward.getKey());
+        rewardTag.put(ITEMS_TAG, itemListTag);
+        additionalListTag.add(rewardTag);
+      }
+    }
+    compoundTag.put(ADDITIONAL_REWARDS_TAG, additionalListTag);
 
     return compoundTag;
   }

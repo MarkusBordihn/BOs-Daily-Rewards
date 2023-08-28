@@ -19,6 +19,7 @@
 
 package de.markusbordihn.dailyrewards.commands;
 
+import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -27,6 +28,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
@@ -37,13 +39,16 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 
 import net.minecraftforge.network.NetworkHooks;
 
-import de.markusbordihn.dailyrewards.menu.RewardMenu;
+import de.markusbordihn.dailyrewards.data.RewardData;
+import de.markusbordihn.dailyrewards.data.RewardUserData;
+import de.markusbordihn.dailyrewards.menu.RewardOverviewMenu;
 
 public class ClaimCommand extends CustomCommand {
   private static final ClaimCommand command = new ClaimCommand();
 
   public static ArgumentBuilder<CommandSourceStack, ?> register() {
-    return Commands.literal("claim").requires(cs -> cs.hasPermission(0)).executes(command);
+    return Commands.literal("claim").requires(cs -> cs.hasPermission(Commands.LEVEL_ALL))
+        .executes(command);
   }
 
   @Override
@@ -63,11 +68,22 @@ public class ClaimCommand extends CustomCommand {
       @Nullable
       @Override
       public AbstractContainerMenu createMenu(int windowId, Inventory inventory, Player player) {
-        return new RewardMenu(windowId, inventory);
+        return new RewardOverviewMenu(windowId, inventory);
       }
     };
 
     NetworkHooks.openGui(player, provider, buffer -> {
+      UUID uuid = player.getUUID();
+      int rewardedDays = RewardUserData.get().getRewardedDaysForCurrentMonth(uuid);
+      String lastRewardedDay = RewardUserData.get().getLastRewardedDayForCurrentMonth(uuid);
+      CompoundTag userRewardsForCurrentMonth =
+          RewardUserData.get().getRewardsForCurrentMonthSyncData(uuid);
+      CompoundTag rewardsForCurrentMonth = RewardData.get().getRewardsForCurrentMonthSyncData();
+      buffer.writeUUID(uuid);
+      buffer.writeInt(rewardedDays);
+      buffer.writeUtf(lastRewardedDay);
+      buffer.writeNbt(userRewardsForCurrentMonth);
+      buffer.writeNbt(rewardsForCurrentMonth);
     });
   }
 }

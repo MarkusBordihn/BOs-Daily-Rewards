@@ -17,26 +17,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.dailyrewards.menu;
+package de.markusbordihn.dailyrewards.item;
+
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
 import de.markusbordihn.dailyrewards.Constants;
-import net.minecraft.world.inventory.MenuType;
 
-import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+public class RewardSlotItem extends Item {
 
-public class ModMenuTypes {
+  private String descriptionTextId;
 
-  protected ModMenuTypes() {
-
+  public RewardSlotItem(Properties properties, String descriptionTextId) {
+    super(properties);
+    this.descriptionTextId = descriptionTextId;
   }
 
-  public static final DeferredRegister<MenuType<?>> MENU_TYPES =
-      DeferredRegister.create(ForgeRegistries.CONTAINERS, Constants.MOD_ID);
-
-  public static final RegistryObject<MenuType<RewardOverviewMenu>> REWARD_OVERVIEW_MENU = MENU_TYPES
-      .register("reward_overview_menu", () -> IForgeMenuType.create(RewardOverviewMenu::new));
+  @Override
+  public void appendHoverText(ItemStack itemStack, @Nullable Level level,
+      List<Component> tooltipList, TooltipFlag tooltipFlag) {
+    if (this.descriptionTextId == null || this.descriptionTextId.isEmpty()) {
+      return;
+    }
+    tooltipList.add(new TranslatableComponent(Constants.TEXT_PREFIX + this.descriptionTextId));
+  }
 
 }

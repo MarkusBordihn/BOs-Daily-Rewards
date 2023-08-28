@@ -38,7 +38,7 @@ public class ClientScreens {
   public static void registerScreens(final FMLClientSetupEvent event) {
     log.info("{} Client Screens ...", Constants.LOG_REGISTER_PREFIX);
 
-    event
-        .enqueueWork(() -> MenuScreens.register(ModMenuTypes.REWARD_MENU.get(), RewardScreen::new));
+    event.enqueueWork(() -> MenuScreens.register(ModMenuTypes.REWARD_OVERVIEW_MENU.get(),
+        RewardOverviewScreen::new));
   }
 }

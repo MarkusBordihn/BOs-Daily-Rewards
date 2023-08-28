@@ -19,10 +19,14 @@
 
 package de.markusbordihn.dailyrewards;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.item.ItemStack;
+
 import net.minecraftforge.event.server.ServerStartingEvent;
 
 import de.markusbordihn.dailyrewards.data.RewardData;
@@ -40,7 +44,19 @@ public class ServerSetup {
     RewardData.prepare(server);
     RewardUserData.prepare(server);
 
-    log.info("Rewards for this Month: {}", RewardData.get().getRewardsForCurrentMonth());
+    List<ItemStack> rewardItems = RewardData.get().getRewardsForCurrentMonth();
+    if (rewardItems.isEmpty()) {
+      log.warn("No rewards found for this month!");
+    } else {
+      log.info("Rewards for this Month: {}", rewardItems);
+    }
+
+    List<ItemStack> additionalRewardItems = RewardData.get().getAdditionalRewardsForCurrentMonth();
+    if (additionalRewardItems.isEmpty()) {
+      log.info("No additional rewards found for this month!");
+    } else {
+      log.info("Additional Rewards for this Month: {}", additionalRewardItems);
+    }
   }
 
 }
