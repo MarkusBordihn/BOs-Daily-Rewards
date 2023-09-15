@@ -35,7 +35,7 @@ minecraft {
   mappings channel: 'official', version: '1.18.2'
   // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
-  accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+  // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
   // Default run configurations.
   // These can be tweaked, removed, or duplicated as needed.
@@ -138,6 +138,7 @@ dependencies {
 
   // Compability Tests
   runtimeOnly fg.deobf("curse.maven:loot-bag-mod-356236:3699372")
+  runtimeOnly fg.deobf("curse.maven:configured-457570:4462832")
 
   // Additional helpful Mods for development (dev depenedency)
   runtimeOnly fg.deobf("curse.maven:jei-238222:3773518")
@@ -182,7 +183,7 @@ curseforge {
   project {
     id = "${curseforge_project_id}"
     changelog = 'See https://github.com/MarkusBordihn/BOs-Daily-Rewards/commits/main'
-    releaseType = 'release'
+    releaseType = 'beta'
     addGameVersion("1.18.2")
     addGameVersion("Forge")
   }

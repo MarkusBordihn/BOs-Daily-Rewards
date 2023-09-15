@@ -31,6 +31,7 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 
 import de.markusbordihn.dailyrewards.data.RewardData;
 import de.markusbordihn.dailyrewards.data.RewardUserData;
+import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
 
 public class ServerSetup {
 
@@ -43,6 +44,7 @@ public class ServerSetup {
     log.info("{} Server Starting setup on {} ...", Constants.LOG_REGISTER_PREFIX, server);
     RewardData.prepare(server);
     RewardUserData.prepare(server);
+    SpecialRewardUserData.prepare(server);
 
     List<ItemStack> rewardItems = RewardData.get().getRewardsForCurrentMonth();
     if (rewardItems.isEmpty()) {
@@ -51,11 +53,11 @@ public class ServerSetup {
       log.info("Rewards for this Month: {}", rewardItems);
     }
 
-    List<ItemStack> additionalRewardItems = RewardData.get().getAdditionalRewardsForCurrentMonth();
-    if (additionalRewardItems.isEmpty()) {
-      log.info("No additional rewards found for this month!");
+    List<ItemStack> specialRewardItems = RewardData.get().getSpecialRewardsForCurrentMonth();
+    if (specialRewardItems.isEmpty()) {
+      log.info("No special rewards found for this month!");
     } else {
-      log.info("Additional Rewards for this Month: {}", additionalRewardItems);
+      log.info("Special Rewards for this Month: {}", specialRewardItems);
     }
   }
 

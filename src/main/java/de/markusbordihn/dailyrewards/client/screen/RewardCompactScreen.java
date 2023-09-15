@@ -39,7 +39,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.item.ModItems;
-import de.markusbordihn.dailyrewards.menu.RewardOverviewMenu;
+import de.markusbordihn.dailyrewards.menu.RewardCompactMenu;
 import de.markusbordihn.dailyrewards.menu.slots.DailyRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.EmptyRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.HiddenRewardSlot;
@@ -51,29 +51,48 @@ import de.markusbordihn.dailyrewards.menu.slots.UnlockedDaySlot;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 
 @OnlyIn(Dist.CLIENT)
-public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
+public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
 
   private int updateTicker = 0;
+  private int updateSpecialTicker = 0;
   private String nextRewardTimeString;
+  private String nextRewardSpecialTimeString;
   private boolean reloadToClaim = false;
 
   private TranslatableComponent rewardScreenTitle;
 
-  public RewardOverviewScreen(RewardOverviewMenu menu, Inventory inventory, Component component) {
+  public RewardCompactScreen(RewardCompactMenu menu, Inventory inventory, Component component) {
     super(menu, inventory, component);
   }
 
+  public void rendererTakenRewardSlot(PoseStack poseStack, int x, int y) {
+    RenderSystem.setShaderTexture(0, Constants.TEXTURE_GENERIC_54);
+    poseStack.pushPose();
+    this.blit(poseStack, x - 1, y - 1, 7, 17, 18, 18);
+    poseStack.popPose();
+  }
+
   public void rendererTakeableRewardSlot(PoseStack poseStack, int x, int y) {
+    RenderSystem.setShaderTexture(0, Constants.TEXTURE_GENERIC_54);
+    poseStack.pushPose();
+    this.blit(poseStack, x - 1, y - 1, 7, 17, 18, 18);
+    poseStack.popPose();
+
     RenderSystem.setShaderTexture(0, Constants.TEXTURE_ICONS);
     poseStack.pushPose();
-    this.blit(poseStack, x + 12, y - 5, 0, 0, 9, 9);
+    this.blit(poseStack, x + 12, y - 5, 0, 0, 8, 8);
     poseStack.popPose();
   }
 
   public void renderRewardSlot(PoseStack poseStack, int x, int y) {
+    RenderSystem.setShaderTexture(0, Constants.TEXTURE_GENERIC_54);
+    poseStack.pushPose();
+    this.blit(poseStack, x - 1, y - 1, 7, 17, 18, 18);
+    poseStack.popPose();
+
     RenderSystem.disableDepthTest();
     RenderSystem.colorMask(true, true, true, false);
-    fill(poseStack, x - 1, y - 1, x + 17, y + 19 + 8, 0x80AAAAAA);
+    fill(poseStack, x - 1, y - 1, x + 17, y + 17, 0x80AAAAAA);
     RenderSystem.colorMask(true, true, true, true);
     RenderSystem.enableDepthTest();
   }
@@ -116,6 +135,51 @@ public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
     // Display next reward time.
     Component component = new TranslatableComponent(Constants.TEXT_PREFIX + "next_reward.in",
         this.nextRewardTimeString);
+    int componentWidth = this.font.width(component);
+    this.font.draw(poseStack, component,
+        x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2f) : 0), y,
+        0x666666);
+  }
+
+  protected void renderNextTimeForSpecialReward(PoseStack poseStack, int x, int y) {
+    // Early return if the user needs to reload to claim rewards.
+    if (this.reloadToClaim) {
+      Component component =
+          new TranslatableComponent(Constants.TEXT_PREFIX + "next_special_reward.reload");
+      int componentWidth = this.font.width(component);
+      this.font.draw(poseStack, component,
+          x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2f) : 0), y,
+          0xFF0000);
+      return;
+    }
+
+    // Update data cache only every 20 ticks to avoid expensive operations on higher fps.
+    if ((this.updateSpecialTicker++ & (20 - 1)) == 0) {
+      int localPlayerTickCount = localPlayer != null ? localPlayer.tickCount : 0;
+      String lastRewardedSpecialDay = this.menu.getLastRewardedSpecialDay();
+      long nextRewardTime = Rewards.getCurrentYearMonthDay().equals(lastRewardedSpecialDay)
+          ? Duration
+              .between(LocalDateTime.now(),
+                  LocalDateTime.now().withHour(23).withMinute(59).withSecond(59))
+              .toSeconds() + this.rewardTimePerDayInSeconds
+          : this.rewardTimePerDayInSeconds - (localPlayerTickCount / 20);
+      // Adding 60 seconds, because the server is only checking every 60 seconds for rewards.
+      this.nextRewardSpecialTimeString = LocalTime.MIN.plusSeconds(nextRewardTime + 60).toString();
+      if (nextRewardSpecialTimeString.length() == 5) {
+        this.nextRewardSpecialTimeString += ":00";
+      }
+      if ("00:00:00".equals(nextRewardSpecialTimeString)) {
+        log.debug("Reload screen to be able to claim for day {} ...", rewardedDays + 1);
+        this.reloadToClaim = true;
+      }
+      if (this.updateSpecialTicker >= 20) {
+        this.updateSpecialTicker = 0;
+      }
+    }
+
+    // Display next reward time.
+    Component component = new TranslatableComponent(
+        Constants.TEXT_PREFIX + "next_special_reward.in", this.nextRewardSpecialTimeString);
     int componentWidth = this.font.width(component);
     this.font.draw(poseStack, component,
         x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2f) : 0), y,
@@ -181,14 +245,8 @@ public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
   public void init() {
     super.init();
 
-    // Set Title with already rewarded days.
-    if (this.rewardedDays > 0) {
-      rewardScreenTitle =
-          new TranslatableComponent(Constants.TEXT_PREFIX + "reward_screen", this.rewardedDays);
-    } else {
-      rewardScreenTitle = new TranslatableComponent(Constants.TEXT_PREFIX + "reward_screen_none",
-          this.rewardedDays);
-    }
+    rewardScreenTitle =
+        new TranslatableComponent(Constants.TEXT_PREFIX + "reward_screen_none", this.rewardedDays);
   }
 
   @Override
@@ -198,17 +256,33 @@ public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
     // Additional styling for the different kind of slots and slot states.
     for (int k = 0; k < this.menu.slots.size(); ++k) {
       Slot slot = this.menu.slots.get(k);
-      if (slot instanceof TakeableRewardSlot && !slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
-        rendererTakeableRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
+      if (slot instanceof TakeableRewardSlot) {
+        if (slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
+          rendererTakenRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
+        } else {
+          rendererTakeableRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
+        }
       } else if (slot instanceof RewardSlot || slot instanceof EmptyRewardSlot
           || slot instanceof HiddenRewardSlot) {
         renderRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
       }
     }
 
+    // Render sub-titles
+    this.font.draw(poseStack,
+        new TranslatableComponent(Constants.TEXT_PREFIX + "daily_rewards.title", this.rewardedDays),
+        leftPos + 50f, topPos + 29f, 4210752);
+    this.font.draw(poseStack,
+        new TranslatableComponent(Constants.TEXT_PREFIX + "special_rewards.title",
+            this.rewardedSpecialDays),
+        leftPos + 30f, topPos + 94f, 4210752);
+
     // Render next reward time, if automatic reward is enabled.
     if (this.automaticRewardPlayers) {
-      this.renderNextTimeForReward(poseStack, leftPos + 2, topPos + 140);
+      this.renderNextTimeForReward(poseStack, leftPos + 2, topPos + 67);
+    }
+    if (this.automaticRewardSpecialPlayers) {
+      this.renderNextTimeForSpecialReward(poseStack, leftPos, topPos + 133);
     }
 
     this.renderTooltip(poseStack, x, y);
@@ -216,8 +290,8 @@ public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
 
   @Override
   protected void renderLabels(PoseStack poseStack, int x, int y) {
-    this.font.drawShadow(poseStack, rewardScreenTitle, this.titleLabelX + 5f, this.titleLabelY - 1f,
-        Constants.FONT_COLOR_WHITE);
+    this.font.drawShadow(poseStack, rewardScreenTitle, this.titleLabelX + 42f,
+        this.titleLabelY - 1f, Constants.FONT_COLOR_WHITE);
     this.font.draw(poseStack, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY,
         4210752);
   }
@@ -226,27 +300,11 @@ public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
   protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
     super.renderBg(poseStack, partialTicks, mouseX, mouseY);
 
-    // Render custom background for overview screen
-    RenderSystem.setShaderTexture(0, Constants.TEXTURE_OVERVIEW_SCREEN);
+    // Render custom background for compact screen
+    RenderSystem.setShaderTexture(0, Constants.TEXTURE_COMPACT_SCREEN);
     poseStack.pushPose();
     this.blit(poseStack, leftPos + 1, topPos, 0, 0, 256, 256);
     poseStack.popPose();
-
-    // Render Rewards Slots boxes
-    int dayCounter = 1;
-    for (int i = 0; i < 4; i++) {
-      int slotTopPos = topPos + (i * 30) + 2;
-      for (int i2 = 0; i2 < 8; i2++) {
-        if (dayCounter <= rewardDaysForCurrentMonth) {
-          int slotLeftPos = leftPos + 7 + Math.round(i2 * 20.5f);
-          RenderSystem.setShaderTexture(0, Constants.TEXTURE_ICONS);
-          this.blit(poseStack, slotLeftPos - 1, slotTopPos + 17, 0, 11, 20, 29);
-          this.font.draw(poseStack, dayCounter + "", slotLeftPos + (dayCounter < 10 ? 6f : 4f),
-              slotTopPos + 36f, 4210752);
-          dayCounter++;
-        }
-      }
-    }
   }
 
 }

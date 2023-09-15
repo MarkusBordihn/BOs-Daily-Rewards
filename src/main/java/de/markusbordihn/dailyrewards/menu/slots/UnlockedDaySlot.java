@@ -21,13 +21,12 @@ package de.markusbordihn.dailyrewards.menu.slots;
 
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.menu.RewardMenu;
 
-public class UnlockedDaySlot extends Slot {
+public class UnlockedDaySlot extends DailyRewardSlot {
 
   protected RewardMenu menu;
 

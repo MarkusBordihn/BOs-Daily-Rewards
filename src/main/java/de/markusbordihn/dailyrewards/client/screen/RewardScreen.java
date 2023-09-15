@@ -51,8 +51,10 @@ public class RewardScreen<T extends RewardMenu> extends AbstractContainerScreen<
   protected int currentDay = Rewards.getCurrentDay();
   protected int daysCurrentMonth = Rewards.getDaysCurrentMonth();
   protected boolean automaticRewardPlayers = true;
+  protected boolean automaticRewardSpecialPlayers = true;
   protected int rewardDaysForCurrentMonth = Rewards.getDaysCurrentMonth();
   protected int rewardedDays = 0;
+  protected int rewardedSpecialDays = 0;
   protected int rewardTimePerDay = 30;
   protected int rewardTimePerDayInSeconds = rewardTimePerDay * 60;
   protected LocalPlayer localPlayer;
@@ -70,9 +72,11 @@ public class RewardScreen<T extends RewardMenu> extends AbstractContainerScreen<
 
     // Set Title with already rewarded days.
     this.rewardedDays = this.menu.getRewardedDays();
+    this.rewardedSpecialDays = this.menu.getRewardedSpecialDays();
 
     // Automatic reward players
     this.automaticRewardPlayers = COMMON.automaticRewardPlayers.get();
+    this.automaticRewardSpecialPlayers = COMMON.automaticRewardSpecialPlayers.get();
 
     // Calculations for next reward
     localPlayer = Minecraft.getInstance() != null ? Minecraft.getInstance().player : null;
@@ -101,7 +105,7 @@ public class RewardScreen<T extends RewardMenu> extends AbstractContainerScreen<
 
     // Main screen
     this.blit(poseStack, leftPos, topPos + 20, 0, 0, 176, 222);
-    this.blit(poseStack, leftPos, topPos, 0, 0, 176, 139);
+    this.blit(poseStack, leftPos, topPos + 8, 0, 0, 176, 139);
     blit(poseStack, leftPos + 5, topPos + 15, 3, 64, 165, 130, 255, 4096);
   }
 

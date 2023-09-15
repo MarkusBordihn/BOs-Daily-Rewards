@@ -35,7 +35,7 @@ import net.minecraft.world.item.ItemStack;
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.config.CommonConfig;
 
-public class AdditionalRewards {
+public class SpecialRewards {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
@@ -44,27 +44,27 @@ public class AdditionalRewards {
 
   protected static final Random random = new Random();
 
-  protected AdditionalRewards() {}
+  protected SpecialRewards() {}
 
-  public static List<ItemStack> calculateAdditionalRewardItemsForMonth(int month) {
+  public static List<ItemStack> calculateSpecialRewardItemsForMonth(int month) {
     YearMonth yearMonth = YearMonth.of(getCurrentYear(), month);
     int numberOfDays = yearMonth.lengthOfMonth();
-    List<ItemStack> rewardItemsForMonth = getAdditionalRewardItemForMonth(month);
+    List<ItemStack> rewardItemsForMonth = getSpecialRewardItemForMonth(month);
 
     // Early return if we have no items.
     if (rewardItemsForMonth.isEmpty()) {
-      log.info("No additional reward items for month {} with {} days ...", month, numberOfDays);
+      log.info("No special reward items for month {} with {} days ...", month, numberOfDays);
       return new ArrayList<>();
     }
 
     // Early return if we have matching items.
     if (rewardItemsForMonth.size() >= numberOfDays) {
-      log.info("Found {} additional reward items for month {} with {} days ...",
+      log.info("Found {} special reward items for month {} with {} days ...",
           rewardItemsForMonth.size(), month, numberOfDays);
       List<ItemStack> rewardItems =
           rewardItemsForMonth.stream().limit(numberOfDays).collect(Collectors.toList());
-      if (Boolean.TRUE.equals(COMMON.shuffleRewardsAdditionalItems.get())) {
-        log.info("Shuffle additional reward items for month {} ...", month);
+      if (Boolean.TRUE.equals(COMMON.shuffleRewardsSpecialItems.get())) {
+        log.info("Shuffle special reward items for month {} ...", month);
         Collections.shuffle(rewardItems);
       }
       return rewardItems;
@@ -73,7 +73,7 @@ public class AdditionalRewards {
     // If we have only one item for the month we will use it for all days.
     // No need to shuffle here with only one item.
     if (rewardItemsForMonth.size() == 1) {
-      log.info("Found only one additional reward item for month {} with {} days ...", month,
+      log.info("Found only one special reward item for month {} with {} days ...", month,
           numberOfDays);
       List<ItemStack> rewardItems = new ArrayList<>();
       for (int i = 0; i < numberOfDays; i++) {
@@ -83,7 +83,7 @@ public class AdditionalRewards {
     }
 
     // If we have not enough items for the month we will use them in the defined order.
-    log.info("Found only {} additional reward items for month {} with {} days ...",
+    log.info("Found only {} special reward items for month {} with {} days ...",
         rewardItemsForMonth.size(), month, numberOfDays);
     List<ItemStack> rewardItems = new ArrayList<>();
     for (int i = 0; i < numberOfDays; i++) {
@@ -91,40 +91,40 @@ public class AdditionalRewards {
     }
 
     // Shuffle items before returning.
-    if (Boolean.TRUE.equals(COMMON.shuffleRewardsAdditionalItems.get())) {
-      log.info("Shuffle additional reward items for month {} ...", month);
+    if (Boolean.TRUE.equals(COMMON.shuffleRewardsSpecialItems.get())) {
+      log.info("Shuffle special reward items for month {} ...", month);
       Collections.shuffle(rewardItems);
     }
 
     return rewardItems;
   }
 
-  public static List<ItemStack> getAdditionalRewardItemForMonth(int month) {
+  public static List<ItemStack> getSpecialRewardItemForMonth(int month) {
     switch (month) {
       case 1:
-        return RewardsItems.parseConfigItems(COMMON.rewardsJanuaryAdditionalItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsJanuarySpecialItems.get());
       case 2:
-        return RewardsItems.parseConfigItems(COMMON.rewardsFebruaryAdditionalItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsFebruarySpecialItems.get());
       case 3:
-        return RewardsItems.parseConfigItems(COMMON.rewardsMarchAdditionalItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsMarchSpecialItems.get());
       case 4:
-        return RewardsItems.parseConfigItems(COMMON.rewardsAprilAdditionalItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsAprilSpecialItems.get());
       case 5:
-        return RewardsItems.parseConfigItems(COMMON.rewardsMayAdditionalItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsMaySpecialItems.get());
       case 6:
-        return RewardsItems.parseConfigItems(COMMON.rewardsJuneAdditionalItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsJuneSpecialItems.get());
       case 7:
-        return RewardsItems.parseConfigItems(COMMON.rewardsJulyAdditionalItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsJulySpecialItems.get());
       case 8:
-        return RewardsItems.parseConfigItems(COMMON.rewardsAugustAdditionalItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsAugustSpecialItems.get());
       case 9:
-        return RewardsItems.parseConfigItems(COMMON.rewardsSeptemberAdditionalItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsSeptemberSpecialItems.get());
       case 10:
-        return RewardsItems.parseConfigItems(COMMON.rewardsOctoberAdditionalItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsOctoberSpecialItems.get());
       case 11:
-        return RewardsItems.parseConfigItems(COMMON.rewardsNovemberAdditionalItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsNovemberSpecialItems.get());
       case 12:
-        return RewardsItems.parseConfigItems(COMMON.rewardsDecemberAdditionalItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsDecemberSpecialItems.get());
       default:
         return new ArrayList<>();
     }

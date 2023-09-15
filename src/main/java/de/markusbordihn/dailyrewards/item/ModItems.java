@@ -36,6 +36,9 @@ public class ModItems {
   public static final DeferredRegister<Item> ITEMS =
       DeferredRegister.create(ForgeRegistries.ITEMS, Constants.MOD_ID);
 
+  public static final RegistryObject<Item> HIDDEN_REWARD = ITEMS.register("hidden_reward",
+      () -> new RewardSlotItem(new Item.Properties(), "hidden_reward.description"));
+
   public static final RegistryObject<Item> TAKEN_REWARD = ITEMS.register("taken_reward",
       () -> new RewardSlotItem(new Item.Properties(), "taken_reward.description"));
 
