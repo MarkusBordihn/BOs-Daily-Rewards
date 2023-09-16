@@ -19,53 +19,45 @@
 
 package de.markusbordihn.dailyrewards.commands;
 
-import javax.annotation.Nullable;
-
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.Component;
+
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 
-import net.minecraftforge.network.NetworkHooks;
-
-import de.markusbordihn.dailyrewards.menu.RewardMenu;
+import de.markusbordihn.dailyrewards.rewards.RewardsScreen;
 
 public class ClaimCommand extends CustomCommand {
   private static final ClaimCommand command = new ClaimCommand();
 
   public static ArgumentBuilder<CommandSourceStack, ?> register() {
-    return Commands.literal("claim").requires(cs -> cs.hasPermission(0)).executes(command);
+    return Commands.literal("claim").requires(cs -> cs.hasPermission(Commands.LEVEL_ALL))
+        .executes(command);
   }
 
   @Override
   public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     ServerPlayer player = context.getSource().getPlayerOrException();
-    openRewardMenuForPlayer(player);
+
+    // Open reward screen for player depending on the configuration
+    switch (COMMON.rewardScreenType.get()) {
+      case "overview":
+        RewardsScreen.openRewardOverviewMenuForPlayer(player);
+        break;
+      case "compact":
+        RewardsScreen.openRewardCompactMenuForPlayer(player);
+        break;
+      case "special":
+        RewardsScreen.openRewardSpecialOverviewMenuForPlayer(player);
+        break;
+      default:
+        RewardsScreen.openRewardOverviewMenuForPlayer(player);
+        break;
+    }
     return 0;
   }
 
-  public static void openRewardMenuForPlayer(ServerPlayer player) {
-    MenuProvider provider = new MenuProvider() {
-      @Override
-      public Component getDisplayName() {
-        return Component.literal("Rewards");
-      }
-
-      @Nullable
-      @Override
-      public AbstractContainerMenu createMenu(int windowId, Inventory inventory, Player player) {
-        return new RewardMenu(windowId, inventory);
-      }
-    };
-    NetworkHooks.openScreen(player, provider, buffer -> {
-    });
-  }
 }
