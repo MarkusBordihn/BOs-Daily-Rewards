@@ -35,8 +35,8 @@ public class PreviewCommand extends CustomCommand {
   private static final PreviewCommand command = new PreviewCommand();
 
   public static ArgumentBuilder<CommandSourceStack, ?> register() {
-    return Commands.literal("preview").requires(cs -> cs.hasPermission(2)).executes(command)
-        .then(Commands.literal("January").executes(command::showJanuary))
+    return Commands.literal("preview").requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS))
+        .executes(command).then(Commands.literal("January").executes(command::showJanuary))
         .then(Commands.literal("February").executes(command::showFebruary))
         .then(Commands.literal("March").executes(command::showMarch))
         .then(Commands.literal("April").executes(command::showApril))

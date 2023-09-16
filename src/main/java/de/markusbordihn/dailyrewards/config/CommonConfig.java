@@ -43,6 +43,19 @@ public class CommonConfig {
   public static final ForgeConfigSpec commonSpec;
   public static final Config COMMON;
 
+  private static final String JANUARY = "January";
+  private static final String FEBRUARY = "February";
+  private static final String MARCH = "March";
+  private static final String APRIL = "April";
+  private static final String MAY = "May";
+  private static final String JUNE = "June";
+  private static final String JULY = "July";
+  private static final String AUGUST = "August";
+  private static final String SEPTEMBER = "September";
+  private static final String OCTOBER = "October";
+  private static final String NOVEMBER = "November";
+  private static final String DECEMBER = "December";
+
   protected CommonConfig() {}
 
   static {
@@ -57,8 +70,11 @@ public class CommonConfig {
 
   public static class Config {
 
+    public final ForgeConfigSpec.BooleanValue automaticRewardPlayers;
+    public final ForgeConfigSpec.BooleanValue automaticRewardSpecialPlayers;
     public final ForgeConfigSpec.IntValue rewardTimePerDay;
     public final ForgeConfigSpec.BooleanValue showRewardMenuOnPlayerJoin;
+    public final ForgeConfigSpec.ConfigValue<String> rewardScreenType;
 
     public final ForgeConfigSpec.BooleanValue useFillItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> normalFillItems;
@@ -68,29 +84,75 @@ public class CommonConfig {
     public final ForgeConfigSpec.IntValue lootBagFillItemsChance;
 
     public final ForgeConfigSpec.BooleanValue shuffleRewardsItems;
+    public final ForgeConfigSpec.BooleanValue shuffleRewardsSpecialItems;
+    public final ForgeConfigSpec.BooleanValue previewRewardsItems;
+    public final ForgeConfigSpec.BooleanValue previewRewardsSpecialItems;
+
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJanuaryItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJanuarySpecialItems;
+
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsFebruaryItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsFebruarySpecialItems;
+
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsMarchItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsMarchSpecialItems;
+
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsAprilItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsAprilSpecialItems;
+
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsMayItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsMaySpecialItems;
+
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJuneItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJuneSpecialItems;
+
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJulyItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJulySpecialItems;
+
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsAugustItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsAugustSpecialItems;
+
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsSeptemberItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsSeptemberSpecialItems;
+
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsOctoberItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsOctoberSpecialItems;
+
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsNovemberItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsNovemberSpecialItems;
+
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsDecemberItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsDecemberSpecialItems;
+
+    private static final String getListOfRewardsItemsText(String month) {
+      return "List of rewards items for " + month;
+    }
+
+    private static final String getSpecialRewardsItemsText(String month) {
+      return "Single reward item or list of special streak rewards items for " + month
+          + ". (Only used if rewards" + month + "SpecialItemsNeededDays is greater than 0)";
+    }
 
     Config(ForgeConfigSpec.Builder builder) {
+
       builder.comment("Daily Rewards (General configuration)");
 
       builder.push("General");
+      automaticRewardPlayers = builder.comment(
+          "Automatically reward players after the rewardTimePerDay is reached. (e.g. 30 minutes). If disabled the reward command needs to be executed manually to reward the players.")
+          .define("automaticRewardPlayers", true);
+      automaticRewardSpecialPlayers = builder.comment(
+          "Automatically reward players with specials after the rewardTimePerDay is reached. (e.g. 30 minutes). If disabled the reward command needs to be executed manually to reward the players.")
+          .define("automaticRewardSpecialPlayers", true);
       rewardTimePerDay = builder.comment(
           "Time in minutes the players needs to be online on the server before receiving a reward for the day.")
           .defineInRange("rewardTimePerDay", 30, 1, 1440);
       showRewardMenuOnPlayerJoin = builder.comment(
           "Shows the rewards menu when a player joins the server (if there are unclaimed rewards).")
           .define("showRewardMenuOnPlayerJoin", false);
+      rewardScreenType =
+          builder.comment("Type of the reward screen (e.g. default, overview, compact)")
+              .define("rewardScreenType", "default");
       builder.pop();
 
       builder.push("Fill Items");
@@ -122,34 +184,116 @@ public class CommonConfig {
       shuffleRewardsItems =
           builder.comment("Shuffle the rewards items instead of using the defined order.")
               .define("shuffleRewardsItems", true);
-      rewardsJanuaryItems = builder.comment("List of rewards items for January.")
+      shuffleRewardsSpecialItems =
+          builder.comment("Shuffle the special rewards items instead of using the defined order.")
+              .define("shuffleRewardsSpecialItems", false);
+      previewRewardsItems = builder.comment("Preview the upcoming rewards items for the next days.")
+          .define("previewRewardsItems", true);
+      previewRewardsSpecialItems =
+          builder.comment("Preview the upcoming special rewards items for the next days.")
+              .define("previewRewardsSpecialItems", true);
+
+      builder.push("January Rewards Items");
+      rewardsJanuaryItems = builder.comment(getListOfRewardsItemsText(JANUARY))
           .define("rewardsJanuaryItems", new ArrayList<String>(Arrays.asList("minecraft:oak_log:32",
               "minecraft:cooked_salmon:16", "minecraft:white_wool:16", "minecraft:cake:1")));
-      rewardsFebruaryItems = builder.comment("List of rewards items for February.")
+      rewardsJanuarySpecialItems = builder.comment(getSpecialRewardsItemsText(JANUARY))
+          .define("rewardsJanuarySpecialItems", new ArrayList<String>(Arrays
+              .asList("minecraft:cooked_salmon:1", "minecraft:cake:1", "minecraft:cookie:1")));
+      builder.pop();
+
+      builder.push("February Rewards Items");
+      rewardsFebruaryItems = builder.comment(getListOfRewardsItemsText(FEBRUARY))
           .define("rewardsFebruaryItems", new ArrayList<String>(Arrays.asList()));
-      rewardsMarchItems = builder.comment("List of rewards items for March.")
+      rewardsFebruarySpecialItems = builder.comment(getSpecialRewardsItemsText(FEBRUARY)).define(
+          "rewardsFebruarySpecialItems",
+          new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      builder.pop();
+
+      builder.push("March Rewards Items");
+      rewardsMarchItems = builder.comment(getListOfRewardsItemsText(MARCH))
           .define("rewardsMarchItems", new ArrayList<String>(Arrays.asList()));
-      rewardsAprilItems = builder.comment("List of rewards items for April.")
+      rewardsMarchSpecialItems =
+          builder.comment(getSpecialRewardsItemsText(MARCH)).define("rewardsMarchSpecialItems",
+              new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      builder.pop();
+
+      builder.push("April Rewards Items");
+      rewardsAprilItems = builder.comment(getListOfRewardsItemsText(APRIL))
           .define("rewardsAprilItems", new ArrayList<String>(Arrays.asList()));
-      rewardsMayItems = builder.comment("List of rewards items for May.").define("rewardsMayItems",
+      rewardsAprilSpecialItems = builder.comment(getSpecialRewardsItemsText(APRIL))
+          .define("rewardsAprilSpecialItems", new ArrayList<String>(
+              Arrays.asList("minecraft:eggs:1", "minecraft:cake:1", "minecraft:cookie:1")));
+      builder.pop();
+
+      builder.push("May Rewards Items");
+      rewardsMayItems = builder.comment(getListOfRewardsItemsText(MAY)).define("rewardsMayItems",
           new ArrayList<String>(Arrays.asList("minecraft:egg:16")));
-      rewardsJuneItems = builder.comment("List of rewards items for June.")
-          .define("rewardsJuneItems", new ArrayList<String>(Arrays.asList()));
-      rewardsJulyItems = builder.comment("List of rewards items for July.")
-          .define("rewardsJulyItems", new ArrayList<String>(Arrays.asList()));
-      rewardsAugustItems = builder.comment("List of rewards items for August.")
+      rewardsMaySpecialItems =
+          builder.comment(getSpecialRewardsItemsText(MAY)).define("rewardsMaySpecialItems",
+              new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      builder.pop();
+
+      builder.push("June Rewards Items");
+      rewardsJuneItems = builder.comment(getListOfRewardsItemsText(JUNE)).define("rewardsJuneItems",
+          new ArrayList<String>(Arrays.asList()));
+      rewardsJuneSpecialItems =
+          builder.comment(getSpecialRewardsItemsText(JUNE)).define("rewardsJuneSpecialItems",
+              new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      builder.pop();
+
+      builder.push("July Rewards Items");
+      rewardsJulyItems = builder.comment(getListOfRewardsItemsText(JULY)).define("rewardsJulyItems",
+          new ArrayList<String>(Arrays.asList()));
+      rewardsJulySpecialItems =
+          builder.comment(getSpecialRewardsItemsText(JULY)).define("rewardsJulySpecialItems",
+              new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      builder.pop();
+
+      builder.push("August Rewards Items");
+      rewardsAugustItems = builder.comment(getListOfRewardsItemsText(AUGUST))
           .define("rewardsAugustItems", new ArrayList<String>(Arrays.asList()));
-      rewardsSeptemberItems = builder.comment("List of rewards items for September.")
+      rewardsAugustSpecialItems =
+          builder.comment(getSpecialRewardsItemsText(AUGUST)).define("rewardsAugustSpecialItems",
+              new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      builder.pop();
+
+      builder.push("September Rewards Items");
+      rewardsSeptemberItems = builder.comment(getListOfRewardsItemsText(SEPTEMBER))
           .define("rewardsSeptemberItems", new ArrayList<String>(Arrays.asList()));
-      rewardsOctoberItems = builder.comment("List of rewards items for October.")
+      rewardsSeptemberSpecialItems = builder.comment(getSpecialRewardsItemsText(SEPTEMBER)).define(
+          "rewardsSeptemberSpecialItems",
+          new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      builder.pop();
+
+      builder.push("October Rewards Items");
+      rewardsOctoberItems = builder.comment(getListOfRewardsItemsText(OCTOBER))
           .define("rewardsOctoberItems", new ArrayList<String>(Arrays.asList()));
-      rewardsNovemberItems = builder.comment("List of rewards items for November.")
+      rewardsOctoberSpecialItems =
+          builder.comment(getSpecialRewardsItemsText(OCTOBER)).define("rewardsOctoberSpecialItems",
+              new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      builder.pop();
+
+      builder.push("November Rewards Items");
+      rewardsNovemberItems = builder.comment(getListOfRewardsItemsText(NOVEMBER))
           .define("rewardsNovemberItems", new ArrayList<String>(Arrays.asList()));
+      rewardsNovemberSpecialItems = builder.comment(getSpecialRewardsItemsText(NOVEMBER)).define(
+          "rewardsNovemberSpecialItems",
+          new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      builder.pop();
+
+      builder.push("December Rewards Items");
       rewardsDecemberItems =
-          builder.comment("List of rewards items for December.").define("rewardsDecemberItems",
+          builder.comment(getListOfRewardsItemsText(DECEMBER)).define("rewardsDecemberItems",
               new ArrayList<String>(Arrays.asList("minecraft:firework_rocket:32")));
+      rewardsDecemberSpecialItems = builder.comment(getSpecialRewardsItemsText(DECEMBER)).define(
+          "rewardsDecemberSpecialItems",
+          new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      builder.pop();
+
       builder.pop();
     }
   }
+
 
 }
