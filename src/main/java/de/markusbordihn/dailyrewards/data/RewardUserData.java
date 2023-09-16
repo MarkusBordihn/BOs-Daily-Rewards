@@ -130,6 +130,19 @@ public class RewardUserData extends SavedData {
     return rewardItemsMap.computeIfAbsent(key, id -> new ArrayList<>());
   }
 
+  public void removeRewardFor(int year, int month, int day, UUID uuid) {
+    List<ItemStack> rewards = getRewardsFor(year, month, uuid);
+    int rewardIndex = --day;
+    if (rewardIndex >= 0 && rewards.size() > rewardIndex) {
+      rewards.remove(rewardIndex);
+    }
+    this.setDirty();
+  }
+
+  public void removeRewardForCurrentMonth(int day, UUID uuid) {
+    removeRewardFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth(), day, uuid);
+  }
+
   public List<ItemStack> getRewardsForCurrentMonth(UUID uuid) {
     return getRewardsFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth(), uuid);
   }
@@ -156,6 +169,18 @@ public class RewardUserData extends SavedData {
     }
     syncData.put(ITEM_LIST_TAG, itemListTag);
     return syncData;
+  }
+
+  public static List<ItemStack> getRewardsForCurrentMonthSyncData(CompoundTag compoundTag) {
+    List<ItemStack> rewardItems = new ArrayList<>();
+    if (compoundTag.contains(ITEM_LIST_TAG)) {
+      ListTag itemListTag = compoundTag.getList(ITEM_LIST_TAG, 10);
+      for (int i = 0; i < itemListTag.size(); ++i) {
+        ItemStack itemStack = ItemStack.of(itemListTag.getCompound(i));
+        rewardItems.add(itemStack);
+      }
+    }
+    return rewardItems;
   }
 
   public void setRewardsForCurrentMonth(UUID uuid, List<ItemStack> rewardItems) {
@@ -207,14 +232,43 @@ public class RewardUserData extends SavedData {
 
   public int increaseRewardedDays(int year, int month, UUID uuid) {
     String key = getKeyId(year, month, uuid);
+    int daysPerMonth = Rewards.getDaysPerMonth(year, month);
     int rewardedDays = rewardedDaysMap.getOrDefault(key, 0);
-    rewardedDaysMap.put(key, ++rewardedDays);
-    this.setDirty();
+    if (rewardedDays < daysPerMonth) {
+      rewardedDaysMap.put(key, ++rewardedDays);
+      this.setDirty();
+    }
     return rewardedDays;
   }
 
   public int increaseRewardedDaysForCurrentMonth(UUID uuid) {
     return increaseRewardedDays(Rewards.getCurrentYear(), Rewards.getCurrentMonth(), uuid);
+  }
+
+  public int decreaseRewardedDays(int year, int month, UUID uuid) {
+    String key = getKeyId(year, month, uuid);
+    int rewardedDays = rewardedDaysMap.getOrDefault(key, 0);
+    if (rewardedDays > 0) {
+      rewardedDaysMap.put(key, --rewardedDays);
+      this.setDirty();
+    }
+    return rewardedDays;
+  }
+
+  public int decreaseRewardedDaysForCurrentMonth(UUID uuid) {
+    return decreaseRewardedDays(Rewards.getCurrentYear(), Rewards.getCurrentMonth(), uuid);
+  }
+
+  public void clearRewards(int year, int month, UUID uuid) {
+    String key = getKeyId(year, month, uuid);
+    rewardItemsMap.remove(key);
+    rewardedDaysMap.remove(key);
+    lastRewardedDayMap.remove(key);
+    this.setDirty();
+  }
+
+  public void clearRewardsForCurrentMonth(UUID uuid) {
+    clearRewards(Rewards.getCurrentYear(), Rewards.getCurrentMonth(), uuid);
   }
 
   public static RewardUserData load(CompoundTag compoundTag) {
@@ -227,8 +281,10 @@ public class RewardUserData extends SavedData {
       for (int i = 0; i < listTag.size(); ++i) {
         CompoundTag rewardUserTag = listTag.getCompound(i);
 
-        // Get Reward key
+        // Get Reward key, days and last rewarded day.
         String rewardKey = rewardUserTag.getString(YEAR_MONTH_USER_TAG);
+        int rewardedDays = rewardUserTag.getInt(REWARDED_DAYS_TAG);
+        String lastRewardedDay = rewardUserTag.getString(LAST_REWARDED_DAY_TAG);
 
         // Restoring rewards items per year-month:uuid
         List<ItemStack> rewardItems = new ArrayList<>();
@@ -239,9 +295,21 @@ public class RewardUserData extends SavedData {
         }
         rewardItemsMap.put(rewardKey, rewardItems);
 
+        // Validate totally rewarded days and last rewarded day for the month.
+        if (rewardedDays > itemListTag.size()) {
+          log.error("{} Invalid rewarded days {} for {}! Resetting to {}.", Constants.LOG_NAME,
+              rewardedDays, rewardKey, itemListTag.size());
+          rewardedDays = itemListTag.size();
+        }
+        if (rewardedDays == 0 && !lastRewardedDay.isEmpty()) {
+          log.error("{} Invalid last rewarded day {} for {}! Resetting to empty.",
+              Constants.LOG_NAME, lastRewardedDay, rewardKey);
+          lastRewardedDay = "";
+        }
+
         // Restoring last rewarded day and totally rewarded days for the month.
-        rewardedDaysMap.put(rewardKey, rewardUserTag.getInt(REWARDED_DAYS_TAG));
-        lastRewardedDayMap.put(rewardKey, rewardUserTag.getString(LAST_REWARDED_DAY_TAG));
+        rewardedDaysMap.put(rewardKey, rewardedDays);
+        lastRewardedDayMap.put(rewardKey, lastRewardedDay);
       }
     }
     log.debug("{} Loaded stored rewards user data from disk: {}", Constants.LOG_NAME, rewardData);

@@ -32,14 +32,12 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.config.CommonConfig;
@@ -157,36 +155,36 @@ public class Rewards {
   public static List<ItemStack> getRewardItemForMonth(int month) {
     switch (month) {
       case 1:
-        return parseConfigItems(COMMON.rewardsJanuaryItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsJanuaryItems.get());
       case 2:
-        return parseConfigItems(COMMON.rewardsFebruaryItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsFebruaryItems.get());
       case 3:
-        return parseConfigItems(COMMON.rewardsMarchItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsMarchItems.get());
       case 4:
-        return parseConfigItems(COMMON.rewardsAprilItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsAprilItems.get());
       case 5:
-        return parseConfigItems(COMMON.rewardsMayItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsMayItems.get());
       case 6:
-        return parseConfigItems(COMMON.rewardsJuneItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsJuneItems.get());
       case 7:
-        return parseConfigItems(COMMON.rewardsJulyItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsJulyItems.get());
       case 8:
-        return parseConfigItems(COMMON.rewardsAugustItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsAugustItems.get());
       case 9:
-        return parseConfigItems(COMMON.rewardsSeptemberItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsSeptemberItems.get());
       case 10:
-        return parseConfigItems(COMMON.rewardsOctoberItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsOctoberItems.get());
       case 11:
-        return parseConfigItems(COMMON.rewardsNovemberItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsNovemberItems.get());
       case 12:
-        return parseConfigItems(COMMON.rewardsDecemberItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsDecemberItems.get());
       default:
         return new ArrayList<>();
     }
   }
 
   public static List<ItemStack> getNormalFillItems() {
-    return parseConfigItems(COMMON.normalFillItems.get());
+    return RewardsItems.parseConfigItems(COMMON.normalFillItems.get());
   }
 
   public static ItemStack getNormalFillItem() {
@@ -195,7 +193,7 @@ public class Rewards {
   }
 
   public static List<ItemStack> getRareFillItems() {
-    return parseConfigItems(COMMON.rareFillItems.get());
+    return RewardsItems.parseConfigItems(COMMON.rareFillItems.get());
   }
 
   public static ItemStack getRareFillItem() {
@@ -204,7 +202,7 @@ public class Rewards {
   }
 
   public static List<ItemStack> getLootBagFillItems() {
-    return parseConfigItems(COMMON.lootBagFillItems.get());
+    return RewardsItems.parseConfigItems(COMMON.lootBagFillItems.get());
   }
 
   public static ItemStack getLootBagFillItem() {
@@ -228,37 +226,17 @@ public class Rewards {
     return getCurrentYear() + "-" + getCurrentMonth() + "-" + getCurrentDay();
   }
 
-  public static int getDaysCurrentMonth() {
-    YearMonth yearMonth = YearMonth.of(getCurrentYear(), getCurrentMonth());
+  public static int getDaysPerMonth(int year, int month) {
+    YearMonth yearMonth = YearMonth.of(year, month);
     return yearMonth.lengthOfMonth();
+  }
+
+  public static int getDaysCurrentMonth() {
+    return getDaysPerMonth(getCurrentYear(), getCurrentMonth());
   }
 
   public static int getDaysLeftCurrentMonth() {
     return getDaysCurrentMonth() - getCurrentDay();
-  }
-
-  public static List<ItemStack> parseConfigItems(List<String> configItems) {
-    List<ItemStack> items = new ArrayList<>();
-
-    for (String configItem : configItems) {
-      String itemName = configItem;
-      int itemCount = 1;
-      if (configItem.chars().filter(delimiter -> delimiter == ':').count() == 2) {
-        String[] itemParts = configItem.split(":");
-        itemName = itemParts[0] + ":" + itemParts[1];
-        itemCount = Integer.parseInt(itemParts[2]);
-      }
-      Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName));
-      if (item == null || item == Items.AIR) {
-        log.warn("Unable to find reward item {} in the registry!", itemName);
-      } else {
-        ItemStack itemStack = new ItemStack(item);
-        itemStack.setCount(itemCount);
-        items.add(itemStack);
-      }
-    }
-
-    return items;
   }
 
 }

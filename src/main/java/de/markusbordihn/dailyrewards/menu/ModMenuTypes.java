@@ -19,13 +19,14 @@
 
 package de.markusbordihn.dailyrewards.menu;
 
-import de.markusbordihn.dailyrewards.Constants;
 import net.minecraft.world.inventory.MenuType;
 
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+
+import de.markusbordihn.dailyrewards.Constants;
 
 public class ModMenuTypes {
 
@@ -36,7 +37,14 @@ public class ModMenuTypes {
   public static final DeferredRegister<MenuType<?>> MENU_TYPES =
       DeferredRegister.create(ForgeRegistries.MENU_TYPES, Constants.MOD_ID);
 
-  public static final RegistryObject<MenuType<RewardMenu>> REWARD_MENU =
-      MENU_TYPES.register("reward_menu", () -> IForgeMenuType.create(RewardMenu::new));
+  public static final RegistryObject<MenuType<RewardCompactMenu>> REWARD_COMPACT_MENU = MENU_TYPES
+      .register("reward_compact_menu", () -> IForgeMenuType.create(RewardCompactMenu::new));
+
+  public static final RegistryObject<MenuType<RewardOverviewMenu>> REWARD_OVERVIEW_MENU = MENU_TYPES
+      .register("reward_overview_menu", () -> IForgeMenuType.create(RewardOverviewMenu::new));
+
+  public static final RegistryObject<MenuType<RewardSpecialOverviewMenu>> REWARD_SPECIAL_OVERVIEW_MENU =
+      MENU_TYPES.register("reward_special_overview_menu",
+          () -> IForgeMenuType.create(RewardSpecialOverviewMenu::new));
 
 }

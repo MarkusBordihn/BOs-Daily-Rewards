@@ -29,16 +29,18 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 
 import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.config.CommonConfig;
 
 public abstract class CustomCommand implements Command<CommandSourceStack> {
-  protected CustomCommand() {}
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
+  protected static final CommonConfig.Config COMMON = CommonConfig.COMMON;
+
+  protected CustomCommand() {}
+
   public static void sendFeedback(CommandContext<CommandSourceStack> context, String feedback) {
     CommandSourceStack commandSource = context.getSource();
-    commandSource.sendSuccess(() -> {
-      return Component.literal(feedback);
-    }, false);
+    commandSource.sendSuccess(() -> Component.literal(feedback), false);
   }
 }
