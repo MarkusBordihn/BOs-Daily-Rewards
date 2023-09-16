@@ -24,14 +24,13 @@ import org.apache.logging.log4j.Logger;
 
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.menu.RewardMenu;
 
-public class TakeableRewardSlot extends Slot {
+public class TakeableRewardSlot extends DailyRewardSlot {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
@@ -50,7 +49,7 @@ public class TakeableRewardSlot extends Slot {
   public void onTake(Player player, ItemStack itemStack) {
     if (!getItem().is(ModItems.TAKEN_REWARD.get())) {
       set(new ItemStack(ModItems.TAKEN_REWARD.get()));
-      this.menu.syncRewardsUserContainer(player);
+      this.menu.syncRewardContainer(player);
     } else {
       this.setChanged();
     }
