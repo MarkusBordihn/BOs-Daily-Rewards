@@ -19,53 +19,48 @@
 
 package de.markusbordihn.dailyrewards.client.screen;
 
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
+
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.item.ModItems;
+import de.markusbordihn.dailyrewards.config.CommonConfig;
 import de.markusbordihn.dailyrewards.menu.RewardMenu;
-import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
-import de.markusbordihn.dailyrewards.menu.slots.TakeableRewardSlot;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 
-public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
+@OnlyIn(Dist.CLIENT)
+public class RewardScreen<T extends RewardMenu> extends AbstractContainerScreen<T> {
+
+  protected static final CommonConfig.Config COMMON = CommonConfig.COMMON;
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  private ResourceLocation texture =
-      new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen.png");
+  protected int currentDay = Rewards.getCurrentDay();
+  protected int daysCurrentMonth = Rewards.getDaysCurrentMonth();
+  protected boolean automaticRewardPlayers = true;
+  protected boolean automaticRewardSpecialPlayers = true;
+  protected int rewardDaysForCurrentMonth = Rewards.getDaysCurrentMonth();
+  protected int rewardedDays = 0;
+  protected int rewardedSpecialDays = 0;
+  protected int rewardTimePerDay = 30;
+  protected int rewardTimePerDayInSeconds = rewardTimePerDay * 60;
+  protected LocalPlayer localPlayer;
 
-  private MutableComponent rewardScreenTitle;
-
-  public RewardScreen(RewardMenu menu, Inventory inventory, Component component) {
+  public RewardScreen(T menu, Inventory inventory, Component component) {
     super(menu, inventory, component);
-  }
-
-  public void rendererTakeableRewardSlot(PoseStack poseStack, int x, int y) {
-    RenderSystem.setShaderTexture(0, this.texture);
-    poseStack.pushPose();
-    this.blit(poseStack, x + 11, y - 4, 430, 17, 16, 16);
-    poseStack.popPose();
-  }
-
-  public void renderRewardSlot(PoseStack poseStack, int x, int y, int blitOffset) {
-    RenderSystem.disableDepthTest();
-    RenderSystem.colorMask(true, true, true, false);
-    fillGradient(poseStack, x, y, x + 16, y + 16, -2130706433, 0, blitOffset);
-    RenderSystem.colorMask(true, true, true, true);
-    RenderSystem.enableDepthTest();
   }
 
   @Override
@@ -73,76 +68,45 @@ public class RewardScreen extends AbstractContainerScreen<RewardMenu> {
     super.init();
 
     // Default stats
-    this.imageWidth = 171;
-    this.imageHeight = 247;
+    this.imageHeight = 242;
 
     // Set Title with already rewarded days.
-    int rewardedDays = this.menu.getRewardedDays();
-    rewardScreenTitle =
-        Component.translatable(Constants.TEXT_PREFIX + "reward_screen", rewardedDays);
+    this.rewardedDays = this.menu.getRewardedDays();
+    this.rewardedSpecialDays = this.menu.getRewardedSpecialDays();
 
-    // Set background according the number or days for the current month.
-    switch (Rewards.getDaysCurrentMonth()) {
-      case 28:
-        texture =
-            new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen_28_days.png");
-        break;
-      case 29:
-        texture =
-            new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen_29_days.png");
-        break;
-      case 30:
-        texture =
-            new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen_30_days.png");
-        break;
-      case 31:
-        texture =
-            new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen_31_days.png");
-        break;
-      default:
-        texture = new ResourceLocation(Constants.MOD_ID, "textures/container/reward_screen.png");
-    }
+    // Automatic reward players
+    this.automaticRewardPlayers = COMMON.automaticRewardPlayers.get();
+    this.automaticRewardSpecialPlayers = COMMON.automaticRewardSpecialPlayers.get();
 
+    // Calculations for next reward
+    localPlayer = Minecraft.getInstance() != null ? Minecraft.getInstance().player : null;
+    rewardTimePerDay = COMMON.rewardTimePerDay.get();
+    rewardTimePerDayInSeconds = rewardTimePerDay * 60;
+
+    // Basic Position
     this.titleLabelX = 8;
     this.titleLabelY = 6;
     this.topPos = (this.height - this.imageHeight) / 2;
-    this.inventoryLabelX = 6;
-    this.inventoryLabelY = this.imageHeight - 90;
+    this.inventoryLabelX = 8;
+    this.inventoryLabelY = this.imageHeight - 92;
   }
 
   @Override
   public void render(PoseStack poseStack, int x, int y, float partialTicks) {
     this.renderBackground(poseStack);
     super.render(poseStack, x, y, partialTicks);
-
-    // Additional styling for the different kind of slots and slot states.
-    for (int k = 0; k < this.menu.slots.size(); ++k) {
-      Slot slot = this.menu.slots.get(k);
-      if (slot instanceof TakeableRewardSlot && !slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
-        rendererTakeableRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
-      } else if (slot instanceof RewardSlot) {
-        renderRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y, this.getBlitOffset());
-      }
-    }
-
-    this.renderTooltip(poseStack, x, y);
-  }
-
-  @Override
-  protected void renderLabels(PoseStack poseStack, int x, int y) {
-    this.font.draw(poseStack, rewardScreenTitle, this.titleLabelX, this.titleLabelY, 4210752);
-    this.font.draw(poseStack, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY,
-        4210752);
   }
 
   @Override
   protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
     RenderSystem.setShader(GameRenderer::getPositionTexShader);
     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-    RenderSystem.setShaderTexture(0, this.texture);
+    RenderSystem.setShaderTexture(0, Constants.TEXTURE_GENERIC_54);
 
     // Main screen
-    this.blit(poseStack, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
+    this.blit(poseStack, leftPos, topPos + 20, 0, 0, 176, 222);
+    this.blit(poseStack, leftPos, topPos + 8, 0, 0, 176, 139);
+    blit(poseStack, leftPos + 5, topPos + 15, 3, 64, 165, 130, 255, 4096);
   }
 
 }

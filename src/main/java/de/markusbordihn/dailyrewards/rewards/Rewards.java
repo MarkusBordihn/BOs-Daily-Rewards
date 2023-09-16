@@ -32,14 +32,12 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.config.CommonConfig;
@@ -58,19 +56,37 @@ public class Rewards {
 
   @SubscribeEvent
   public static void handleServerAboutToStartEvent(ServerAboutToStartEvent event) {
-    log.info("Will use the following normal fill items: {}", getNormalFillItems());
-    log.info("Will use the following rare fill items: {}", getRareFillItems());
+    if (Boolean.TRUE.equals(COMMON.useFillItems.get())) {
+      log.info("Will use the following normal fill items: {}", getNormalFillItems());
+      log.info("Will use the following rare fill items: {}", getRareFillItems());
+    } else {
+      log.info("Fill items are disabled, will use only reward items.");
+    }
   }
 
   public static List<ItemStack> calculateRewardItemsForMonth(int month) {
-    log.info("Calculate Reward items for month {} ...", month);
     YearMonth yearMonth = YearMonth.of(getCurrentYear(), month);
     int numberOfDays = yearMonth.lengthOfMonth();
+    log.info("Calculate Reward items for month {} with {} days ...", month, numberOfDays);
     List<ItemStack> rewardItemsForMonth = getRewardItemForMonth(month);
 
     // Early return if we have matching items without shuffle.
-    if (rewardItemsForMonth.size() >= numberOfDays) {
-      return rewardItemsForMonth.stream().limit(numberOfDays).collect(Collectors.toList());
+    if (Boolean.TRUE.equals(!COMMON.useFillItems.get())
+        || rewardItemsForMonth.size() >= numberOfDays) {
+      if (Boolean.FALSE.equals(COMMON.useFillItems.get())) {
+        log.info("Fill items are disabled, will use {} reward items for month {} with {} days ...",
+            rewardItemsForMonth.size(), month, numberOfDays);
+      } else {
+        log.info("Found {} reward items for month {} with {} days ...", rewardItemsForMonth.size(),
+            month, numberOfDays);
+      }
+      List<ItemStack> rewardItems =
+          rewardItemsForMonth.stream().limit(numberOfDays).collect(Collectors.toList());
+      if (Boolean.TRUE.equals(COMMON.shuffleRewardsItems.get())) {
+        log.info("Shuffle reward items for month {} ...", month);
+        Collections.shuffle(rewardItems);
+      }
+      return rewardItems;
     }
 
     // Fill missing days with fill items.
@@ -78,13 +94,23 @@ public class Rewards {
     int numMissingRewardItems = numberOfDays - numRewardItems;
     List<ItemStack> normalFillItems = getNormalFillItems();
     List<ItemStack> rareFillItems = getRareFillItems();
+    List<ItemStack> lootBagFillItems = getLootBagFillItems();
     Set<ItemStack> rareDuplicates = new HashSet<>();
+    Set<ItemStack> lootBagDuplicates = new HashSet<>();
 
+    // Chances for different items types.
+    int rareFillItemsChance = rareFillItems.isEmpty() ? 0 : COMMON.rareFillItemsChance.get();
+    int lootBackFillItemChance =
+        lootBagFillItems.isEmpty() ? 0 : COMMON.lootBagFillItemsChance.get();
+
+    // Fill missing reward items.
+    log.warn("Found {} missing days without any items, will try to use fill items ...",
+        numMissingRewardItems);
     for (int i = 0; i < numMissingRewardItems; i++) {
       ItemStack fillItem = null;
 
-      // There is a 1:7 change to get an rare item instead of an normal item.
-      if (random.nextInt(7) == 0) {
+      // There is a 1:x (1:7) chance to get an rare item instead of an normal item.
+      if (rareFillItemsChance > 0 && random.nextInt(rareFillItemsChance) == 0) {
         ItemStack rareFillItem = rareFillItems.get(random.nextInt(rareFillItems.size()));
         // Make sure we avoid duplicates of rare fill items.
         if (!rareDuplicates.contains(rareFillItem)) {
@@ -93,52 +119,72 @@ public class Rewards {
         }
       }
 
+      // There is a 1:x (1:15) chance to get an loot bag item instead of an normal
+      // item.
+      else if (lootBackFillItemChance > 0 && random.nextInt(lootBackFillItemChance) == 0) {
+        ItemStack lootBagFillItem = lootBagFillItems.get(random.nextInt(lootBagFillItems.size()));
+        // Make sure we avoid duplicates of lootBag fill items.
+        if (!lootBagDuplicates.contains(lootBagFillItem)) {
+          fillItem = lootBagFillItem;
+          lootBagDuplicates.add(lootBagFillItem);
+        }
+      }
+
       // Make sure we have filled something.
       if (fillItem == null) {
-        fillItem = normalFillItems.get(random.nextInt(normalFillItems.size()));
+        if (!normalFillItems.isEmpty()) {
+          fillItem = normalFillItems.get(random.nextInt(normalFillItems.size()));
+        } else {
+          log.error("Unable to find any fill item for {} of {} missing days, will use {} instead!",
+              i + 1, numMissingRewardItems, Items.DIRT);
+          fillItem = new ItemStack(Items.DIRT);
+        }
       }
 
       rewardItemsForMonth.add(fillItem);
     }
 
-    // Shuffle items before returning
-    Collections.shuffle(rewardItemsForMonth);
+    // Shuffle items before returning.
+    if (Boolean.TRUE.equals(COMMON.shuffleRewardsItems.get())) {
+      log.info("Shuffle reward items for month {} ...", month);
+      Collections.shuffle(rewardItemsForMonth);
+    }
     return rewardItemsForMonth;
   }
 
   public static List<ItemStack> getRewardItemForMonth(int month) {
     switch (month) {
       case 1:
-        return parseConfigItems(COMMON.rewardsJanuaryItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsJanuaryItems.get());
       case 2:
-        return parseConfigItems(COMMON.rewardsFebruaryItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsFebruaryItems.get());
       case 3:
-        return parseConfigItems(COMMON.rewardsMarchItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsMarchItems.get());
       case 4:
-        return parseConfigItems(COMMON.rewardsAprilItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsAprilItems.get());
       case 5:
-        return parseConfigItems(COMMON.rewardsMayItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsMayItems.get());
       case 6:
-        return parseConfigItems(COMMON.rewardsJuneItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsJuneItems.get());
       case 7:
-        return parseConfigItems(COMMON.rewardsJulyItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsJulyItems.get());
       case 8:
-        return parseConfigItems(COMMON.rewardsAugustItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsAugustItems.get());
       case 9:
-        return parseConfigItems(COMMON.rewardsSeptemberItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsSeptemberItems.get());
       case 10:
-        return parseConfigItems(COMMON.rewardsOctoberItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsOctoberItems.get());
       case 11:
-        return parseConfigItems(COMMON.rewardsNovemberItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsNovemberItems.get());
       case 12:
-        return parseConfigItems(COMMON.rewardsDecemberItems.get());
+        return RewardsItems.parseConfigItems(COMMON.rewardsDecemberItems.get());
       default:
         return new ArrayList<>();
     }
   }
 
   public static List<ItemStack> getNormalFillItems() {
-    return parseConfigItems(COMMON.normalFillItems.get());
+    return RewardsItems.parseConfigItems(COMMON.normalFillItems.get());
   }
 
   public static ItemStack getNormalFillItem() {
@@ -147,12 +193,21 @@ public class Rewards {
   }
 
   public static List<ItemStack> getRareFillItems() {
-    return parseConfigItems(COMMON.rareFillItems.get());
+    return RewardsItems.parseConfigItems(COMMON.rareFillItems.get());
   }
 
   public static ItemStack getRareFillItem() {
     List<ItemStack> rareFillItems = getRareFillItems();
     return rareFillItems.get(random.nextInt(rareFillItems.size()));
+  }
+
+  public static List<ItemStack> getLootBagFillItems() {
+    return RewardsItems.parseConfigItems(COMMON.lootBagFillItems.get());
+  }
+
+  public static ItemStack getLootBagFillItem() {
+    List<ItemStack> lootBagFillItems = getRareFillItems();
+    return lootBagFillItems.get(random.nextInt(lootBagFillItems.size()));
   }
 
   public static int getCurrentDay() {
@@ -171,33 +226,17 @@ public class Rewards {
     return getCurrentYear() + "-" + getCurrentMonth() + "-" + getCurrentDay();
   }
 
-  public static int getDaysCurrentMonth() {
-    YearMonth yearMonth = YearMonth.of(getCurrentYear(), getCurrentMonth());
+  public static int getDaysPerMonth(int year, int month) {
+    YearMonth yearMonth = YearMonth.of(year, month);
     return yearMonth.lengthOfMonth();
   }
 
-  public static List<ItemStack> parseConfigItems(List<String> configItems) {
-    List<ItemStack> items = new ArrayList<>();
+  public static int getDaysCurrentMonth() {
+    return getDaysPerMonth(getCurrentYear(), getCurrentMonth());
+  }
 
-    for (String configItem : configItems) {
-      String itemName = configItem;
-      int itemCount = 1;
-      if (configItem.chars().filter(delimiter -> delimiter == ':').count() == 2) {
-        String[] itemParts = configItem.split(":");
-        itemName = itemParts[0] + ":" + itemParts[1];
-        itemCount = Integer.parseInt(itemParts[2]);
-      }
-      Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName));
-      if (item == null || item == Items.AIR) {
-        log.error("Unable to find reward item {} in the registry!", itemName);
-      } else {
-        ItemStack itemStack = new ItemStack(item);
-        itemStack.setCount(itemCount);
-        items.add(itemStack);
-      }
-    }
-
-    return items;
+  public static int getDaysLeftCurrentMonth() {
+    return getDaysCurrentMonth() - getCurrentDay();
   }
 
 }

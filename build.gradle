@@ -172,7 +172,7 @@ curseforge {
   project {
     id = "${curseforge_project_id}"
     changelog = 'See https://github.com/MarkusBordihn/BOs-Daily-Rewards/commits/main'
-    releaseType = 'release'
+    releaseType = 'beta'
     addGameVersion("1.19")
     addGameVersion("Forge")
   }
