@@ -43,7 +43,7 @@ import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 
-public class RewardUserData extends SavedData {
+public class SpecialRewardUserData extends SavedData {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
@@ -51,38 +51,40 @@ public class RewardUserData extends SavedData {
   public static final String ITEM_LIST_TAG = "ItemList";
   public static final String LAST_REWARDED_DAY_TAG = "LastRewardedDay";
   public static final String REWARDED_DAYS_TAG = "RewardedDays";
-  public static final String USER_REWARDS_TAG = "UserRewards";
+  public static final String SPECIAL_USER_REWARDS_TAG = "SpecialUserRewards";
   public static final String YEAR_MONTH_TAG = "YearMonth";
   public static final String YEAR_MONTH_USER_TAG = "YearMonthUser";
 
-  private static final String FILE_ID = Constants.MOD_ID + "_user";
+  private static final String FILE_ID = Constants.MOD_ID + "_user_special";
 
   private static MinecraftServer server;
-  private static RewardUserData data;
+  private static SpecialRewardUserData data;
 
   private static ConcurrentHashMap<String, List<ItemStack>> rewardItemsMap =
       new ConcurrentHashMap<>();
   private static ConcurrentHashMap<String, Integer> rewardedDaysMap = new ConcurrentHashMap<>();
   private static ConcurrentHashMap<String, String> lastRewardedDayMap = new ConcurrentHashMap<>();
 
-  public RewardUserData() {
+  public SpecialRewardUserData() {
     this.setDirty();
   }
 
   public static void prepare(MinecraftServer server) {
     // Make sure we preparing the data only once for the same server!
-    if (server == null || server == RewardUserData.server && RewardUserData.data != null) {
+    if (server == null
+        || server == SpecialRewardUserData.server && SpecialRewardUserData.data != null) {
       return;
     }
 
-    log.info("{} preparing reward user data for {}", Constants.LOG_NAME, server);
-    RewardUserData.server = server;
+    log.info("{} preparing special reward user data for {}", Constants.LOG_NAME, server);
+    SpecialRewardUserData.server = server;
 
     // Using a global approach and storing relevant data in the overworld only!
     ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
     if (serverLevel != null) {
-      RewardUserData.data = serverLevel.getDataStorage().computeIfAbsent(RewardUserData::load,
-          RewardUserData::new, RewardUserData.getFileId());
+      SpecialRewardUserData.data =
+          serverLevel.getDataStorage().computeIfAbsent(SpecialRewardUserData::load,
+              SpecialRewardUserData::new, SpecialRewardUserData.getFileId());
     } else {
       log.error("{} unable to get server level {} for storing data!", Constants.LOG_NAME,
           serverLevel);
@@ -90,15 +92,15 @@ public class RewardUserData extends SavedData {
   }
 
   public static boolean available() {
-    RewardUserData.get();
-    return RewardUserData.data != null;
+    SpecialRewardUserData.get();
+    return SpecialRewardUserData.data != null;
   }
 
-  public static RewardUserData get() {
-    if (RewardUserData.data == null) {
+  public static SpecialRewardUserData get() {
+    if (SpecialRewardUserData.data == null) {
       prepare(ServerLifecycleHooks.getCurrentServer());
     }
-    return RewardUserData.data;
+    return SpecialRewardUserData.data;
   }
 
   public static String getFileId() {
@@ -188,7 +190,7 @@ public class RewardUserData extends SavedData {
   }
 
   public void setRewardsFor(int year, int month, UUID uuid, List<ItemStack> rewardItems) {
-    log.debug("Set rewards for {}-{} and player {} to: {}", year, month, uuid, rewardItems);
+    log.debug("Set special rewards for {}-{} and player {} to: {}", year, month, uuid, rewardItems);
     String key = getKeyId(year, month, uuid);
     rewardItemsMap.put(key, rewardItems);
     this.setDirty();
@@ -271,13 +273,13 @@ public class RewardUserData extends SavedData {
     clearRewards(Rewards.getCurrentYear(), Rewards.getCurrentMonth(), uuid);
   }
 
-  public static RewardUserData load(CompoundTag compoundTag) {
-    RewardUserData rewardData = new RewardUserData();
+  public static SpecialRewardUserData load(CompoundTag compoundTag) {
+    SpecialRewardUserData rewardData = new SpecialRewardUserData();
     log.info("{} loading reward user data ... {}", Constants.LOG_NAME, compoundTag);
 
     // Restoring rewards items per year-month:uuid
-    if (compoundTag.contains(USER_REWARDS_TAG)) {
-      ListTag listTag = compoundTag.getList(USER_REWARDS_TAG, 10);
+    if (compoundTag.contains(SPECIAL_USER_REWARDS_TAG)) {
+      ListTag listTag = compoundTag.getList(SPECIAL_USER_REWARDS_TAG, 10);
       for (int i = 0; i < listTag.size(); ++i) {
         CompoundTag rewardUserTag = listTag.getCompound(i);
 
@@ -326,15 +328,16 @@ public class RewardUserData extends SavedData {
     rewardKeys.addAll(lastRewardedDayMap.keySet());
 
     if (rewardKeys.isEmpty()) {
-      log.warn("{} unable to save reward user data, because data are empty!", Constants.LOG_NAME);
+      log.warn("{} unable to save special reward user data, because data are empty!",
+          Constants.LOG_NAME);
       return compoundTag;
     }
-    log.info("{} saving reward user data for {} ...", Constants.LOG_NAME, rewardKeys);
+    log.info("{} saving special reward user data for {} ...", Constants.LOG_NAME, rewardKeys);
 
     // Iterate trough the stored keys to make sure we don't forget anything.
     ListTag listTag = new ListTag();
 
-    compoundTag.put(USER_REWARDS_TAG, listTag);
+    compoundTag.put(SPECIAL_USER_REWARDS_TAG, listTag);
     for (String rewardKey : rewardKeys) {
       CompoundTag rewardUserTag = new CompoundTag();
 

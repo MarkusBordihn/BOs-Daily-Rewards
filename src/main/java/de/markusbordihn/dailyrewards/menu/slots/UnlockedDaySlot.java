@@ -17,32 +17,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.dailyrewards.client.screen;
+package de.markusbordihn.dailyrewards.menu.slots;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
-import net.minecraft.client.gui.screens.MenuScreens;
+import de.markusbordihn.dailyrewards.item.ModItems;
+import de.markusbordihn.dailyrewards.menu.RewardMenu;
 
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+public class UnlockedDaySlot extends DailyRewardSlot {
 
-import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.menu.ModMenuTypes;
+  protected RewardMenu menu;
 
-public class ClientScreens {
-
-  protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
-
-  protected ClientScreens() {}
-
-  public static void registerScreens(final FMLClientSetupEvent event) {
-    log.info("{} Client Screens ...", Constants.LOG_REGISTER_PREFIX);
-
-    event.enqueueWork(() -> {
-      MenuScreens.register(ModMenuTypes.REWARD_COMPACT_MENU.get(), RewardCompactScreen::new);
-      MenuScreens.register(ModMenuTypes.REWARD_OVERVIEW_MENU.get(), RewardOverviewScreen::new);
-      MenuScreens.register(ModMenuTypes.REWARD_SPECIAL_OVERVIEW_MENU.get(),
-          RewardSpecialOverviewScreen::new);
-    });
+  public UnlockedDaySlot(Container container, int index, int x, int y) {
+    super(container, index, x, y);
   }
+
+  public UnlockedDaySlot(Container container, int index, int x, int y, RewardMenu menu) {
+    super(container, index, x, y);
+    this.menu = menu;
+  }
+
+  @Override
+  public ItemStack getItem() {
+    return new ItemStack(ModItems.UNLOCK_DAY.get());
+  }
+
+  @Override
+  public boolean mayPickup(Player player) {
+    return false;
+  }
+
+  @Override
+  public boolean isActive() {
+    return true;
+  }
+
+  @Override
+  public boolean mayPlace(ItemStack itemStack) {
+    return false;
+  }
+
 }

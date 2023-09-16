@@ -25,38 +25,46 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-
 import net.minecraft.server.level.ServerPlayer;
 
 import de.markusbordihn.dailyrewards.rewards.RewardsScreen;
 
-public class ClaimCommand extends CustomCommand {
-  private static final ClaimCommand command = new ClaimCommand();
+public class TestCommand extends CustomCommand {
+  private static final TestCommand command = new TestCommand();
 
   public static ArgumentBuilder<CommandSourceStack, ?> register() {
-    return Commands.literal("claim").requires(cs -> cs.hasPermission(Commands.LEVEL_ALL))
-        .executes(command);
+    return Commands.literal("test").requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS))
+        .executes(command).then(Commands.literal("overview").executes(command::showOverview))
+        .then(Commands.literal("special_overview").executes(command::showSpecialOverview))
+        .then(Commands.literal("compact").executes(command::showCompact));
   }
 
   @Override
   public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-    ServerPlayer player = context.getSource().getPlayerOrException();
+    sendFeedback(context, "This command allows you to test the different kind of reward screens.");
+    return 0;
+  }
 
-    // Open reward screen for player depending on the configuration
-    switch (COMMON.rewardScreenType.get()) {
-      case "overview":
-        RewardsScreen.openRewardOverviewMenuForPlayer(player);
-        break;
-      case "compact":
-        RewardsScreen.openRewardCompactMenuForPlayer(player);
-        break;
-      case "special":
-        RewardsScreen.openRewardSpecialOverviewMenuForPlayer(player);
-        break;
-      default:
-        RewardsScreen.openRewardOverviewMenuForPlayer(player);
-        break;
-    }
+  public int showCompact(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    ServerPlayer player = context.getSource().getPlayerOrException();
+    sendFeedback(context, "Open Compact Reward Screen for " + player);
+    RewardsScreen.openRewardCompactMenuForPlayer(player);
+    return 0;
+  }
+
+  public int showOverview(CommandContext<CommandSourceStack> context)
+      throws CommandSyntaxException {
+    ServerPlayer player = context.getSource().getPlayerOrException();
+    sendFeedback(context, "Open Overview Reward Screen for " + player);
+    RewardsScreen.openRewardOverviewMenuForPlayer(player);
+    return 0;
+  }
+
+  public int showSpecialOverview(CommandContext<CommandSourceStack> context)
+      throws CommandSyntaxException {
+    ServerPlayer player = context.getSource().getPlayerOrException();
+    sendFeedback(context, "Open Overview Special Reward Screen for " + player);
+    RewardsScreen.openRewardSpecialOverviewMenuForPlayer(player);
     return 0;
   }
 

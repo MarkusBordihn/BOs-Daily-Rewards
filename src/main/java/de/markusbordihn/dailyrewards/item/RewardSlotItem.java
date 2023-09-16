@@ -17,32 +17,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.dailyrewards.client.screen;
+package de.markusbordihn.dailyrewards.item;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.List;
 
-import net.minecraft.client.gui.screens.MenuScreens;
+import javax.annotation.Nullable;
 
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
 import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.menu.ModMenuTypes;
 
-public class ClientScreens {
+public class RewardSlotItem extends Item {
 
-  protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
+  private String descriptionTextId;
 
-  protected ClientScreens() {}
-
-  public static void registerScreens(final FMLClientSetupEvent event) {
-    log.info("{} Client Screens ...", Constants.LOG_REGISTER_PREFIX);
-
-    event.enqueueWork(() -> {
-      MenuScreens.register(ModMenuTypes.REWARD_COMPACT_MENU.get(), RewardCompactScreen::new);
-      MenuScreens.register(ModMenuTypes.REWARD_OVERVIEW_MENU.get(), RewardOverviewScreen::new);
-      MenuScreens.register(ModMenuTypes.REWARD_SPECIAL_OVERVIEW_MENU.get(),
-          RewardSpecialOverviewScreen::new);
-    });
+  public RewardSlotItem(Properties properties, String descriptionTextId) {
+    super(properties);
+    this.descriptionTextId = descriptionTextId;
   }
+
+  @Override
+  public void appendHoverText(ItemStack itemStack, @Nullable Level level,
+      List<Component> tooltipList, TooltipFlag tooltipFlag) {
+    if (this.descriptionTextId == null || this.descriptionTextId.isEmpty()) {
+      return;
+    }
+    tooltipList.add(Component.translatable(Constants.TEXT_PREFIX + this.descriptionTextId));
+  }
+
 }

@@ -21,11 +21,11 @@ package de.markusbordihn.dailyrewards.menu;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -37,140 +37,92 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.data.RewardClientData;
-import de.markusbordihn.dailyrewards.data.RewardData;
+import de.markusbordihn.dailyrewards.config.CommonConfig;
 import de.markusbordihn.dailyrewards.data.RewardUserData;
-import de.markusbordihn.dailyrewards.menu.slots.EmptyRewardSlot;
-import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
+import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
+import de.markusbordihn.dailyrewards.item.ModItems;
+import de.markusbordihn.dailyrewards.menu.slots.DailyRewardSlot;
+import de.markusbordihn.dailyrewards.menu.slots.LockedDaySlot;
+import de.markusbordihn.dailyrewards.menu.slots.SkipDaySlot;
+import de.markusbordihn.dailyrewards.menu.slots.SkippedDaySlot;
 import de.markusbordihn.dailyrewards.menu.slots.TakeableRewardSlot;
-import de.markusbordihn.dailyrewards.rewards.Rewards;
+import de.markusbordihn.dailyrewards.menu.slots.UnlockedDaySlot;
 
 public class RewardMenu extends AbstractContainerMenu {
 
-  public static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
+  protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  // Define Slot index for easier access
-
-  public static final int PLAYER_SLOT_START = 9;
-  public static final int PLAYER_INVENTORY_SLOT_START = PLAYER_SLOT_START;
-  public static final int PLAYER_SLOT_STOP = 3 * 9 + PLAYER_INVENTORY_SLOT_START + 8;
-
-  // Defining basic layout options
-  private static int containerSize = 32;
-  private static int slotSize = 18;
+  // Config
+  protected static final CommonConfig.Config COMMON = CommonConfig.COMMON;
 
   // Container
-  private Container rewardsContainer = new SimpleContainer(containerSize);
-  private Container rewardsUserContainer = new SimpleContainer(containerSize);
+  private static final Container REWARD_CONTAINER = new SimpleContainer(0);
+  private static final Container REWARD_USER_CONTAINER = new SimpleContainer(0);
+  private static final Container SPECIAL_REWARD_CONTAINER = new SimpleContainer(0);
+  private static final Container SPECIAL_REWARD_USER_CONTAINER = new SimpleContainer(0);
 
-  // Meta data
-  private int rewardedDays = 0;
-  private String lastRewardedDay;
+  // Reward Data
+  protected int rewardedDays = 0;
+  protected String lastRewardedDay;
+  private static final List<ItemStack> REWARDS_FOR_CURRENT_MONTH = new ArrayList<>();
+  private static final List<ItemStack> USER_REWARDS_FOR_CURRENT_MONTH = new ArrayList<>();
+
+  // Special Reward Data
+  protected int rewardedSpecialDays = 0;
+  protected String lastRewardedSpecialDay;
+  private static final List<ItemStack> SPECIAL_REWARDS_FOR_CURRENT_MONTH = new ArrayList<>();
+  private static final List<ItemStack> USER_SPECIAL_REWARDS_FOR_CURRENT_MONTH = new ArrayList<>();
 
   // Misc
+  protected UUID playerUUID;
   protected final Level level;
   protected final Player player;
 
-  public RewardMenu(final int windowId, final Inventory playerInventory) {
-    this(windowId, playerInventory, ModMenuTypes.REWARD_MENU.get());
-  }
-
-  public RewardMenu(int windowId, Inventory playerInventory, FriendlyByteBuf data) {
-    this(windowId, playerInventory);
-  }
-
-  public RewardMenu(final int windowId, final Inventory playerInventory, MenuType<?> menuType) {
+  public RewardMenu(MenuType<?> menuType, int windowId, Inventory playerInventory) {
     super(menuType, windowId);
-
-    // Other
     this.player = playerInventory.player;
     this.level = this.player.getLevel();
+  }
 
-    // Sync rewarded days.
-    this.rewardedDays = level.isClientSide ? RewardClientData.getRewardedDaysForCurrentMonth()
-        : RewardUserData.get().getRewardedDaysForCurrentMonth(player.getUUID());
-    this.lastRewardedDay = level.isClientSide ? RewardClientData.getLastRewardedDayForCurrentMonth()
-        : RewardUserData.get().getLastRewardedDayForCurrentMonth(player.getUUID());
-
-    // Sync possible rewards items for current month.
-    List<ItemStack> rewardsForCurrentMonth =
-        level.isClientSide ? RewardClientData.getGeneralRewardsForCurrentMonth()
-            : RewardData.get().getRewardsForCurrentMonth();
-    if (!rewardsForCurrentMonth.isEmpty()) {
-      for (int index = 0; index < rewardsForCurrentMonth.size(); index++) {
-        this.rewardsContainer.setItem(index, rewardsForCurrentMonth.get(index));
-      }
+  public void syncRewardContainer(Player player) {
+    if (getRewardsForCurrentMonth() != null && !getRewardsForCurrentMonth().isEmpty()) {
+      syncRewardsUserContainer(player);
     }
-
-    // Sync user rewarded items for current month.
-    List<ItemStack> userRewards =
-        level.isClientSide ? RewardClientData.getUserRewardsForCurrentMonth()
-            : RewardUserData.get().getRewardsForCurrentMonth(player.getUUID());
-    if (!userRewards.isEmpty()) {
-      for (int index = 0; index < userRewards.size(); index++) {
-        this.rewardsUserContainer.setItem(index, userRewards.get(index));
-      }
-    }
-
-    // Define Rewards Slots and render takeable rewards, upcoming rewards and empty rewards.
-    int numberOfDays = Rewards.getDaysCurrentMonth();
-    float rewardSlotSizeX = 20.5f;
-    int rewardSlotSizeY = 31;
-    int rewardStartPositionX = 8;
-    int rewardStartPositionY = 19;
-    for (int rewardRow = 0; rewardRow < 4; ++rewardRow) {
-      for (int rewardColumn = 0; rewardColumn < 8; ++rewardColumn) {
-        int rewardSlotIndex = rewardColumn + rewardRow * 8;
-        if (userRewards.size() > rewardSlotIndex && userRewards.get(rewardSlotIndex) != null
-            && !userRewards.get(rewardSlotIndex).isEmpty()) {
-          this.addSlot(new TakeableRewardSlot(this.rewardsUserContainer, rewardSlotIndex,
-              rewardStartPositionX + Math.round(rewardColumn * rewardSlotSizeX),
-              rewardStartPositionY + rewardRow * rewardSlotSizeY, this));
-        } else if (rewardsForCurrentMonth.size() > rewardSlotIndex) {
-          this.addSlot(new RewardSlot(this.rewardsContainer, rewardSlotIndex,
-              rewardStartPositionX + Math.round(rewardColumn * rewardSlotSizeX),
-              rewardStartPositionY + rewardRow * rewardSlotSizeY, this));
-        } else if (numberOfDays > rewardSlotIndex) {
-          this.addSlot(new EmptyRewardSlot(this.rewardsContainer, rewardSlotIndex,
-              rewardStartPositionX + Math.round(rewardColumn * rewardSlotSizeX),
-              rewardStartPositionY + rewardRow * rewardSlotSizeY, this));
-        }
-      }
-    }
-
-    // Player Inventory Slots
-    int playerInventoryStartPositionY = 160;
-    int playerInventoryStartPositionX = 8;
-    for (int inventoryRow = 0; inventoryRow < 3; ++inventoryRow) {
-      for (int inventoryColumn = 0; inventoryColumn < 9; ++inventoryColumn) {
-        this.addSlot(new Slot(playerInventory, inventoryColumn + inventoryRow * 9 + 9,
-            playerInventoryStartPositionX + inventoryColumn * slotSize,
-            playerInventoryStartPositionY + inventoryRow * slotSize));
-      }
-    }
-
-    // Player Hotbar Slots
-    int hotbarStartPositionY = 218;
-    int hotbarStartPositionX = 8;
-    for (int playerInventorySlot = 0; playerInventorySlot < 9; ++playerInventorySlot) {
-      this.addSlot(new Slot(playerInventory, playerInventorySlot,
-          hotbarStartPositionX + playerInventorySlot * slotSize, hotbarStartPositionY));
+    if (getSpecialRewardsForCurrentMonth() != null && !getSpecialRewardsForCurrentMonth().isEmpty()) {
+      syncSpecialRewardsUserContainer(player);
     }
   }
 
   public void syncRewardsUserContainer(Player player) {
+    if (level.isClientSide) {
+      return;
+    }
     List<ItemStack> userRewards = new ArrayList<>();
-    for (int index = 0; index < this.rewardsUserContainer.getContainerSize(); index++) {
-      ItemStack itemStack = this.rewardsUserContainer.getItem(index);
+    for (int index = 0; index < this.getRewardsUserContainer().getContainerSize(); index++) {
+      ItemStack itemStack = this.getRewardsUserContainer().getItem(index);
       if (itemStack != null && !itemStack.isEmpty()) {
         userRewards.add(itemStack);
       }
     }
+    RewardUserData.get().setRewardsForCurrentMonth(player.getUUID(), userRewards);
+  }
+
+  public void syncSpecialRewardsUserContainer(Player player) {
     if (level.isClientSide) {
-      RewardClientData.setUserRewardsForCurrentMonth(userRewards);
-    } else {
-      RewardUserData.get().setRewardsForCurrentMonth(player.getUUID(), userRewards);
+      return;
     }
+    List<ItemStack> userRewards = new ArrayList<>();
+    for (int index = 0; index < this.getSpecialRewardsUserContainer().getContainerSize(); index++) {
+      ItemStack itemStack = this.getSpecialRewardsUserContainer().getItem(index);
+      if (itemStack != null && !itemStack.isEmpty()) {
+        userRewards.add(itemStack);
+      }
+    }
+    SpecialRewardUserData.get().setRewardsForCurrentMonth(player.getUUID(), userRewards);
+  }
+
+  public UUID getPlayerUUID() {
+    return this.playerUUID;
   }
 
   public int getRewardedDays() {
@@ -179,6 +131,68 @@ public class RewardMenu extends AbstractContainerMenu {
 
   public String getLastRewardedDay() {
     return this.lastRewardedDay;
+  }
+
+  public Container getRewardsContainer() {
+    return REWARD_CONTAINER;
+  }
+
+  public Container getRewardsUserContainer() {
+    return REWARD_USER_CONTAINER;
+  }
+
+  public List<ItemStack> getRewardsForCurrentMonth() {
+    return REWARDS_FOR_CURRENT_MONTH;
+  }
+
+  public List<ItemStack> getUserRewardsForCurrentMonth() {
+    return USER_REWARDS_FOR_CURRENT_MONTH;
+  }
+
+  public int getRewardedSpecialDays() {
+    return this.rewardedSpecialDays;
+  }
+
+  public String getLastRewardedSpecialDay() {
+    return this.lastRewardedSpecialDay;
+  }
+
+  public Container getSpecialRewardsContainer() {
+    return SPECIAL_REWARD_CONTAINER;
+  }
+
+  public Container getSpecialRewardsUserContainer() {
+    return SPECIAL_REWARD_USER_CONTAINER;
+  }
+
+  public List<ItemStack> getSpecialRewardsForCurrentMonth() {
+    return SPECIAL_REWARDS_FOR_CURRENT_MONTH;
+  }
+
+  public List<ItemStack> getUserSpecialRewardsForCurrentMonth() {
+    return USER_SPECIAL_REWARDS_FOR_CURRENT_MONTH;
+  }
+
+  public DailyRewardSlot createRewardSlot(ItemStack itemStack, int rewardedDays,
+      Container container, int index, int x, int y) {
+    if (itemStack.is(ModItems.SKIP_DAY.get())) {
+      // Check if we have already skipped this day and show the skipped day slot.
+      if (index < rewardedDays) {
+        return new SkippedDaySlot(container, index, x, y, this);
+      } else {
+        return new SkipDaySlot(container, index, x, y, this);
+      }
+    } else if (itemStack.is(ModItems.LOCK_DAY.get())) {
+      // Check if we have already unlocked this day and show the unlocked day slot.
+      if (index < rewardedDays) {
+        return new UnlockedDaySlot(container, index, x, y, this);
+      } else {
+        return new LockedDaySlot(container, index, x, y, this);
+      }
+    } else {
+      // If the reward is takeable show the takeable reward slot.
+      return new TakeableRewardSlot(container, index, x, y, this);
+    }
   }
 
   @Override
