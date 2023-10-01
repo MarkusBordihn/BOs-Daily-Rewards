@@ -29,11 +29,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.data.RewardScreenType;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class CommonConfig {
@@ -74,7 +77,7 @@ public class CommonConfig {
     public final ForgeConfigSpec.BooleanValue automaticRewardSpecialPlayers;
     public final ForgeConfigSpec.IntValue rewardTimePerDay;
     public final ForgeConfigSpec.BooleanValue showRewardMenuOnPlayerJoin;
-    public final ForgeConfigSpec.ConfigValue<String> rewardScreenType;
+    public final ForgeConfigSpec.EnumValue<RewardScreenType> rewardScreenType;
 
     public final ForgeConfigSpec.BooleanValue useFillItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> normalFillItems;
@@ -90,39 +93,51 @@ public class CommonConfig {
 
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJanuaryItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJanuarySpecialItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJanuarySpecialUsers;
 
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsFebruaryItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsFebruarySpecialItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsFebruarySpecialUsers;
 
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsMarchItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsMarchSpecialItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsMarchSpecialUsers;
 
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsAprilItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsAprilSpecialItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsAprilSpecialUsers;
 
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsMayItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsMaySpecialItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsMaySpecialUsers;
 
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJuneItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJuneSpecialItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJuneSpecialUsers;
 
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJulyItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJulySpecialItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsJulySpecialUsers;
 
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsAugustItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsAugustSpecialItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsAugustSpecialUsers;
 
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsSeptemberItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsSeptemberSpecialItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsSeptemberSpecialUsers;
 
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsOctoberItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsOctoberSpecialItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsOctoberSpecialUsers;
 
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsNovemberItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsNovemberSpecialItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsNovemberSpecialUsers;
 
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsDecemberItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsDecemberSpecialItems;
+    public final ForgeConfigSpec.ConfigValue<List<String>> rewardsDecemberSpecialUsers;
 
     private static final String getListOfRewardsItemsText(String month) {
       return "List of rewards items for " + month;
@@ -131,6 +146,12 @@ public class CommonConfig {
     private static final String getSpecialRewardsItemsText(String month) {
       return "Single reward item or list of special streak rewards items for " + month
           + ". (Only used if rewards" + month + "SpecialItemsNeededDays is greater than 0)";
+    }
+
+    private static final String getSpecialRewardsUsersText(String month) {
+      return "List of users which will get the special rewards items for " + month
+          + ". (Use empty list to allow all players to get special rewards items for " + month
+          + ")";
     }
 
     Config(ForgeConfigSpec.Builder builder) {
@@ -150,9 +171,8 @@ public class CommonConfig {
       showRewardMenuOnPlayerJoin = builder.comment(
           "Shows the rewards menu when a player joins the server (if there are unclaimed rewards).")
           .define("showRewardMenuOnPlayerJoin", false);
-      rewardScreenType =
-          builder.comment("Type of the reward screen (e.g. default, overview, compact)")
-              .define("rewardScreenType", "default");
+      rewardScreenType = builder.comment("Type of the reward screen.")
+          .defineEnum("rewardScreenType", RewardScreenType.COMPACT);
       builder.pop();
 
       builder.push("Fill Items");
@@ -200,6 +220,8 @@ public class CommonConfig {
       rewardsJanuarySpecialItems = builder.comment(getSpecialRewardsItemsText(JANUARY))
           .define("rewardsJanuarySpecialItems", new ArrayList<String>(Arrays
               .asList("minecraft:cooked_salmon:1", "minecraft:cake:1", "minecraft:cookie:1")));
+      rewardsJanuarySpecialUsers = builder.comment(getSpecialRewardsUsersText(JANUARY))
+          .define("rewardsJanuarySpecialUsers", new ArrayList<String>(Arrays.asList("")));
       builder.pop();
 
       builder.push("February Rewards Items");
@@ -208,6 +230,8 @@ public class CommonConfig {
       rewardsFebruarySpecialItems = builder.comment(getSpecialRewardsItemsText(FEBRUARY)).define(
           "rewardsFebruarySpecialItems",
           new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      rewardsFebruarySpecialUsers = builder.comment(getSpecialRewardsUsersText(FEBRUARY))
+          .define("rewardsFebruarySpecialUsers", new ArrayList<String>(Arrays.asList("")));
       builder.pop();
 
       builder.push("March Rewards Items");
@@ -216,6 +240,8 @@ public class CommonConfig {
       rewardsMarchSpecialItems =
           builder.comment(getSpecialRewardsItemsText(MARCH)).define("rewardsMarchSpecialItems",
               new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      rewardsMarchSpecialUsers = builder.comment(getSpecialRewardsUsersText(MARCH))
+          .define("rewardsMarchSpecialUsers", new ArrayList<String>(Arrays.asList("")));
       builder.pop();
 
       builder.push("April Rewards Items");
@@ -224,6 +250,8 @@ public class CommonConfig {
       rewardsAprilSpecialItems = builder.comment(getSpecialRewardsItemsText(APRIL))
           .define("rewardsAprilSpecialItems", new ArrayList<String>(
               Arrays.asList("minecraft:eggs:1", "minecraft:cake:1", "minecraft:cookie:1")));
+      rewardsAprilSpecialUsers = builder.comment(getSpecialRewardsUsersText(APRIL))
+          .define("rewardsAprilSpecialUsers", new ArrayList<String>(Arrays.asList("")));
       builder.pop();
 
       builder.push("May Rewards Items");
@@ -232,6 +260,8 @@ public class CommonConfig {
       rewardsMaySpecialItems =
           builder.comment(getSpecialRewardsItemsText(MAY)).define("rewardsMaySpecialItems",
               new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      rewardsMaySpecialUsers = builder.comment(getSpecialRewardsUsersText(MAY))
+          .define("rewardsMaySpecialUsers", new ArrayList<String>(Arrays.asList("")));
       builder.pop();
 
       builder.push("June Rewards Items");
@@ -240,6 +270,8 @@ public class CommonConfig {
       rewardsJuneSpecialItems =
           builder.comment(getSpecialRewardsItemsText(JUNE)).define("rewardsJuneSpecialItems",
               new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      rewardsJuneSpecialUsers = builder.comment(getSpecialRewardsUsersText(JUNE))
+          .define("rewardsJuneSpecialUsers", new ArrayList<String>(Arrays.asList("")));
       builder.pop();
 
       builder.push("July Rewards Items");
@@ -248,6 +280,8 @@ public class CommonConfig {
       rewardsJulySpecialItems =
           builder.comment(getSpecialRewardsItemsText(JULY)).define("rewardsJulySpecialItems",
               new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      rewardsJulySpecialUsers = builder.comment(getSpecialRewardsUsersText(JULY))
+          .define("rewardsJulySpecialUsers", new ArrayList<String>(Arrays.asList("")));
       builder.pop();
 
       builder.push("August Rewards Items");
@@ -256,6 +290,8 @@ public class CommonConfig {
       rewardsAugustSpecialItems =
           builder.comment(getSpecialRewardsItemsText(AUGUST)).define("rewardsAugustSpecialItems",
               new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      rewardsAugustSpecialUsers = builder.comment(getSpecialRewardsUsersText(AUGUST))
+          .define("rewardsAugustSpecialUsers", new ArrayList<String>(Arrays.asList("")));
       builder.pop();
 
       builder.push("September Rewards Items");
@@ -264,6 +300,8 @@ public class CommonConfig {
       rewardsSeptemberSpecialItems = builder.comment(getSpecialRewardsItemsText(SEPTEMBER)).define(
           "rewardsSeptemberSpecialItems",
           new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      rewardsSeptemberSpecialUsers = builder.comment(getSpecialRewardsUsersText(SEPTEMBER))
+          .define("rewardsSeptemberSpecialUsers", new ArrayList<String>(Arrays.asList("")));
       builder.pop();
 
       builder.push("October Rewards Items");
@@ -272,6 +310,8 @@ public class CommonConfig {
       rewardsOctoberSpecialItems =
           builder.comment(getSpecialRewardsItemsText(OCTOBER)).define("rewardsOctoberSpecialItems",
               new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      rewardsOctoberSpecialUsers = builder.comment(getSpecialRewardsUsersText(OCTOBER))
+          .define("rewardsOctoberSpecialUsers", new ArrayList<String>(Arrays.asList("")));
       builder.pop();
 
       builder.push("November Rewards Items");
@@ -280,6 +320,8 @@ public class CommonConfig {
       rewardsNovemberSpecialItems = builder.comment(getSpecialRewardsItemsText(NOVEMBER)).define(
           "rewardsNovemberSpecialItems",
           new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      rewardsNovemberSpecialUsers = builder.comment(getSpecialRewardsUsersText(NOVEMBER))
+          .define("rewardsNovemberSpecialUsers", new ArrayList<String>(Arrays.asList("")));
       builder.pop();
 
       builder.push("December Rewards Items");
@@ -289,11 +331,19 @@ public class CommonConfig {
       rewardsDecemberSpecialItems = builder.comment(getSpecialRewardsItemsText(DECEMBER)).define(
           "rewardsDecemberSpecialItems",
           new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+      rewardsDecemberSpecialUsers = builder.comment(getSpecialRewardsUsersText(DECEMBER))
+          .define("rewardsDecemberSpecialUsers", new ArrayList<String>(Arrays.asList("")));
       builder.pop();
 
       builder.pop();
     }
   }
 
+  @SubscribeEvent
+  public static void onConfigReloading(final ModConfigEvent.Reloading configEvent) {
+    if (configEvent.getConfig().getSpec() == CommonConfig.commonSpec) {
+      log.debug("{} Common config reloaded ...", Constants.LOG_REGISTER_PREFIX);
+    }
+  }
 
 }

@@ -34,6 +34,8 @@
   "text.daily_rewards.skip_today.info": "\u2714 Dieser Tag kann heute übersprungen werden.",
   "text.daily_rewards.skipped_day.info": "\u2714 Dieser Tag wurde bereits übersprungen!",
   "text.daily_rewards.unlocked_day.info": "\u2714 Dieser Tag ist bereits freigeschaltet!",
+  "text.daily_rewards.open_special_reward_screen.info": "\u2714 Öffne den Bildschirm für spezielle Belohnungen!",
+  "text.daily_rewards.open_default_reward_screen.info": "\u2714 Öffne den Bildschirm für normale Belohnungen!",
 
   "item.daily_rewards.empty_reward": "Keine Belohnung",
   "item.daily_rewards.hidden_reward": "Versteckte Belohnung",
