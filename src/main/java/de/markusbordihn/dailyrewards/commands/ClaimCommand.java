@@ -44,13 +44,13 @@ public class ClaimCommand extends CustomCommand {
 
     // Open reward screen for player depending on the configuration
     switch (COMMON.rewardScreenType.get()) {
-      case "overview":
+      case DEFAULT_OVERVIEW:
         RewardsScreen.openRewardOverviewMenuForPlayer(player);
         break;
-      case "compact":
+      case COMPACT:
         RewardsScreen.openRewardCompactMenuForPlayer(player);
         break;
-      case "special":
+      case SPECIAL_OVERVIEW:
         RewardsScreen.openRewardSpecialOverviewMenuForPlayer(player);
         break;
       default:

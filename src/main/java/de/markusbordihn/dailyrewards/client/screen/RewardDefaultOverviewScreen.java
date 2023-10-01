@@ -33,16 +33,16 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.data.RewardScreenType;
-import de.markusbordihn.dailyrewards.menu.RewardSpecialOverviewMenu;
+import de.markusbordihn.dailyrewards.menu.RewardOverviewMenu;
 import de.markusbordihn.dailyrewards.network.NetworkMessage;
 
 @OnlyIn(Dist.CLIENT)
-public class RewardSpecialOverviewScreen extends RewardOverviewScreen<RewardSpecialOverviewMenu> {
+public class RewardDefaultOverviewScreen extends RewardOverviewScreen<RewardOverviewMenu> {
 
   // Button
-  protected ImageButton openDefaultRewardsOverviewButton;
+  protected ImageButton openSpecialRewardsOverviewButton;
 
-  public RewardSpecialOverviewScreen(RewardSpecialOverviewMenu menu, Inventory inventory,
+  public RewardDefaultOverviewScreen(RewardOverviewMenu menu, Inventory inventory,
       Component component) {
     super(menu, inventory, component);
   }
@@ -52,16 +52,16 @@ public class RewardSpecialOverviewScreen extends RewardOverviewScreen<RewardSpec
     super.init();
 
     if (this.hasSpecialReward) {
-      Button.OnTooltip openDefaultRewardsOverviewButtonTooltip = (button, poseStack, x, y) -> {
+      Button.OnTooltip openSpecialRewardsOverviewButtonTooltip = (button, poseStack, x, y) -> {
         renderTooltip(poseStack,
-            Component.translatable(Constants.TEXT_PREFIX + "open_default_reward_screen.info"), x,
+            Component.translatable(Constants.TEXT_PREFIX + "open_special_reward_screen.info"), x,
             y);
       };
-      this.openDefaultRewardsOverviewButton =
-          this.addRenderableWidget(new ImageButton(this.leftPos + 172, this.topPos + 18, 32, 28, 96,
+      this.openSpecialRewardsOverviewButton =
+          this.addRenderableWidget(new ImageButton(this.leftPos - 28, this.topPos + 18, 32, 28, 64,
               64, 28, Constants.TEXTURE_TABS, 256, 256, button -> {
-                NetworkMessage.openRewardScreen(RewardScreenType.DEFAULT_OVERVIEW);
-              }, openDefaultRewardsOverviewButtonTooltip, CommonComponents.EMPTY));
+                NetworkMessage.openRewardScreen(RewardScreenType.SPECIAL_OVERVIEW);
+              }, openSpecialRewardsOverviewButtonTooltip, CommonComponents.EMPTY));
     }
 
   }
@@ -71,20 +71,8 @@ public class RewardSpecialOverviewScreen extends RewardOverviewScreen<RewardSpec
     super.renderIcons(poseStack, x, y);
     RenderSystem.setShaderTexture(0, Constants.TEXTURE_ICONS);
     poseStack.pushPose();
-    this.blit(poseStack, leftPos + 176, topPos + 20, 0, 40, 32, 32);
+    this.blit(poseStack, leftPos - 21, topPos + 20, 0, 40, 32, 32);
     poseStack.popPose();
-  }
-
-  @Override
-  protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
-    super.renderBg(poseStack, partialTicks, mouseX, mouseY);
-
-    // Render custom background for overview screen
-    RenderSystem.setShaderTexture(0, Constants.TEXTURE_SPECIAL_OVERVIEW_SCREEN);
-    poseStack.pushPose();
-    this.blit(poseStack, leftPos + 1, topPos, 0, 0, 256, 256);
-    poseStack.popPose();
-
   }
 
 }

@@ -60,6 +60,7 @@ public class SpecialRewardUserData extends SavedData {
   private static MinecraftServer server;
   private static SpecialRewardUserData data;
 
+  private static HashSet<UUID> rewardPlayers = new HashSet<>();
   private static ConcurrentHashMap<String, List<ItemStack>> rewardItemsMap =
       new ConcurrentHashMap<>();
   private static ConcurrentHashMap<String, Integer> rewardedDaysMap = new ConcurrentHashMap<>();
@@ -111,6 +112,15 @@ public class SpecialRewardUserData extends SavedData {
     return year + "-" + month + ":" + uuid.toString();
   }
 
+  public static UUID getUUIDfromKeyId(String key) {
+    if (key != null && key.contains(":")) {
+      String[] keyParts = key.split(":");
+      if (keyParts.length == 2) {
+        return UUID.fromString(keyParts[1]);
+      }
+    }
+    return null;
+  }
 
   public void addRewardFor(int year, int month, int day, UUID uuid, ItemStack itemStack) {
     List<ItemStack> rewards = getRewardsFor(year, month, uuid);
@@ -120,6 +130,7 @@ public class SpecialRewardUserData extends SavedData {
     } else {
       rewards.add(itemStack);
     }
+    rewardPlayers.add(uuid);
     this.setDirty();
   }
 
@@ -129,6 +140,7 @@ public class SpecialRewardUserData extends SavedData {
 
   public List<ItemStack> getRewardsFor(int year, int month, UUID uuid) {
     String key = getKeyId(year, month, uuid);
+    rewardPlayers.add(uuid);
     return rewardItemsMap.computeIfAbsent(key, id -> new ArrayList<>());
   }
 
@@ -192,6 +204,7 @@ public class SpecialRewardUserData extends SavedData {
   public void setRewardsFor(int year, int month, UUID uuid, List<ItemStack> rewardItems) {
     log.debug("Set special rewards for {}-{} and player {} to: {}", year, month, uuid, rewardItems);
     String key = getKeyId(year, month, uuid);
+    rewardPlayers.add(uuid);
     rewardItemsMap.put(key, rewardItems);
     this.setDirty();
   }
@@ -209,6 +222,7 @@ public class SpecialRewardUserData extends SavedData {
     log.debug("Set last rewarded day for {}-{} and player {} to {}", year, month, uuid,
         lastRewardedDay);
     String key = getKeyId(year, month, uuid);
+    rewardPlayers.add(uuid);
     lastRewardedDayMap.put(key, lastRewardedDay);
     this.setDirty();
   }
@@ -238,6 +252,7 @@ public class SpecialRewardUserData extends SavedData {
     int rewardedDays = rewardedDaysMap.getOrDefault(key, 0);
     if (rewardedDays < daysPerMonth) {
       rewardedDaysMap.put(key, ++rewardedDays);
+      rewardPlayers.add(uuid);
       this.setDirty();
     }
     return rewardedDays;
@@ -252,6 +267,7 @@ public class SpecialRewardUserData extends SavedData {
     int rewardedDays = rewardedDaysMap.getOrDefault(key, 0);
     if (rewardedDays > 0) {
       rewardedDaysMap.put(key, --rewardedDays);
+      rewardPlayers.add(uuid);
       this.setDirty();
     }
     return rewardedDays;
@@ -273,9 +289,31 @@ public class SpecialRewardUserData extends SavedData {
     clearRewards(Rewards.getCurrentYear(), Rewards.getCurrentMonth(), uuid);
   }
 
+  public void resetRewardUserDataForCurrentMonth() {
+    resetRewardUserDataFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth());
+  }
+
+  public void resetRewardUserDataFor(int year, int month) {
+    log.info("{} Resetting special reward user data for {}-{} ...", Constants.LOG_NAME, year,
+        month);
+    for (UUID uuid : rewardPlayers) {
+      clearRewards(year, month, uuid);
+    }
+    this.setDirty();
+  }
+
+  public void clearRewardUserData() {
+    log.info("{} Clearing special reward user data ...", Constants.LOG_NAME);
+    rewardPlayers.clear();
+    rewardItemsMap.clear();
+    rewardedDaysMap.clear();
+    lastRewardedDayMap.clear();
+    this.setDirty();
+  }
+
   public static SpecialRewardUserData load(CompoundTag compoundTag) {
     SpecialRewardUserData rewardData = new SpecialRewardUserData();
-    log.info("{} loading reward user data ... {}", Constants.LOG_NAME, compoundTag);
+    log.info("{} loading special reward user data ... {}", Constants.LOG_NAME, compoundTag);
 
     // Restoring rewards items per year-month:uuid
     if (compoundTag.contains(SPECIAL_USER_REWARDS_TAG)) {
@@ -287,6 +325,12 @@ public class SpecialRewardUserData extends SavedData {
         String rewardKey = rewardUserTag.getString(YEAR_MONTH_USER_TAG);
         int rewardedDays = rewardUserTag.getInt(REWARDED_DAYS_TAG);
         String lastRewardedDay = rewardUserTag.getString(LAST_REWARDED_DAY_TAG);
+
+        // Restoring rewards users
+        UUID uuid = getUUIDfromKeyId(rewardKey);
+        if (uuid != null) {
+          rewardPlayers.add(uuid);
+        }
 
         // Restoring rewards items per year-month:uuid
         List<ItemStack> rewardItems = new ArrayList<>();
@@ -314,7 +358,8 @@ public class SpecialRewardUserData extends SavedData {
         lastRewardedDayMap.put(rewardKey, lastRewardedDay);
       }
     }
-    log.debug("{} Loaded stored rewards user data from disk: {}", Constants.LOG_NAME, rewardData);
+    log.debug("{} Loaded stored special reward user data from disk: {}", Constants.LOG_NAME,
+        rewardData);
 
     return rewardData;
   }
