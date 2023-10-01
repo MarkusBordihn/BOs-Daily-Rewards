@@ -17,43 +17,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.dailyrewards.commands;
+package de.markusbordihn.dailyrewards.network;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.mojang.brigadier.CommandDispatcher;
-
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-
 import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.data.RewardScreenType;
+import de.markusbordihn.dailyrewards.network.message.MessageOpenRewardScreen;
 
-@EventBusSubscriber
-public class CommandManager {
-
-  protected CommandManager() {}
+public class NetworkMessage {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  @SubscribeEvent
-  public static void handleRegisterCommandsEvent(RegisterCommandsEvent event) {
-    log.info("Registering {} commands ...", Constants.MOD_COMMAND);
-    CommandDispatcher<CommandSourceStack> commandDispatcher = event.getDispatcher();
-    commandDispatcher.register(Commands.literal(Constants.MOD_COMMAND)
-    // @formatter:off
-        .then(ClaimCommand.register())
-        .then(ConfigCommand.register())
-        .then(PreviewCommand.register())
-        .then(RewardCommand.register())
-        .then(RewardSpecialCommand.register())
-        .then(TestCommand.register())
-      // @formatter:on
-    );
+  /**
+   * Open Reward Screen
+   */
+  public static void openRewardScreen(RewardScreenType rewardScreenType) {
+    if (rewardScreenType != null) {
+      NetworkHandler.INSTANCE.sendToServer(new MessageOpenRewardScreen(rewardScreenType));
+    }
   }
 
 }

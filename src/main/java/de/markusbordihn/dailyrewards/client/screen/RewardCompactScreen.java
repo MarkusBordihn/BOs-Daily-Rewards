@@ -30,6 +30,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -53,23 +54,21 @@ import de.markusbordihn.dailyrewards.rewards.Rewards;
 @OnlyIn(Dist.CLIENT)
 public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
 
+  private final MutableComponent rewardScreenTitle;
+  private final ResourceLocation rewardScreenBackground;
+
   private int updateTicker = 0;
   private int updateSpecialTicker = 0;
   private String nextRewardTimeString;
   private String nextRewardSpecialTimeString;
   private boolean reloadToClaim = false;
 
-  private MutableComponent rewardScreenTitle;
-
   public RewardCompactScreen(RewardCompactMenu menu, Inventory inventory, Component component) {
     super(menu, inventory, component);
-  }
-
-  public void rendererTakenRewardSlot(PoseStack poseStack, int x, int y) {
-    RenderSystem.setShaderTexture(0, Constants.TEXTURE_GENERIC_54);
-    poseStack.pushPose();
-    this.blit(poseStack, x - 1, y - 1, 7, 17, 18, 18);
-    poseStack.popPose();
+    this.rewardScreenTitle =
+        Component.translatable(Constants.TEXT_PREFIX + "reward_screen_none", this.rewardedDays);
+    this.rewardScreenBackground = hasSpecialReward ? Constants.TEXTURE_COMPACT_SCREEN_COMBINED
+        : Constants.TEXTURE_COMPACT_SCREEN;
   }
 
   public void rendererTakeableRewardSlot(PoseStack poseStack, int x, int y) {
@@ -244,44 +243,50 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
   @Override
   public void init() {
     super.init();
-
-    rewardScreenTitle =
-        Component.translatable(Constants.TEXT_PREFIX + "reward_screen_none", this.rewardedDays);
   }
 
   @Override
   public void render(PoseStack poseStack, int x, int y, float partialTicks) {
     super.render(poseStack, x, y, partialTicks);
 
+    // Shift content if special rewards are available.
+    int shiftTopPos = this.hasSpecialReward ? 0 : 30;
+
     // Additional styling for the different kind of slots and slot states.
     for (int k = 0; k < this.menu.slots.size(); ++k) {
       Slot slot = this.menu.slots.get(k);
-      if (slot instanceof TakeableRewardSlot) {
-        if (slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
-          rendererTakenRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
-        } else {
-          rendererTakeableRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
+      if (slot instanceof DailyRewardSlot) {
+        if (slot instanceof TakeableRewardSlot) {
+          if (!slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
+            rendererTakeableRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
+          }
+        } else if (slot instanceof RewardSlot || slot instanceof EmptyRewardSlot
+            || slot instanceof HiddenRewardSlot) {
+          renderRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
         }
-      } else if (slot instanceof RewardSlot || slot instanceof EmptyRewardSlot
-          || slot instanceof HiddenRewardSlot) {
-        renderRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
       }
     }
 
     // Render sub-titles
     this.font.draw(poseStack,
         Component.translatable(Constants.TEXT_PREFIX + "daily_rewards.title", this.rewardedDays),
-        leftPos + 50f, topPos + 29f, 4210752);
-    this.font.draw(poseStack,
-        Component.translatable(Constants.TEXT_PREFIX + "special_rewards.title",
-            this.rewardedSpecialDays),
-        leftPos + 30f, topPos + 94f, 4210752);
+        leftPos + 50f, topPos + 29f + shiftTopPos, 4210752);
+
+    // Render special rewards sub-title, if available.
+    if (this.hasSpecialReward) {
+      this.font.draw(poseStack,
+          Component.translatable(Constants.TEXT_PREFIX + "special_rewards.title",
+              this.rewardedSpecialDays),
+          leftPos + 30f, topPos + 94f, 4210752);
+    }
 
     // Render next reward time, if automatic reward is enabled.
     if (this.automaticRewardPlayers) {
-      this.renderNextTimeForReward(poseStack, leftPos + 2, topPos + 67);
+      this.renderNextTimeForReward(poseStack, leftPos + 2, topPos + 67 + shiftTopPos);
     }
-    if (this.automaticRewardSpecialPlayers) {
+
+    // Render next special reward time, if automatic reward is enabled and available.
+    if (this.automaticRewardSpecialPlayers && this.hasSpecialReward) {
       this.renderNextTimeForSpecialReward(poseStack, leftPos, topPos + 133);
     }
 
@@ -301,7 +306,7 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
     super.renderBg(poseStack, partialTicks, mouseX, mouseY);
 
     // Render custom background for compact screen
-    RenderSystem.setShaderTexture(0, Constants.TEXTURE_COMPACT_SCREEN);
+    RenderSystem.setShaderTexture(0, this.rewardScreenBackground);
     poseStack.pushPose();
     this.blit(poseStack, leftPos + 1, topPos, 0, 0, 256, 256);
     poseStack.popPose();

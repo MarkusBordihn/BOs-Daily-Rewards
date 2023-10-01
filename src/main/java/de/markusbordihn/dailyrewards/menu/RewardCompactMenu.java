@@ -28,7 +28,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -168,9 +167,17 @@ public class RewardCompactMenu extends RewardMenu {
     int specialRewardIndexStart = Math.max(0, specialRewardedDays - 4);
     int specialRewardIndexStop = Math.min(numberOfDays, specialRewardedDays + 2);
 
+    // Shift slot position if we have no special rewards to show.
+    if (!this.specialRewardAvailable) {
+      slotStartPositionY += 30;
+    }
+
     // Move slot position if we have less than 3 rewards.
-    if (specialRewardIndexStop - specialRewardIndexStart == 4) {
-      specialSlotStartPositionX =
+    if (rewardIndexStop - rewardIndexStart == 5) {
+      slotStartPositionX =
+          (int) (REWARD_SLOT_START_POSITION_X + (REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X) * 1);
+    } else if (rewardIndexStop - rewardIndexStart == 4) {
+      slotStartPositionX =
           (int) (REWARD_SLOT_START_POSITION_X + (REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X) * 2);
     } else if (rewardIndexStop - rewardIndexStart == 3) {
       slotStartPositionX =
@@ -180,21 +187,6 @@ public class RewardCompactMenu extends RewardMenu {
           (int) (REWARD_SLOT_START_POSITION_X + (REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X) * 4);
     } else if (rewardIndexStop - rewardIndexStart == 1) {
       slotStartPositionX =
-          (int) (REWARD_SLOT_START_POSITION_X + (REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X) * 5);
-    }
-
-    // Move special slot position if we have less than 3 rewards.
-    if (specialRewardIndexStop - specialRewardIndexStart == 4) {
-      specialSlotStartPositionX =
-          (int) (REWARD_SLOT_START_POSITION_X + (REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X) * 2);
-    } else if (specialRewardIndexStop - specialRewardIndexStart == 3) {
-      specialSlotStartPositionX =
-          (int) (REWARD_SLOT_START_POSITION_X + (REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X) * 3);
-    } else if (specialRewardIndexStop - specialRewardIndexStart == 2) {
-      specialSlotStartPositionX =
-          (int) (REWARD_SLOT_START_POSITION_X + (REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X) * 4);
-    } else if (specialRewardIndexStop - specialRewardIndexStart == 1) {
-      specialSlotStartPositionX =
           (int) (REWARD_SLOT_START_POSITION_X + (REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X) * 5);
     }
 
@@ -227,35 +219,57 @@ public class RewardCompactMenu extends RewardMenu {
       slotStartPositionX += REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X;
     }
 
-    // Special User Reward Slot
-    for (int slotIndex =
-        specialRewardIndexStart; slotIndex <= specialRewardIndexStop; slotIndex++) {
-      if (this.userSpecialRewardsForCurrentMonth.size() > slotIndex) {
-        ItemStack itemStack;
-        try {
-          itemStack = this.userSpecialRewardsForCurrentMonth.get(slotIndex);
-        } catch (Exception e) {
-          itemStack = ItemStack.EMPTY;
-        }
-        this.addSlot(
-            this.createRewardSlot(itemStack, rewardedDays, this.specialRewardsUserContainer,
-                slotIndex, specialSlotStartPositionX, specialSlotStartPositionY));
-      } else if (this.rewardsForCurrentMonth.size() > slotIndex) {
-        if (Boolean.TRUE.equals(COMMON.previewRewardsSpecialItems.get())) {
-          // If the reward was not taken yet preview the reward slot.
-          this.addSlot(new RewardSlot(this.specialRewardsContainer, slotIndex,
-              specialSlotStartPositionX, specialSlotStartPositionY));
-        } else {
-          // Hide the reward slot.
-          this.addSlot(new HiddenRewardSlot(this.specialRewardsContainer, slotIndex,
-              specialSlotStartPositionX, specialSlotStartPositionY));
-        }
-      } else if (numberOfDays > slotIndex) {
-        // If there is no reward show the empty reward slot.
-        this.addSlot(new EmptyRewardSlot(this.specialRewardsContainer, slotIndex,
-            specialSlotStartPositionX, specialSlotStartPositionY));
+    // Only show special rewards if we have any.
+    if (this.specialRewardAvailable) {
+
+      // Move special slot position if we have less than 3 rewards.
+      if (specialRewardIndexStop - specialRewardIndexStart == 5) {
+        specialSlotStartPositionX =
+            (int) (REWARD_SLOT_START_POSITION_X + (REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X) * 1);
+      } else if (specialRewardIndexStop - specialRewardIndexStart == 4) {
+        specialSlotStartPositionX =
+            (int) (REWARD_SLOT_START_POSITION_X + (REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X) * 2);
+      } else if (specialRewardIndexStop - specialRewardIndexStart == 3) {
+        specialSlotStartPositionX =
+            (int) (REWARD_SLOT_START_POSITION_X + (REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X) * 3);
+      } else if (specialRewardIndexStop - specialRewardIndexStart == 2) {
+        specialSlotStartPositionX =
+            (int) (REWARD_SLOT_START_POSITION_X + (REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X) * 4);
+      } else if (specialRewardIndexStop - specialRewardIndexStart == 1) {
+        specialSlotStartPositionX =
+            (int) (REWARD_SLOT_START_POSITION_X + (REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X) * 5);
       }
-      specialSlotStartPositionX += REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X;
+
+      // Special User Reward Slot
+      for (int slotIndex =
+          specialRewardIndexStart; slotIndex <= specialRewardIndexStop; slotIndex++) {
+        if (this.userSpecialRewardsForCurrentMonth.size() > slotIndex) {
+          ItemStack itemStack;
+          try {
+            itemStack = this.userSpecialRewardsForCurrentMonth.get(slotIndex);
+          } catch (Exception e) {
+            itemStack = ItemStack.EMPTY;
+          }
+          this.addSlot(
+              this.createRewardSlot(itemStack, rewardedDays, this.specialRewardsUserContainer,
+                  slotIndex, specialSlotStartPositionX, specialSlotStartPositionY));
+        } else if (this.rewardsForCurrentMonth.size() > slotIndex) {
+          if (Boolean.TRUE.equals(COMMON.previewRewardsSpecialItems.get())) {
+            // If the reward was not taken yet preview the reward slot.
+            this.addSlot(new RewardSlot(this.specialRewardsContainer, slotIndex,
+                specialSlotStartPositionX, specialSlotStartPositionY));
+          } else {
+            // Hide the reward slot.
+            this.addSlot(new HiddenRewardSlot(this.specialRewardsContainer, slotIndex,
+                specialSlotStartPositionX, specialSlotStartPositionY));
+          }
+        } else if (numberOfDays > slotIndex) {
+          // If there is no reward show the empty reward slot.
+          this.addSlot(new EmptyRewardSlot(this.specialRewardsContainer, slotIndex,
+              specialSlotStartPositionX, specialSlotStartPositionY));
+        }
+        specialSlotStartPositionX += REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X;
+      }
     }
 
     // Player Inventory Slots
@@ -316,30 +330,6 @@ public class RewardCompactMenu extends RewardMenu {
   @Override
   public List<ItemStack> getUserSpecialRewardsForCurrentMonth() {
     return this.userSpecialRewardsForCurrentMonth;
-  }
-
-  @Override
-  public ItemStack quickMoveStack(Player player, int slotIndex) {
-    Slot slot = this.slots.get(slotIndex);
-    if (!slot.hasItem()) {
-      return ItemStack.EMPTY;
-    }
-
-    ItemStack itemStack = slot.getItem();
-
-    // Store changes if itemStack is not empty.
-    if (itemStack.isEmpty()) {
-      slot.set(ItemStack.EMPTY);
-    } else {
-      slot.setChanged();
-    }
-
-    return ItemStack.EMPTY;
-  }
-
-  @Override
-  public boolean stillValid(Player player) {
-    return true;
   }
 
 }
