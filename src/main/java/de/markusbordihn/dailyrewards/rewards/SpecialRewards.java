@@ -130,6 +130,14 @@ public class SpecialRewards {
     }
   }
 
+  public static boolean hasSpecialRewardItemsForMonth(int month) {
+    return !getSpecialRewardItemForMonth(month).isEmpty();
+  }
+
+  public static boolean hasSpecialRewardItemsForCurrentMonth() {
+    return hasSpecialRewardItemsForMonth(getCurrentMonth());
+  }
+
   public static int getCurrentDay() {
     return LocalDate.now().getDayOfMonth();
   }
@@ -153,6 +161,49 @@ public class SpecialRewards {
 
   public static int getDaysLeftCurrentMonth() {
     return getDaysCurrentMonth() - getCurrentDay();
+  }
+
+  public static List<String> getSpecialRewardUsersForMonth(int month) {
+    switch (month) {
+      case 1:
+        return COMMON.rewardsJanuarySpecialUsers.get();
+      case 2:
+        return COMMON.rewardsFebruarySpecialUsers.get();
+      case 3:
+        return COMMON.rewardsMarchSpecialUsers.get();
+      case 4:
+        return COMMON.rewardsAprilSpecialUsers.get();
+      case 5:
+        return COMMON.rewardsMaySpecialUsers.get();
+      case 6:
+        return COMMON.rewardsJuneSpecialUsers.get();
+      case 7:
+        return COMMON.rewardsJulySpecialUsers.get();
+      case 8:
+        return COMMON.rewardsAugustSpecialUsers.get();
+      case 9:
+        return COMMON.rewardsSeptemberSpecialUsers.get();
+      case 10:
+        return COMMON.rewardsOctoberSpecialUsers.get();
+      case 11:
+        return COMMON.rewardsNovemberSpecialUsers.get();
+      case 12:
+        return COMMON.rewardsDecemberSpecialUsers.get();
+      default:
+        return new ArrayList<>();
+    }
+  }
+
+  public static List<String> getSpecialRewardUsersForCurrentMonth() {
+    return getSpecialRewardUsersForMonth(getCurrentMonth());
+  }
+
+  public static boolean isSpecialRewardUserForCurrentMonth(String playerName) {
+    List<String> specialRewardUsersForCurrentMonth = getSpecialRewardUsersForCurrentMonth();
+    return specialRewardUsersForCurrentMonth == null || specialRewardUsersForCurrentMonth.isEmpty()
+        || (getSpecialRewardUsersForCurrentMonth().size() == 1
+            && specialRewardUsersForCurrentMonth.get(0).isEmpty())
+        || specialRewardUsersForCurrentMonth.contains(playerName);
   }
 
 }

@@ -47,6 +47,7 @@ import de.markusbordihn.dailyrewards.menu.slots.SkipDaySlot;
 import de.markusbordihn.dailyrewards.menu.slots.SkippedDaySlot;
 import de.markusbordihn.dailyrewards.menu.slots.TakeableRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.UnlockedDaySlot;
+import de.markusbordihn.dailyrewards.rewards.SpecialRewards;
 
 public class RewardMenu extends AbstractContainerMenu {
 
@@ -70,6 +71,7 @@ public class RewardMenu extends AbstractContainerMenu {
   // Special Reward Data
   protected int rewardedSpecialDays = 0;
   protected String lastRewardedSpecialDay;
+  protected boolean specialRewardAvailable = true;
   private static final List<ItemStack> SPECIAL_REWARDS_FOR_CURRENT_MONTH = new ArrayList<>();
   private static final List<ItemStack> USER_SPECIAL_REWARDS_FOR_CURRENT_MONTH = new ArrayList<>();
 
@@ -82,13 +84,16 @@ public class RewardMenu extends AbstractContainerMenu {
     super(menuType, windowId);
     this.player = playerInventory.player;
     this.level = this.player.level();
+    this.specialRewardAvailable = SpecialRewards.hasSpecialRewardItemsForCurrentMonth()
+        && SpecialRewards.isSpecialRewardUserForCurrentMonth(this.player.getName().getString());
   }
 
   public void syncRewardContainer(Player player) {
     if (getRewardsForCurrentMonth() != null && !getRewardsForCurrentMonth().isEmpty()) {
       syncRewardsUserContainer(player);
     }
-    if (getSpecialRewardsForCurrentMonth() != null && !getSpecialRewardsForCurrentMonth().isEmpty()) {
+    if (getSpecialRewardsForCurrentMonth() != null
+        && !getSpecialRewardsForCurrentMonth().isEmpty()) {
       syncSpecialRewardsUserContainer(player);
     }
   }
@@ -157,6 +162,10 @@ public class RewardMenu extends AbstractContainerMenu {
     return this.lastRewardedSpecialDay;
   }
 
+  public boolean isSpecialRewardAvailable() {
+    return this.specialRewardAvailable;
+  }
+
   public Container getSpecialRewardsContainer() {
     return SPECIAL_REWARD_CONTAINER;
   }
@@ -182,6 +191,8 @@ public class RewardMenu extends AbstractContainerMenu {
       } else {
         return new SkipDaySlot(container, index, x, y, this);
       }
+    } else if (itemStack.is(ModItems.SKIPPED_DAY.get())) {
+      return new SkippedDaySlot(container, index, x, y, this);
     } else if (itemStack.is(ModItems.LOCK_DAY.get())) {
       // Check if we have already unlocked this day and show the unlocked day slot.
       if (index < rewardedDays) {
@@ -189,6 +200,8 @@ public class RewardMenu extends AbstractContainerMenu {
       } else {
         return new LockedDaySlot(container, index, x, y, this);
       }
+    } else if (itemStack.is(ModItems.UNLOCK_DAY.get())) {
+      return new LockedDaySlot(container, index, x, y, this);
     } else {
       // If the reward is takeable show the takeable reward slot.
       return new TakeableRewardSlot(container, index, x, y, this);
@@ -216,7 +229,7 @@ public class RewardMenu extends AbstractContainerMenu {
 
   @Override
   public boolean stillValid(Player player) {
-    return true;
+    return player != null && player.isAlive();
   }
 
 }

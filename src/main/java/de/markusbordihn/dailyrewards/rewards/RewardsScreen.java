@@ -67,9 +67,9 @@ public class RewardsScreen {
       CompoundTag rewardsForCurrentMonth = RewardData.get().getRewardsForCurrentMonthSyncData();
 
       // Get special user rewards
-      int specialRewardedDays =
-          SpecialRewardUserData.get().getRewardedDaysForCurrentMonth(uuid);
-      String lastSpecialRewardedDay = SpecialRewardUserData.get().getLastRewardedDayForCurrentMonth(uuid);
+      int specialRewardedDays = SpecialRewardUserData.get().getRewardedDaysForCurrentMonth(uuid);
+      String lastSpecialRewardedDay =
+          SpecialRewardUserData.get().getLastRewardedDayForCurrentMonth(uuid);
       CompoundTag specialUserRewardsForCurrentMonth =
           SpecialRewardUserData.get().getRewardsForCurrentMonthSyncData(uuid);
       CompoundTag specialRewardsForCurrentMonth =
@@ -108,15 +108,18 @@ public class RewardsScreen {
 
     NetworkHooks.openScreen(player, provider, buffer -> {
       UUID uuid = player.getUUID();
+
+      // Get user rewards
       int rewardedDays = RewardUserData.get().getRewardedDaysForCurrentMonth(uuid);
       String lastRewardedDay = RewardUserData.get().getLastRewardedDayForCurrentMonth(uuid);
-
-      // Handle user rewards
       CompoundTag userRewardsForCurrentMonth =
           RewardUserData.get().getRewardsForCurrentMonthSyncData(uuid);
       CompoundTag rewardsForCurrentMonth = RewardData.get().getRewardsForCurrentMonthSyncData();
 
+      // User UUID
       buffer.writeUUID(uuid);
+
+      // User Rewards
       buffer.writeInt(rewardedDays);
       buffer.writeUtf(lastRewardedDay);
       buffer.writeNbt(userRewardsForCurrentMonth);
@@ -140,19 +143,24 @@ public class RewardsScreen {
 
     NetworkHooks.openScreen(player, provider, buffer -> {
       UUID uuid = player.getUUID();
-      int rewardedDays = SpecialRewardUserData.get().getRewardedDaysForCurrentMonth(uuid);
-      String lastRewardedDay = SpecialRewardUserData.get().getLastRewardedDayForCurrentMonth(uuid);
 
-      // Handle user rewards
-      CompoundTag userRewardsForCurrentMonth =
+      // Get special user rewards
+      int specialRewardedDays = SpecialRewardUserData.get().getRewardedDaysForCurrentMonth(uuid);
+      String lastSpecialRewardedDay =
+          SpecialRewardUserData.get().getLastRewardedDayForCurrentMonth(uuid);
+      CompoundTag specialUserRewardsForCurrentMonth =
           SpecialRewardUserData.get().getRewardsForCurrentMonthSyncData(uuid);
-      CompoundTag rewardsForCurrentMonth = RewardData.get().getSpecialRewardsForCurrentMonthSyncData();
+      CompoundTag specialRewardsForCurrentMonth =
+          RewardData.get().getSpecialRewardsForCurrentMonthSyncData();
 
+      // User UUID
       buffer.writeUUID(uuid);
-      buffer.writeInt(rewardedDays);
-      buffer.writeUtf(lastRewardedDay);
-      buffer.writeNbt(userRewardsForCurrentMonth);
-      buffer.writeNbt(rewardsForCurrentMonth);
+
+      // Special User Rewards
+      buffer.writeInt(specialRewardedDays);
+      buffer.writeUtf(lastSpecialRewardedDay);
+      buffer.writeNbt(specialUserRewardsForCurrentMonth);
+      buffer.writeNbt(specialRewardsForCurrentMonth);
     });
   }
 
