@@ -48,19 +48,34 @@ public class RewardScreen<T extends RewardMenu> extends AbstractContainerScreen<
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  protected int currentDay = Rewards.getCurrentDay();
-  protected int daysCurrentMonth = Rewards.getDaysCurrentMonth();
+  protected final boolean hasSpecialReward;
+  protected final int rewardedDays;
+  protected final int rewardedSpecialDays;
+  protected final int currentDay = Rewards.getCurrentDay();
+  protected final int daysCurrentMonth = Rewards.getDaysCurrentMonth();
+  protected final int rewardDaysForCurrentMonth = Rewards.getDaysCurrentMonth();
+
   protected boolean automaticRewardPlayers = true;
   protected boolean automaticRewardSpecialPlayers = true;
-  protected int rewardDaysForCurrentMonth = Rewards.getDaysCurrentMonth();
-  protected int rewardedDays = 0;
-  protected int rewardedSpecialDays = 0;
   protected int rewardTimePerDay = 30;
   protected int rewardTimePerDayInSeconds = rewardTimePerDay * 60;
   protected LocalPlayer localPlayer;
 
   public RewardScreen(T menu, Inventory inventory, Component component) {
     super(menu, inventory, component);
+
+    // Set already rewarded days.
+    this.rewardedDays = this.menu.getRewardedDays();
+    this.rewardedSpecialDays = this.menu.getRewardedSpecialDays();
+
+    // Set special reward flag.
+    this.hasSpecialReward = this.menu.isSpecialRewardAvailable();
+  }
+
+  public void close() {
+    if (this.minecraft != null) {
+      this.minecraft.setScreen(null);
+    }
   }
 
   @Override
@@ -69,10 +84,6 @@ public class RewardScreen<T extends RewardMenu> extends AbstractContainerScreen<
 
     // Default stats
     this.imageHeight = 242;
-
-    // Set Title with already rewarded days.
-    this.rewardedDays = this.menu.getRewardedDays();
-    this.rewardedSpecialDays = this.menu.getRewardedSpecialDays();
 
     // Automatic reward players
     this.automaticRewardPlayers = COMMON.automaticRewardPlayers.get();

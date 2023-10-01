@@ -39,7 +39,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.item.ModItems;
-import de.markusbordihn.dailyrewards.menu.RewardOverviewMenu;
+import de.markusbordihn.dailyrewards.menu.RewardMenu;
 import de.markusbordihn.dailyrewards.menu.slots.DailyRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.EmptyRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.HiddenRewardSlot;
@@ -51,16 +51,25 @@ import de.markusbordihn.dailyrewards.menu.slots.UnlockedDaySlot;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 
 @OnlyIn(Dist.CLIENT)
-public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
+public class RewardOverviewScreen<T extends RewardMenu> extends RewardScreen<T> {
+
+  private final MutableComponent rewardScreenTitle;
 
   private int updateTicker = 0;
   private String nextRewardTimeString;
   private boolean reloadToClaim = false;
 
-  private MutableComponent rewardScreenTitle;
-
-  public RewardOverviewScreen(RewardOverviewMenu menu, Inventory inventory, Component component) {
+  public RewardOverviewScreen(T menu, Inventory inventory, Component component) {
     super(menu, inventory, component);
+
+    // Set Title with already rewarded days.
+    if (this.rewardedDays > 0) {
+      rewardScreenTitle =
+          Component.translatable(Constants.TEXT_PREFIX + "reward_screen", this.rewardedDays);
+    } else {
+      rewardScreenTitle = Component.translatable(Constants.TEXT_PREFIX + "reward_screen_none",
+          this.rewardedDays);
+    }
   }
 
   public void rendererTakeableRewardSlot(PoseStack poseStack, int x, int y) {
@@ -71,11 +80,7 @@ public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
   }
 
   public void renderRewardSlot(PoseStack poseStack, int x, int y) {
-    RenderSystem.disableDepthTest();
-    RenderSystem.colorMask(true, true, true, false);
     fill(poseStack, x - 1, y - 1, x + 17, y + 19 + 8, 0x80AAAAAA);
-    RenderSystem.colorMask(true, true, true, true);
-    RenderSystem.enableDepthTest();
   }
 
   protected void renderNextTimeForReward(PoseStack poseStack, int x, int y) {
@@ -121,6 +126,8 @@ public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
         x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2f) : 0), y,
         0x666666);
   }
+
+  protected void renderIcons(PoseStack poseStack, int x, int y) {}
 
   @Override
   protected void renderTooltip(PoseStack poseStack, ItemStack itemStack, int x, int y) {
@@ -178,33 +185,24 @@ public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
   }
 
   @Override
-  public void init() {
-    super.init();
-
-    // Set Title with already rewarded days.
-    if (this.rewardedDays > 0) {
-      rewardScreenTitle =
-          Component.translatable(Constants.TEXT_PREFIX + "reward_screen", this.rewardedDays);
-    } else {
-      rewardScreenTitle = Component.translatable(Constants.TEXT_PREFIX + "reward_screen_none",
-          this.rewardedDays);
-    }
-  }
-
-  @Override
   public void render(PoseStack poseStack, int x, int y, float partialTicks) {
     super.render(poseStack, x, y, partialTicks);
 
     // Additional styling for the different kind of slots and slot states.
     for (int k = 0; k < this.menu.slots.size(); ++k) {
       Slot slot = this.menu.slots.get(k);
-      if (slot instanceof TakeableRewardSlot && !slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
-        rendererTakeableRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
-      } else if (slot instanceof RewardSlot || slot instanceof EmptyRewardSlot
-          || slot instanceof HiddenRewardSlot) {
-        renderRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
+      if (slot instanceof DailyRewardSlot) {
+        if (slot instanceof TakeableRewardSlot && !slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
+          rendererTakeableRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
+        } else if (slot instanceof RewardSlot || slot instanceof EmptyRewardSlot
+            || slot instanceof HiddenRewardSlot) {
+          renderRewardSlot(poseStack, leftPos + slot.x, topPos + slot.y);
+        }
       }
     }
+
+    // Render additional icons.
+    this.renderIcons(poseStack, x, y);
 
     // Render next reward time, if automatic reward is enabled.
     if (this.automaticRewardPlayers) {
@@ -247,6 +245,7 @@ public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
         }
       }
     }
+
   }
 
 }

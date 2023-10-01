@@ -17,33 +17,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.dailyrewards.client.screen;
+package de.markusbordihn.dailyrewards.network;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.client.gui.screens.MenuScreens;
-
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-
 import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.menu.ModMenuTypes;
+import de.markusbordihn.dailyrewards.data.RewardScreenType;
+import de.markusbordihn.dailyrewards.network.message.MessageOpenRewardScreen;
 
-public class ClientScreens {
+public class NetworkMessage {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  protected ClientScreens() {}
-
-  public static void registerScreens(final FMLClientSetupEvent event) {
-    log.info("{} Client Screens ...", Constants.LOG_REGISTER_PREFIX);
-
-    event.enqueueWork(() -> {
-      MenuScreens.register(ModMenuTypes.REWARD_COMPACT_MENU.get(), RewardCompactScreen::new);
-      MenuScreens.register(ModMenuTypes.REWARD_OVERVIEW_MENU.get(),
-          RewardDefaultOverviewScreen::new);
-      MenuScreens.register(ModMenuTypes.REWARD_SPECIAL_OVERVIEW_MENU.get(),
-          RewardSpecialOverviewScreen::new);
-    });
+  /**
+   * Open Reward Screen
+   */
+  public static void openRewardScreen(RewardScreenType rewardScreenType) {
+    if (rewardScreenType != null) {
+      NetworkHandler.INSTANCE.sendToServer(new MessageOpenRewardScreen(rewardScreenType));
+    }
   }
+
 }

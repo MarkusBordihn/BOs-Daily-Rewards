@@ -34,6 +34,8 @@
   "text.daily_rewards.skip_today.info": "\u2714 This day can be skipped today.",
   "text.daily_rewards.skipped_day.info": "\u2714 This day was already skipped!",
   "text.daily_rewards.unlocked_day.info": "\u2714 This day was already unlocked!",
+  "text.daily_rewards.open_special_reward_screen.info": "\u2714 Open the special reward screen!",
+  "text.daily_rewards.open_default_reward_screen.info": "\u2714 Open the default reward screen!",
 
   "item.daily_rewards.empty_reward": "No reward",
   "item.daily_rewards.hidden_reward": "Hidden reward",
