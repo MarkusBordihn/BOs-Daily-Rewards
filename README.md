@@ -1,4 +1,4 @@
-# Daily Rewards 1.19.2
+# Daily Rewards 1.19.3
 
 [![Daily Rewards Downloads](http://cf.way2muchnoise.eu/full_628798_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/daily-rewards)
 [![Daily Rewards Versions](http://cf.way2muchnoise.eu/versions/Minecraft_628798_all.svg)](https://www.curseforge.com/minecraft/mc-mods/daily-rewards)
@@ -7,7 +7,7 @@
 
 Daily rewards is a very lightweight and simple Forge mod that rewards players daily.
 
-![Daily Rewards Screenshot](examples/daily_rewards_screen.png)
+![Daily Rewards Screenshot](https://github.com/MarkusBordihn/BOs-Daily-Rewards/wiki/images/compact_default_and_special_screen.png)
 
 ## Features
 
