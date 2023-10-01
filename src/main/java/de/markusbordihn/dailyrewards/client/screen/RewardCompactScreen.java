@@ -22,19 +22,16 @@ package de.markusbordihn.dailyrewards.client.screen;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -45,15 +42,15 @@ import de.markusbordihn.dailyrewards.menu.RewardCompactMenu;
 import de.markusbordihn.dailyrewards.menu.slots.DailyRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.EmptyRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.HiddenRewardSlot;
-import de.markusbordihn.dailyrewards.menu.slots.LockedDaySlot;
 import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
-import de.markusbordihn.dailyrewards.menu.slots.SkippedDaySlot;
 import de.markusbordihn.dailyrewards.menu.slots.TakeableRewardSlot;
-import de.markusbordihn.dailyrewards.menu.slots.UnlockedDaySlot;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 
 @OnlyIn(Dist.CLIENT)
 public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
+
+  private final MutableComponent rewardScreenTitle;
+  private final ResourceLocation rewardScreenBackground;
 
   private int updateTicker = 0;
   private int updateSpecialTicker = 0;
@@ -61,16 +58,12 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
   private String nextRewardSpecialTimeString;
   private boolean reloadToClaim = false;
 
-  private MutableComponent rewardScreenTitle;
-
   public RewardCompactScreen(RewardCompactMenu menu, Inventory inventory, Component component) {
     super(menu, inventory, component);
-  }
-
-  public void rendererTakenRewardSlot(GuiGraphics guiGraphics, int x, int y) {
-    guiGraphics.pose().pushPose();
-    guiGraphics.blit(Constants.TEXTURE_GENERIC_54, x - 1, y - 1, 7, 17, 18, 18);
-    guiGraphics.pose().popPose();
+    this.rewardScreenTitle =
+        Component.translatable(Constants.TEXT_PREFIX + "reward_screen_none", this.rewardedDays);
+    this.rewardScreenBackground = hasSpecialReward ? Constants.TEXTURE_COMPACT_SCREEN_COMBINED
+        : Constants.TEXTURE_COMPACT_SCREEN;
   }
 
   public void rendererTakeableRewardSlot(GuiGraphics guiGraphics, int x, int y) {
@@ -134,8 +127,7 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
     Component component =
         Component.translatable(Constants.TEXT_PREFIX + "next_reward.in", this.nextRewardTimeString);
     int componentWidth = this.font.width(component);
-    guiGraphics.drawString(this.font,
-        component,
+    guiGraphics.drawString(this.font, component,
         x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2) : 0), y,
         0x666666, false);
   }
@@ -146,8 +138,7 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
       Component component =
           Component.translatable(Constants.TEXT_PREFIX + "next_special_reward.reload");
       int componentWidth = this.font.width(component);
-      guiGraphics.drawString(this.font,
-          component,
+      guiGraphics.drawString(this.font, component,
           x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2) : 0), y,
           0xFF0000, false);
       return;
@@ -181,8 +172,7 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
     Component component = Component.translatable(Constants.TEXT_PREFIX + "next_special_reward.in",
         this.nextRewardSpecialTimeString);
     int componentWidth = this.font.width(component);
-    guiGraphics.drawString(this.font,
-        component,
+    guiGraphics.drawString(this.font, component,
         x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2) : 0), y,
         0x666666, false);
   }
@@ -190,43 +180,49 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
   @Override
   public void init() {
     super.init();
-
-    rewardScreenTitle =
-        Component.translatable(Constants.TEXT_PREFIX + "reward_screen_none", this.rewardedDays);
   }
 
   @Override
   public void render(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
     super.render(guiGraphics, x, y, partialTicks);
 
+    // Shift content if special rewards are available.
+    int shiftTopPos = this.hasSpecialReward ? 0 : 30;
+
     // Additional styling for the different kind of slots and slot states.
     for (int k = 0; k < this.menu.slots.size(); ++k) {
       Slot slot = this.menu.slots.get(k);
-      if (slot instanceof TakeableRewardSlot) {
-        if (slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
-          rendererTakenRewardSlot(guiGraphics, leftPos + slot.x, topPos + slot.y);
-        } else {
-          rendererTakeableRewardSlot(guiGraphics, leftPos + slot.x, topPos + slot.y);
+      if (slot instanceof DailyRewardSlot) {
+        if (slot instanceof TakeableRewardSlot) {
+          if (!slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
+            rendererTakeableRewardSlot(guiGraphics, leftPos + slot.x, topPos + slot.y);
+          }
+        } else if (slot instanceof RewardSlot || slot instanceof EmptyRewardSlot
+            || slot instanceof HiddenRewardSlot) {
+          renderRewardSlot(guiGraphics, leftPos + slot.x, topPos + slot.y);
         }
-      } else if (slot instanceof RewardSlot || slot instanceof EmptyRewardSlot
-          || slot instanceof HiddenRewardSlot) {
-        renderRewardSlot(guiGraphics, leftPos + slot.x, topPos + slot.y);
       }
     }
 
     // Render sub-titles
     guiGraphics.drawString(this.font,
         Component.translatable(Constants.TEXT_PREFIX + "daily_rewards.title", this.rewardedDays),
-        leftPos + 50, topPos + 29, 4210752, false);
-    guiGraphics.drawString(this.font,
-        Component.translatable(Constants.TEXT_PREFIX + "special_rewards.title", this.rewardedSpecialDays),
-        leftPos + 30, topPos + 94, 4210752, false);
+        leftPos + 50, topPos + 29 + shiftTopPos, 4210752, false);
+
+    // Render special rewards sub-title, if available.
+    if (this.hasSpecialReward) {
+      guiGraphics.drawString(this.font, Component
+          .translatable(Constants.TEXT_PREFIX + "special_rewards.title", this.rewardedSpecialDays),
+          leftPos + 30, topPos + 94, 4210752, false);
+    }
 
     // Render next reward time, if automatic reward is enabled.
     if (this.automaticRewardPlayers) {
-      this.renderNextTimeForReward(guiGraphics, leftPos + 2, topPos + 67);
+      this.renderNextTimeForReward(guiGraphics, leftPos + 2, topPos + 67 + shiftTopPos);
     }
-    if (this.automaticRewardSpecialPlayers) {
+
+    // Render next special reward time, if automatic reward is enabled and available.
+    if (this.automaticRewardSpecialPlayers && this.hasSpecialReward) {
       this.renderNextTimeForSpecialReward(guiGraphics, leftPos, topPos + 133);
     }
 
@@ -235,12 +231,10 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
 
   @Override
   protected void renderLabels(GuiGraphics guiGraphics, int x, int y) {
-    guiGraphics.drawString(this.font,
-        rewardScreenTitle, this.titleLabelX + 42,
+    guiGraphics.drawString(this.font, rewardScreenTitle, this.titleLabelX + 42,
         this.titleLabelY - 1, Constants.FONT_COLOR_WHITE, true);
-    guiGraphics.drawString(this.font,
-        this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY,
-        4210752, false);
+    guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX,
+        this.inventoryLabelY, 4210752, false);
   }
 
   @Override
@@ -249,7 +243,7 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
 
     // Render custom background for compact screen
     guiGraphics.pose().pushPose();
-    guiGraphics.blit(Constants.TEXTURE_COMPACT_SCREEN, leftPos + 1, topPos, 0, 0, 256, 256);
+    guiGraphics.blit(this.rewardScreenBackground, leftPos + 1, topPos, 0, 0, 256, 256);
     guiGraphics.pose().popPose();
   }
 

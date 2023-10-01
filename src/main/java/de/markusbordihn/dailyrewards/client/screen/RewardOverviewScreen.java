@@ -22,47 +22,47 @@ package de.markusbordihn.dailyrewards.client.screen;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.item.ModItems;
-import de.markusbordihn.dailyrewards.menu.RewardOverviewMenu;
+import de.markusbordihn.dailyrewards.menu.RewardMenu;
 import de.markusbordihn.dailyrewards.menu.slots.DailyRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.EmptyRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.HiddenRewardSlot;
-import de.markusbordihn.dailyrewards.menu.slots.LockedDaySlot;
 import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
-import de.markusbordihn.dailyrewards.menu.slots.SkippedDaySlot;
 import de.markusbordihn.dailyrewards.menu.slots.TakeableRewardSlot;
-import de.markusbordihn.dailyrewards.menu.slots.UnlockedDaySlot;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 
 @OnlyIn(Dist.CLIENT)
-public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
+public class RewardOverviewScreen<T extends RewardMenu> extends RewardScreen<T> {
+
+  private final MutableComponent rewardScreenTitle;
 
   private int updateTicker = 0;
   private String nextRewardTimeString;
   private boolean reloadToClaim = false;
 
-  private MutableComponent rewardScreenTitle;
-
-  public RewardOverviewScreen(RewardOverviewMenu menu, Inventory inventory, Component component) {
+  public RewardOverviewScreen(T menu, Inventory inventory, Component component) {
     super(menu, inventory, component);
+
+    // Set Title with already rewarded days.
+    if (this.rewardedDays > 0) {
+      rewardScreenTitle =
+          Component.translatable(Constants.TEXT_PREFIX + "reward_screen", this.rewardedDays);
+    } else {
+      rewardScreenTitle =
+          Component.translatable(Constants.TEXT_PREFIX + "reward_screen_none", this.rewardedDays);
+    }
   }
 
   public void rendererTakeableRewardSlot(GuiGraphics guiGraphics, int x, int y) {
@@ -72,11 +72,7 @@ public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
   }
 
   public void renderRewardSlot(GuiGraphics guiGraphics, int x, int y) {
-    RenderSystem.disableDepthTest();
-    RenderSystem.colorMask(true, true, true, false);
     guiGraphics.fill(RenderType.guiOverlay(), x - 1, y - 1, x + 17, y + 19 + 8, 0x80AAAAAA);
-    RenderSystem.colorMask(true, true, true, true);
-    RenderSystem.enableDepthTest();
   }
 
   protected void renderNextTimeForReward(GuiGraphics guiGraphics, int x, int y) {
@@ -123,19 +119,7 @@ public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
         0x666666, false);
   }
 
-  @Override
-  public void init() {
-    super.init();
-
-    // Set Title with already rewarded days.
-    if (this.rewardedDays > 0) {
-      rewardScreenTitle =
-          Component.translatable(Constants.TEXT_PREFIX + "reward_screen", this.rewardedDays);
-    } else {
-      rewardScreenTitle =
-          Component.translatable(Constants.TEXT_PREFIX + "reward_screen_none", this.rewardedDays);
-    }
-  }
+  protected void renderIcons(GuiGraphics guiGraphics, int x, int y) {}
 
   @Override
   public void render(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
@@ -144,13 +128,18 @@ public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
     // Additional styling for the different kind of slots and slot states.
     for (int k = 0; k < this.menu.slots.size(); ++k) {
       Slot slot = this.menu.slots.get(k);
-      if (slot instanceof TakeableRewardSlot && !slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
-        rendererTakeableRewardSlot(guiGraphics, leftPos + slot.x, topPos + slot.y);
-      } else if (slot instanceof RewardSlot || slot instanceof EmptyRewardSlot
-          || slot instanceof HiddenRewardSlot) {
-        renderRewardSlot(guiGraphics, leftPos + slot.x, topPos + slot.y);
+      if (slot instanceof DailyRewardSlot) {
+        if (slot instanceof TakeableRewardSlot && !slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
+          rendererTakeableRewardSlot(guiGraphics, leftPos + slot.x, topPos + slot.y);
+        } else if (slot instanceof RewardSlot || slot instanceof EmptyRewardSlot
+            || slot instanceof HiddenRewardSlot) {
+          renderRewardSlot(guiGraphics, leftPos + slot.x, topPos + slot.y);
+        }
       }
     }
+
+    // Render additional icons.
+    this.renderIcons(guiGraphics, x, y);
 
     // Render next reward time, if automatic reward is enabled.
     if (this.automaticRewardPlayers) {
@@ -192,6 +181,7 @@ public class RewardOverviewScreen extends RewardScreen<RewardOverviewMenu> {
         }
       }
     }
+
   }
 
 }

@@ -48,6 +48,7 @@ import de.markusbordihn.dailyrewards.data.RewardUserData;
 import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 import de.markusbordihn.dailyrewards.rewards.RewardsScreen;
+import de.markusbordihn.dailyrewards.rewards.SpecialRewards;
 
 @EventBusSubscriber
 public class PlayerRewardManager {
@@ -55,11 +56,6 @@ public class PlayerRewardManager {
   private static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
   private static final CommonConfig.Config COMMON = CommonConfig.COMMON;
-  private static boolean automaticRewardPlayers = true;
-  private static boolean automaticRewardSpecialPlayers = true;
-  private static int rewardTimePerDay = 30;
-  private static int rewardTimePerDayTicks = rewardTimePerDay * 60 * 20;
-
   private static final short REWARD_CHECK_TICK = 20 * 60; // every 1 Minute
   private static final MutableComponent claimCommand = Component.literal("/DailyRewards claim")
       .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(
@@ -73,13 +69,10 @@ public class PlayerRewardManager {
   @SubscribeEvent
   public static void onServerAboutToStartEvent(ServerAboutToStartEvent event) {
     playerList = ConcurrentHashMap.newKeySet();
+    int rewardTimePerDay = COMMON.rewardTimePerDay.get();
+    int rewardTimePerDayTicks = rewardTimePerDay * 60 * 20;
 
-    automaticRewardPlayers = COMMON.automaticRewardPlayers.get();
-    automaticRewardSpecialPlayers = COMMON.automaticRewardSpecialPlayers.get();
-    rewardTimePerDay = COMMON.rewardTimePerDay.get();
-    rewardTimePerDayTicks = rewardTimePerDay * 60 * 20;
-
-    if (automaticRewardPlayers) {
+    if (Boolean.TRUE.equals(COMMON.automaticRewardPlayers.get())) {
       log.info(
           "Daily rewards will be automatically granted after {} min ({} ticks) a player is online.",
           rewardTimePerDay, rewardTimePerDayTicks);
@@ -88,7 +81,7 @@ public class PlayerRewardManager {
           "Daily rewards will not be automatically granted. Use `/DailyRewards reward today <player>` to manually grant rewards.");
     }
 
-    if (automaticRewardSpecialPlayers) {
+    if (Boolean.TRUE.equals(COMMON.automaticRewardSpecialPlayers.get())) {
       log.info(
           "Special daily rewards will be automatically granted after {} min ({} ticks) a player is online.",
           rewardTimePerDay, rewardTimePerDayTicks);
@@ -138,8 +131,6 @@ public class PlayerRewardManager {
             .translatable(Constants.TEXT_PREFIX + "unclaimed_rewarded_item_today", player.getName())
             .withStyle(ChatFormatting.RED));
       }
-      player.sendSystemMessage(
-          Component.translatable(Constants.TEXT_PREFIX + "claim_rewards", claimCommand));
       hasUnclaimedRewards = true;
     }
 
@@ -154,27 +145,28 @@ public class PlayerRewardManager {
             Component.translatable(Constants.TEXT_PREFIX + "unclaimed_special_rewarded_item_today",
                 player.getName()).withStyle(ChatFormatting.RED));
       }
-      player.sendSystemMessage(
-          Component.translatable(Constants.TEXT_PREFIX + "claim_rewards", claimCommand));
       hasUnclaimedRewards = true;
     }
 
-    // Open reward overview menu if player has any unclaimed rewards.
+    // Open reward overview menu or show claim command, if player has any unclaimed rewards.
     if (hasUnclaimedRewards && Boolean.TRUE.equals(COMMON.showRewardMenuOnPlayerJoin.get())) {
       switch (COMMON.rewardScreenType.get()) {
-        case "compact":
+        case COMPACT:
           RewardsScreen.openRewardCompactMenuForPlayer(player);
           break;
-        case "overview":
+        case DEFAULT_OVERVIEW:
           RewardsScreen.openRewardOverviewMenuForPlayer(player);
           break;
-        case "special":
+        case SPECIAL_OVERVIEW:
           RewardsScreen.openRewardSpecialOverviewMenuForPlayer(player);
           break;
         default:
           RewardsScreen.openRewardOverviewMenuForPlayer(player);
           break;
       }
+    } else if (hasUnclaimedRewards) {
+      player.sendSystemMessage(
+          Component.translatable(Constants.TEXT_PREFIX + "claim_rewards", claimCommand));
     }
   }
 
@@ -196,19 +188,21 @@ public class PlayerRewardManager {
     // Early return if we are not on the end of the tick, should not reward player automatically or
     // we have no players online.
     if (event.phase == TickEvent.Phase.END
-        || (!automaticRewardPlayers && !automaticRewardSpecialPlayers)
+        || (!COMMON.automaticRewardPlayers.get() && !COMMON.automaticRewardSpecialPlayers.get())
         || ticker++ < REWARD_CHECK_TICK || playerList.isEmpty()) {
       return;
     }
 
     // Check if we have any players online which should be rewarded.
     for (ServerPlayer player : playerList) {
-      if (player.tickCount > rewardTimePerDayTicks) {
+      if (player.tickCount > COMMON.rewardTimePerDay.get() * 60 * 20) {
         UUID uuid = player.getUUID();
+        String username = player.getName().getString();
+        boolean showRewardClaimCommand = false;
 
         // Reward player if he has not been rewarded today.
         RewardUserData rewardUserData = RewardUserData.get();
-        if (!automaticRewardPlayers) {
+        if (Boolean.FALSE.equals(COMMON.automaticRewardPlayers.get())) {
           log.debug("Player {} will not be automatically rewarded for day {}.", player);
         } else if (!rewardUserData.hasRewardedToday(uuid)) {
           // Update stored data
@@ -223,8 +217,7 @@ public class PlayerRewardManager {
             rewardUserData.addRewardForCurrentMonth(rewardedDays, uuid, itemStack);
             player.sendSystemMessage(Component.translatable(Constants.TEXT_PREFIX + "rewarded_item",
                 player.getName(), itemStack, rewardedDays));
-            player.sendSystemMessage(
-                Component.translatable(Constants.TEXT_PREFIX + "claim_rewards", claimCommand));
+            showRewardClaimCommand = true;
           }
 
           log.info("Reward player {} daily reward for {} days with {} ...", player, rewardedDays,
@@ -233,9 +226,10 @@ public class PlayerRewardManager {
 
         // Special Reward for player if he has not been rewarded today.
         SpecialRewardUserData specialRewardUserData = SpecialRewardUserData.get();
-        if (!automaticRewardSpecialPlayers) {
+        if (Boolean.FALSE.equals(COMMON.automaticRewardSpecialPlayers.get())) {
           log.debug("Player {} will not be automatically special rewarded for today.", player);
-        } else if (!specialRewardUserData.hasRewardedToday(uuid)) {
+        } else if (!specialRewardUserData.hasRewardedToday(uuid)
+            && SpecialRewards.isSpecialRewardUserForCurrentMonth(username)) {
           // Update stored data
           specialRewardUserData.setLastRewardedDayForCurrentMonth(uuid);
           int rewardedDays = specialRewardUserData.increaseRewardedDaysForCurrentMonth(uuid);
@@ -249,12 +243,17 @@ public class PlayerRewardManager {
             specialRewardUserData.addRewardForCurrentMonth(rewardedDays, uuid, itemStack);
             player.sendSystemMessage(Component.translatable(Constants.TEXT_PREFIX + "rewarded_item",
                 player.getName(), itemStack, rewardedDays));
-            player.sendSystemMessage(
-                Component.translatable(Constants.TEXT_PREFIX + "claim_rewards", claimCommand));
+            showRewardClaimCommand = true;
           }
 
           log.info("Special Reward player {} daily reward for {} days with {} ...", player,
               rewardedDays, itemStack);
+        }
+
+        // Show reward command if player has any unclaimed rewards.
+        if (showRewardClaimCommand) {
+          player.sendSystemMessage(
+              Component.translatable(Constants.TEXT_PREFIX + "claim_rewards", claimCommand));
         }
 
       }
