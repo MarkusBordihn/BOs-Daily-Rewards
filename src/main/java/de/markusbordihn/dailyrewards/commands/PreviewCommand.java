@@ -52,7 +52,8 @@ public class PreviewCommand extends CustomCommand {
 
   @Override
   public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-    sendFeedback(context, "...");
+    sendFeedback(context, "Preview for current month " + Rewards.getCurrentMonth());
+    previewRewardsItemsForMonth(context, Rewards.getCurrentMonth());
     return 0;
   }
 

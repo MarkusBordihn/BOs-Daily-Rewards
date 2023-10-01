@@ -50,6 +50,7 @@ import de.markusbordihn.dailyrewards.data.RewardUserData;
 import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 import de.markusbordihn.dailyrewards.rewards.RewardsScreen;
+import de.markusbordihn.dailyrewards.rewards.SpecialRewards;
 
 @EventBusSubscriber
 public class PlayerRewardManager {
@@ -142,9 +143,6 @@ public class PlayerRewardManager {
                 player.getName()).withStyle(ChatFormatting.RED),
             Util.NIL_UUID);
       }
-      player.sendMessage(
-          new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
-          Util.NIL_UUID);
       hasUnclaimedRewards = true;
     }
 
@@ -161,28 +159,29 @@ public class PlayerRewardManager {
                 .withStyle(ChatFormatting.RED),
             Util.NIL_UUID);
       }
-      player.sendMessage(
-          new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
-          Util.NIL_UUID);
       hasUnclaimedRewards = true;
     }
 
-    // Open reward overview menu if player has any unclaimed rewards.
+    // Open reward overview menu or show claim command, if player has any unclaimed rewards.
     if (hasUnclaimedRewards && Boolean.TRUE.equals(COMMON.showRewardMenuOnPlayerJoin.get())) {
       switch (COMMON.rewardScreenType.get()) {
-        case "compact":
+        case COMPACT:
           RewardsScreen.openRewardCompactMenuForPlayer(player);
           break;
-        case "overview":
+        case DEFAULT_OVERVIEW:
           RewardsScreen.openRewardOverviewMenuForPlayer(player);
           break;
-        case "special":
+        case SPECIAL_OVERVIEW:
           RewardsScreen.openRewardSpecialOverviewMenuForPlayer(player);
           break;
         default:
           RewardsScreen.openRewardOverviewMenuForPlayer(player);
           break;
       }
+    } else if (hasUnclaimedRewards) {
+      player.sendMessage(
+          new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
+          Util.NIL_UUID);
     }
   }
 
@@ -213,6 +212,8 @@ public class PlayerRewardManager {
     for (ServerPlayer player : playerList) {
       if (player.tickCount > rewardTimePerDayTicks) {
         UUID uuid = player.getUUID();
+        String username = player.getName().getString();
+        boolean showRewardClaimCommand = false;
 
         // Reward player if he has not been rewarded today.
         RewardUserData rewardUserData = RewardUserData.get();
@@ -231,9 +232,7 @@ public class PlayerRewardManager {
             rewardUserData.addRewardForCurrentMonth(rewardedDays, uuid, itemStack);
             player.sendMessage(new TranslatableComponent(Constants.TEXT_PREFIX + "rewarded_item",
                 player.getName(), itemStack, rewardedDays), Util.NIL_UUID);
-            player.sendMessage(
-                new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
-                Util.NIL_UUID);
+            showRewardClaimCommand = true;
           }
 
           log.info("Reward player {} daily reward for {} days with {} ...", player, rewardedDays,
@@ -244,7 +243,8 @@ public class PlayerRewardManager {
         SpecialRewardUserData specialRewardUserData = SpecialRewardUserData.get();
         if (!automaticRewardSpecialPlayers) {
           log.debug("Player {} will not be automatically special rewarded for today.", player);
-        } else if (!specialRewardUserData.hasRewardedToday(uuid)) {
+        } else if (!specialRewardUserData.hasRewardedToday(uuid)
+            && SpecialRewards.isSpecialRewardUserForCurrentMonth(username)) {
           // Update stored data
           specialRewardUserData.setLastRewardedDayForCurrentMonth(uuid);
           int rewardedDays = specialRewardUserData.increaseRewardedDaysForCurrentMonth(uuid);
@@ -258,13 +258,18 @@ public class PlayerRewardManager {
             specialRewardUserData.addRewardForCurrentMonth(rewardedDays, uuid, itemStack);
             player.sendMessage(new TranslatableComponent(Constants.TEXT_PREFIX + "rewarded_item",
                 player.getName(), itemStack, rewardedDays), Util.NIL_UUID);
-            player.sendMessage(
-                new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
-                Util.NIL_UUID);
+            showRewardClaimCommand = true;
           }
 
           log.info("Special Reward player {} daily reward for {} days with {} ...", player,
               rewardedDays, itemStack);
+        }
+
+        // Show reward command if player has any unclaimed rewards.
+        if (showRewardClaimCommand) {
+          player.sendMessage(
+              new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
+              Util.NIL_UUID);
         }
 
       }
