@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,16 +19,15 @@
 
 package de.markusbordihn.dailyrewards.data;
 
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.item.ModItems;
+import de.markusbordihn.dailyrewards.rewards.Rewards;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
@@ -36,16 +35,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
-
 import net.minecraftforge.server.ServerLifecycleHooks;
-
-import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.item.ModItems;
-import de.markusbordihn.dailyrewards.rewards.Rewards;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RewardUserData extends SavedData {
-
-  protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
   public static final String ITEMS_TAG = "RewardItems";
   public static final String ITEM_LIST_TAG = "ItemList";
@@ -54,7 +48,7 @@ public class RewardUserData extends SavedData {
   public static final String USER_REWARDS_TAG = "UserRewards";
   public static final String YEAR_MONTH_TAG = "YearMonth";
   public static final String YEAR_MONTH_USER_TAG = "YearMonthUser";
-
+  protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
   private static final String FILE_ID = Constants.MOD_ID + "_user";
 
   private static MinecraftServer server;
@@ -82,11 +76,14 @@ public class RewardUserData extends SavedData {
     // Using a global approach and storing relevant data in the overworld only!
     ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
     if (serverLevel != null) {
-      RewardUserData.data = serverLevel.getDataStorage().computeIfAbsent(RewardUserData::load,
-          RewardUserData::new, RewardUserData.getFileId());
+      RewardUserData.data =
+          serverLevel
+              .getDataStorage()
+              .computeIfAbsent(
+                  RewardUserData::load, RewardUserData::new, RewardUserData.getFileId());
     } else {
-      log.error("{} unable to get server level {} for storing data!", Constants.LOG_NAME,
-          serverLevel);
+      log.error(
+          "{} unable to get server level {} for storing data!", Constants.LOG_NAME, serverLevel);
     }
   }
 
@@ -118,6 +115,77 @@ public class RewardUserData extends SavedData {
       }
     }
     return null;
+  }
+
+  public static List<ItemStack> getRewardsForCurrentMonthSyncData(CompoundTag compoundTag) {
+    List<ItemStack> rewardItems = new ArrayList<>();
+    if (compoundTag.contains(ITEM_LIST_TAG)) {
+      ListTag itemListTag = compoundTag.getList(ITEM_LIST_TAG, 10);
+      for (int i = 0; i < itemListTag.size(); ++i) {
+        ItemStack itemStack = ItemStack.of(itemListTag.getCompound(i));
+        rewardItems.add(itemStack);
+      }
+    }
+    return rewardItems;
+  }
+
+  public static RewardUserData load(CompoundTag compoundTag) {
+    RewardUserData rewardData = new RewardUserData();
+    log.info("{} loading reward user data ... {}", Constants.LOG_NAME, compoundTag);
+
+    // Restoring rewards items per year-month:uuid
+    if (compoundTag.contains(USER_REWARDS_TAG)) {
+      ListTag listTag = compoundTag.getList(USER_REWARDS_TAG, 10);
+      for (int i = 0; i < listTag.size(); ++i) {
+        CompoundTag rewardUserTag = listTag.getCompound(i);
+
+        // Get Reward key, days and last rewarded day.
+        String rewardKey = rewardUserTag.getString(YEAR_MONTH_USER_TAG);
+        int rewardedDays = rewardUserTag.getInt(REWARDED_DAYS_TAG);
+        String lastRewardedDay = rewardUserTag.getString(LAST_REWARDED_DAY_TAG);
+
+        // Restoring rewards users
+        UUID uuid = getUUIDfromKeyId(rewardKey);
+        if (uuid != null) {
+          rewardPlayers.add(uuid);
+        }
+
+        // Restoring rewards items per year-month:uuid
+        List<ItemStack> rewardItems = new ArrayList<>();
+        ListTag itemListTag = rewardUserTag.getList(ITEMS_TAG, 10);
+        for (int i2 = 0; i2 < itemListTag.size(); ++i2) {
+          ItemStack itemStack = ItemStack.of(itemListTag.getCompound(i2));
+          rewardItems.add(itemStack);
+        }
+        rewardItemsMap.put(rewardKey, rewardItems);
+
+        // Validate totally rewarded days and last rewarded day for the month.
+        if (rewardedDays > itemListTag.size()) {
+          log.error(
+              "{} Invalid rewarded days {} for {}! Resetting to {}.",
+              Constants.LOG_NAME,
+              rewardedDays,
+              rewardKey,
+              itemListTag.size());
+          rewardedDays = itemListTag.size();
+        }
+        if (rewardedDays == 0 && !lastRewardedDay.isEmpty()) {
+          log.error(
+              "{} Invalid last rewarded day {} for {}! Resetting to empty.",
+              Constants.LOG_NAME,
+              lastRewardedDay,
+              rewardKey);
+          lastRewardedDay = "";
+        }
+
+        // Restoring last rewarded day and totally rewarded days for the month.
+        rewardedDaysMap.put(rewardKey, rewardedDays);
+        lastRewardedDayMap.put(rewardKey, lastRewardedDay);
+      }
+    }
+    log.debug("{} Loaded stored rewards user data from disk: {}", Constants.LOG_NAME, rewardData);
+
+    return rewardData;
   }
 
   public void addRewardFor(int year, int month, int day, UUID uuid, ItemStack itemStack) {
@@ -173,26 +241,13 @@ public class RewardUserData extends SavedData {
     List<ItemStack> rewardItems = getRewardsForCurrentMonth(uuid);
     CompoundTag syncData = new CompoundTag();
     ListTag itemListTag = new ListTag();
-    for (int i = 0; i < rewardItems.size(); ++i) {
-      ItemStack itemStack = rewardItems.get(i);
+    for (ItemStack itemStack : rewardItems) {
       CompoundTag itemStackTag = new CompoundTag();
       itemStack.save(itemStackTag);
       itemListTag.add(itemStackTag);
     }
     syncData.put(ITEM_LIST_TAG, itemListTag);
     return syncData;
-  }
-
-  public static List<ItemStack> getRewardsForCurrentMonthSyncData(CompoundTag compoundTag) {
-    List<ItemStack> rewardItems = new ArrayList<>();
-    if (compoundTag.contains(ITEM_LIST_TAG)) {
-      ListTag itemListTag = compoundTag.getList(ITEM_LIST_TAG, 10);
-      for (int i = 0; i < itemListTag.size(); ++i) {
-        ItemStack itemStack = ItemStack.of(itemListTag.getCompound(i));
-        rewardItems.add(itemStack);
-      }
-    }
-    return rewardItems;
   }
 
   public void setRewardsForCurrentMonth(UUID uuid, List<ItemStack> rewardItems) {
@@ -217,8 +272,8 @@ public class RewardUserData extends SavedData {
   }
 
   public void setLastRewardedDay(int year, int month, UUID uuid, String lastRewardedDay) {
-    log.debug("Set last rewarded day for {}-{} and player {} to {}", year, month, uuid,
-        lastRewardedDay);
+    log.debug(
+        "Set last rewarded day for {}-{} and player {} to {}", year, month, uuid, lastRewardedDay);
     String key = getKeyId(year, month, uuid);
     rewardPlayers.add(uuid);
     lastRewardedDayMap.put(key, lastRewardedDay);
@@ -226,7 +281,10 @@ public class RewardUserData extends SavedData {
   }
 
   public void setLastRewardedDayForCurrentMonth(UUID uuid) {
-    setLastRewardedDay(Rewards.getCurrentYear(), Rewards.getCurrentMonth(), uuid,
+    setLastRewardedDay(
+        Rewards.getCurrentYear(),
+        Rewards.getCurrentMonth(),
+        uuid,
         Rewards.getCurrentYearMonthDay());
   }
 
@@ -308,58 +366,6 @@ public class RewardUserData extends SavedData {
     this.setDirty();
   }
 
-  public static RewardUserData load(CompoundTag compoundTag) {
-    RewardUserData rewardData = new RewardUserData();
-    log.info("{} loading reward user data ... {}", Constants.LOG_NAME, compoundTag);
-
-    // Restoring rewards items per year-month:uuid
-    if (compoundTag.contains(USER_REWARDS_TAG)) {
-      ListTag listTag = compoundTag.getList(USER_REWARDS_TAG, 10);
-      for (int i = 0; i < listTag.size(); ++i) {
-        CompoundTag rewardUserTag = listTag.getCompound(i);
-
-        // Get Reward key, days and last rewarded day.
-        String rewardKey = rewardUserTag.getString(YEAR_MONTH_USER_TAG);
-        int rewardedDays = rewardUserTag.getInt(REWARDED_DAYS_TAG);
-        String lastRewardedDay = rewardUserTag.getString(LAST_REWARDED_DAY_TAG);
-
-        // Restoring rewards users
-        UUID uuid = getUUIDfromKeyId(rewardKey);
-        if (uuid != null) {
-          rewardPlayers.add(uuid);
-        }
-
-        // Restoring rewards items per year-month:uuid
-        List<ItemStack> rewardItems = new ArrayList<>();
-        ListTag itemListTag = rewardUserTag.getList(ITEMS_TAG, 10);
-        for (int i2 = 0; i2 < itemListTag.size(); ++i2) {
-          ItemStack itemStack = ItemStack.of(itemListTag.getCompound(i2));
-          rewardItems.add(itemStack);
-        }
-        rewardItemsMap.put(rewardKey, rewardItems);
-
-        // Validate totally rewarded days and last rewarded day for the month.
-        if (rewardedDays > itemListTag.size()) {
-          log.error("{} Invalid rewarded days {} for {}! Resetting to {}.", Constants.LOG_NAME,
-              rewardedDays, rewardKey, itemListTag.size());
-          rewardedDays = itemListTag.size();
-        }
-        if (rewardedDays == 0 && !lastRewardedDay.isEmpty()) {
-          log.error("{} Invalid last rewarded day {} for {}! Resetting to empty.",
-              Constants.LOG_NAME, lastRewardedDay, rewardKey);
-          lastRewardedDay = "";
-        }
-
-        // Restoring last rewarded day and totally rewarded days for the month.
-        rewardedDaysMap.put(rewardKey, rewardedDays);
-        lastRewardedDayMap.put(rewardKey, lastRewardedDay);
-      }
-    }
-    log.debug("{} Loaded stored rewards user data from disk: {}", Constants.LOG_NAME, rewardData);
-
-    return rewardData;
-  }
-
   @Override
   public CompoundTag save(CompoundTag compoundTag) {
     // Get a list of all keys which needs to be stored.
@@ -387,8 +393,7 @@ public class RewardUserData extends SavedData {
       // Storing rewards items per year-month:uuid
       ListTag itemListTag = new ListTag();
       List<ItemStack> rewardItems = rewardItemsMap.get(rewardKey);
-      for (int i = 0; i < rewardItems.size(); ++i) {
-        ItemStack itemStack = rewardItems.get(i);
+      for (ItemStack itemStack : rewardItems) {
         CompoundTag itemStackTag = new CompoundTag();
         itemStack.save(itemStackTag);
         itemListTag.add(itemStackTag);
@@ -397,8 +402,8 @@ public class RewardUserData extends SavedData {
 
       // Adding last rewarded day and totally rewarded days for the month.
       rewardUserTag.putInt(REWARDED_DAYS_TAG, rewardedDaysMap.getOrDefault(rewardKey, 0));
-      rewardUserTag.putString(LAST_REWARDED_DAY_TAG,
-          lastRewardedDayMap.getOrDefault(rewardKey, ""));
+      rewardUserTag.putString(
+          LAST_REWARDED_DAY_TAG, lastRewardedDayMap.getOrDefault(rewardKey, ""));
 
       // Storing entry
       listTag.add(rewardUserTag);
@@ -406,5 +411,4 @@ public class RewardUserData extends SavedData {
 
     return compoundTag;
   }
-
 }

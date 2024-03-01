@@ -6,7 +6,6 @@
   "text.daily_rewards.unclaimed_rewarded_item_today": "%1$s，你有未领取的每日奖励，请务必在今天结束之前领取！！！",
   "text.daily_rewards.next_reward.in": "领取需等待：%1$s",
   "text.daily_rewards.next_reward.reload": "请重新打开界面！",
-
   "item.daily_rewards.empty_reward": "无奖励。",
   "item.daily_rewards.taken_reward": "已领取奖励。"
 }

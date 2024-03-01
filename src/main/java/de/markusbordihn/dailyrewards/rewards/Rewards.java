@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,6 +19,8 @@
 
 package de.markusbordihn.dailyrewards.rewards;
 
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.config.CommonConfig;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -28,19 +30,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-
-import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.config.CommonConfig;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @EventBusSubscriber
 public class Rewards {
@@ -74,11 +70,17 @@ public class Rewards {
     if (Boolean.TRUE.equals(!COMMON.useFillItems.get())
         || rewardItemsForMonth.size() >= numberOfDays) {
       if (Boolean.FALSE.equals(COMMON.useFillItems.get())) {
-        log.info("Fill items are disabled, will use {} reward items for month {} with {} days ...",
-            rewardItemsForMonth.size(), month, numberOfDays);
+        log.info(
+            "Fill items are disabled, will use {} reward items for month {} with {} days ...",
+            rewardItemsForMonth.size(),
+            month,
+            numberOfDays);
       } else {
-        log.info("Found {} reward items for month {} with {} days ...", rewardItemsForMonth.size(),
-            month, numberOfDays);
+        log.info(
+            "Found {} reward items for month {} with {} days ...",
+            rewardItemsForMonth.size(),
+            month,
+            numberOfDays);
       }
       List<ItemStack> rewardItems =
           rewardItemsForMonth.stream().limit(numberOfDays).collect(Collectors.toList());
@@ -104,7 +106,8 @@ public class Rewards {
         lootBagFillItems.isEmpty() ? 0 : COMMON.lootBagFillItemsChance.get();
 
     // Fill missing reward items.
-    log.warn("Found {} missing days without any items, will try to use fill items ...",
+    log.warn(
+        "Found {} missing days without any items, will try to use fill items ...",
         numMissingRewardItems);
     for (int i = 0; i < numMissingRewardItems; i++) {
       ItemStack fillItem = null;
@@ -135,8 +138,11 @@ public class Rewards {
         if (!normalFillItems.isEmpty()) {
           fillItem = normalFillItems.get(random.nextInt(normalFillItems.size()));
         } else {
-          log.error("Unable to find any fill item for {} of {} missing days, will use {} instead!",
-              i + 1, numMissingRewardItems, Items.DIRT);
+          log.error(
+              "Unable to find any fill item for {} of {} missing days, will use {} instead!",
+              i + 1,
+              numMissingRewardItems,
+              Items.DIRT);
           fillItem = new ItemStack(Items.DIRT);
         }
       }
@@ -153,34 +159,21 @@ public class Rewards {
   }
 
   public static List<ItemStack> getRewardItemForMonth(int month) {
-    switch (month) {
-      case 1:
-        return RewardsItems.parseConfigItems(COMMON.rewardsJanuaryItems.get());
-      case 2:
-        return RewardsItems.parseConfigItems(COMMON.rewardsFebruaryItems.get());
-      case 3:
-        return RewardsItems.parseConfigItems(COMMON.rewardsMarchItems.get());
-      case 4:
-        return RewardsItems.parseConfigItems(COMMON.rewardsAprilItems.get());
-      case 5:
-        return RewardsItems.parseConfigItems(COMMON.rewardsMayItems.get());
-      case 6:
-        return RewardsItems.parseConfigItems(COMMON.rewardsJuneItems.get());
-      case 7:
-        return RewardsItems.parseConfigItems(COMMON.rewardsJulyItems.get());
-      case 8:
-        return RewardsItems.parseConfigItems(COMMON.rewardsAugustItems.get());
-      case 9:
-        return RewardsItems.parseConfigItems(COMMON.rewardsSeptemberItems.get());
-      case 10:
-        return RewardsItems.parseConfigItems(COMMON.rewardsOctoberItems.get());
-      case 11:
-        return RewardsItems.parseConfigItems(COMMON.rewardsNovemberItems.get());
-      case 12:
-        return RewardsItems.parseConfigItems(COMMON.rewardsDecemberItems.get());
-      default:
-        return new ArrayList<>();
-    }
+    return switch (month) {
+      case 1 -> RewardsItems.parseConfigItems(COMMON.rewardsJanuaryItems.get());
+      case 2 -> RewardsItems.parseConfigItems(COMMON.rewardsFebruaryItems.get());
+      case 3 -> RewardsItems.parseConfigItems(COMMON.rewardsMarchItems.get());
+      case 4 -> RewardsItems.parseConfigItems(COMMON.rewardsAprilItems.get());
+      case 5 -> RewardsItems.parseConfigItems(COMMON.rewardsMayItems.get());
+      case 6 -> RewardsItems.parseConfigItems(COMMON.rewardsJuneItems.get());
+      case 7 -> RewardsItems.parseConfigItems(COMMON.rewardsJulyItems.get());
+      case 8 -> RewardsItems.parseConfigItems(COMMON.rewardsAugustItems.get());
+      case 9 -> RewardsItems.parseConfigItems(COMMON.rewardsSeptemberItems.get());
+      case 10 -> RewardsItems.parseConfigItems(COMMON.rewardsOctoberItems.get());
+      case 11 -> RewardsItems.parseConfigItems(COMMON.rewardsNovemberItems.get());
+      case 12 -> RewardsItems.parseConfigItems(COMMON.rewardsDecemberItems.get());
+      default -> new ArrayList<>();
+    };
   }
 
   public static List<ItemStack> getNormalFillItems() {
@@ -238,5 +231,4 @@ public class Rewards {
   public static int getDaysLeftCurrentMonth() {
     return getDaysCurrentMonth() - getCurrentDay();
   }
-
 }

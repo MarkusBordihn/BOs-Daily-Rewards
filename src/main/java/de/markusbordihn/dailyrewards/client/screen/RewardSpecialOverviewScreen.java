@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,19 +19,17 @@
 
 package de.markusbordihn.dailyrewards.client.screen;
 
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.data.RewardScreenType;
+import de.markusbordihn.dailyrewards.menu.RewardSpecialOverviewMenu;
+import de.markusbordihn.dailyrewards.network.NetworkMessage;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.data.RewardScreenType;
-import de.markusbordihn.dailyrewards.menu.RewardSpecialOverviewMenu;
-import de.markusbordihn.dailyrewards.network.NetworkMessage;
 
 @OnlyIn(Dist.CLIENT)
 public class RewardSpecialOverviewScreen extends RewardOverviewScreen<RewardSpecialOverviewMenu> {
@@ -39,8 +37,8 @@ public class RewardSpecialOverviewScreen extends RewardOverviewScreen<RewardSpec
   // Button
   protected ImageButton openDefaultRewardsOverviewButton;
 
-  public RewardSpecialOverviewScreen(RewardSpecialOverviewMenu menu, Inventory inventory,
-      Component component) {
+  public RewardSpecialOverviewScreen(
+      RewardSpecialOverviewMenu menu, Inventory inventory, Component component) {
     super(menu, inventory, component);
   }
 
@@ -50,14 +48,23 @@ public class RewardSpecialOverviewScreen extends RewardOverviewScreen<RewardSpec
 
     if (this.hasSpecialReward) {
       this.openDefaultRewardsOverviewButton =
-          this.addRenderableWidget(new ImageButton(this.leftPos + 172, this.topPos + 18, 32, 28, 96,
-              64, 28, Constants.TEXTURE_TABS, 256, 256, button -> {
-                NetworkMessage.openRewardScreen(RewardScreenType.DEFAULT_OVERVIEW);
-              }));
-      this.openDefaultRewardsOverviewButton.setTooltip(Tooltip.create(
-          Component.translatable(Constants.TEXT_PREFIX + "open_default_reward_screen.info")));
+          this.addRenderableWidget(
+              new ImageButton(
+                  this.leftPos + 172,
+                  this.topPos + 18,
+                  32,
+                  28,
+                  96,
+                  64,
+                  28,
+                  Constants.TEXTURE_TABS,
+                  256,
+                  256,
+                  button -> NetworkMessage.openRewardScreen(RewardScreenType.DEFAULT_OVERVIEW)));
+      this.openDefaultRewardsOverviewButton.setTooltip(
+          Tooltip.create(
+              Component.translatable(Constants.TEXT_PREFIX + "open_default_reward_screen.info")));
     }
-
   }
 
   @Override
@@ -74,9 +81,8 @@ public class RewardSpecialOverviewScreen extends RewardOverviewScreen<RewardSpec
 
     // Render custom background for overview screen
     guiGraphics.pose().pushPose();
-    guiGraphics.blit(Constants.TEXTURE_SPECIAL_OVERVIEW_SCREEN, leftPos + 1, topPos, 0, 0, 256,
-        256);
+    guiGraphics.blit(
+        Constants.TEXTURE_SPECIAL_OVERVIEW_SCREEN, leftPos + 1, topPos, 0, 0, 256, 256);
     guiGraphics.pose().popPose();
   }
-
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,23 +19,7 @@
 
 package de.markusbordihn.dailyrewards.client.screen;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
-
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.menu.RewardCompactMenu;
@@ -45,6 +29,18 @@ import de.markusbordihn.dailyrewards.menu.slots.HiddenRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.TakeableRewardSlot;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
@@ -62,8 +58,10 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
     super(menu, inventory, component);
     this.rewardScreenTitle =
         Component.translatable(Constants.TEXT_PREFIX + "reward_screen_none", this.rewardedDays);
-    this.rewardScreenBackground = hasSpecialReward ? Constants.TEXTURE_COMPACT_SCREEN_COMBINED
-        : Constants.TEXTURE_COMPACT_SCREEN;
+    this.rewardScreenBackground =
+        hasSpecialReward
+            ? Constants.TEXTURE_COMPACT_SCREEN_COMBINED
+            : Constants.TEXTURE_COMPACT_SCREEN;
   }
 
   public void rendererTakeableRewardSlot(GuiGraphics guiGraphics, int x, int y) {
@@ -93,9 +91,13 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
     if (this.reloadToClaim) {
       Component component = Component.translatable(Constants.TEXT_PREFIX + "next_reward.reload");
       int componentWidth = this.font.width(component);
-      guiGraphics.drawString(this.font, component,
-          x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2) : 0), y,
-          0xFF0000, false);
+      guiGraphics.drawString(
+          this.font,
+          component,
+          x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2) : 0),
+          y,
+          0xFF0000,
+          false);
       return;
     }
 
@@ -103,12 +105,14 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
     if ((this.updateTicker++ & (20 - 1)) == 0) {
       int localPlayerTickCount = localPlayer != null ? localPlayer.tickCount : 0;
       String lastRewardedDay = this.menu.getLastRewardedDay();
-      long nextRewardTime = Rewards.getCurrentYearMonthDay().equals(lastRewardedDay)
-          ? Duration
-              .between(LocalDateTime.now(),
-                  LocalDateTime.now().withHour(23).withMinute(59).withSecond(59))
-              .toSeconds() + this.rewardTimePerDayInSeconds
-          : this.rewardTimePerDayInSeconds - (localPlayerTickCount / 20);
+      long nextRewardTime =
+          Rewards.getCurrentYearMonthDay().equals(lastRewardedDay)
+              ? Duration.between(
+                          LocalDateTime.now(),
+                          LocalDateTime.now().withHour(23).withMinute(59).withSecond(59))
+                      .toSeconds()
+                  + this.rewardTimePerDayInSeconds
+              : this.rewardTimePerDayInSeconds - (localPlayerTickCount / 20);
       // Adding 60 seconds, because the server is only checking every 60 seconds for rewards.
       this.nextRewardTimeString = LocalTime.MIN.plusSeconds(nextRewardTime + 60).toString();
       if (nextRewardTimeString.length() == 5) {
@@ -127,9 +131,13 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
     Component component =
         Component.translatable(Constants.TEXT_PREFIX + "next_reward.in", this.nextRewardTimeString);
     int componentWidth = this.font.width(component);
-    guiGraphics.drawString(this.font, component,
-        x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2) : 0), y,
-        0x666666, false);
+    guiGraphics.drawString(
+        this.font,
+        component,
+        x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2) : 0),
+        y,
+        0x666666,
+        false);
   }
 
   protected void renderNextTimeForSpecialReward(GuiGraphics guiGraphics, int x, int y) {
@@ -138,9 +146,13 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
       Component component =
           Component.translatable(Constants.TEXT_PREFIX + "next_special_reward.reload");
       int componentWidth = this.font.width(component);
-      guiGraphics.drawString(this.font, component,
-          x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2) : 0), y,
-          0xFF0000, false);
+      guiGraphics.drawString(
+          this.font,
+          component,
+          x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2) : 0),
+          y,
+          0xFF0000,
+          false);
       return;
     }
 
@@ -148,12 +160,14 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
     if ((this.updateSpecialTicker++ & (20 - 1)) == 0) {
       int localPlayerTickCount = localPlayer != null ? localPlayer.tickCount : 0;
       String lastRewardedSpecialDay = this.menu.getLastRewardedSpecialDay();
-      long nextRewardTime = Rewards.getCurrentYearMonthDay().equals(lastRewardedSpecialDay)
-          ? Duration
-              .between(LocalDateTime.now(),
-                  LocalDateTime.now().withHour(23).withMinute(59).withSecond(59))
-              .toSeconds() + this.rewardTimePerDayInSeconds
-          : this.rewardTimePerDayInSeconds - (localPlayerTickCount / 20);
+      long nextRewardTime =
+          Rewards.getCurrentYearMonthDay().equals(lastRewardedSpecialDay)
+              ? Duration.between(
+                          LocalDateTime.now(),
+                          LocalDateTime.now().withHour(23).withMinute(59).withSecond(59))
+                      .toSeconds()
+                  + this.rewardTimePerDayInSeconds
+              : this.rewardTimePerDayInSeconds - (localPlayerTickCount / 20);
       // Adding 60 seconds, because the server is only checking every 60 seconds for rewards.
       this.nextRewardSpecialTimeString = LocalTime.MIN.plusSeconds(nextRewardTime + 60).toString();
       if (nextRewardSpecialTimeString.length() == 5) {
@@ -169,12 +183,17 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
     }
 
     // Display next reward time.
-    Component component = Component.translatable(Constants.TEXT_PREFIX + "next_special_reward.in",
-        this.nextRewardSpecialTimeString);
+    Component component =
+        Component.translatable(
+            Constants.TEXT_PREFIX + "next_special_reward.in", this.nextRewardSpecialTimeString);
     int componentWidth = this.font.width(component);
-    guiGraphics.drawString(this.font, component,
-        x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2) : 0), y,
-        0x666666, false);
+    guiGraphics.drawString(
+        this.font,
+        component,
+        x + (componentWidth < this.imageWidth ? ((this.imageWidth - componentWidth) / 2) : 0),
+        y,
+        0x666666,
+        false);
   }
 
   @Override
@@ -197,7 +216,8 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
           if (!slot.getItem().is(ModItems.TAKEN_REWARD.get())) {
             rendererTakeableRewardSlot(guiGraphics, leftPos + slot.x, topPos + slot.y);
           }
-        } else if (slot instanceof RewardSlot || slot instanceof EmptyRewardSlot
+        } else if (slot instanceof RewardSlot
+            || slot instanceof EmptyRewardSlot
             || slot instanceof HiddenRewardSlot) {
           renderRewardSlot(guiGraphics, leftPos + slot.x, topPos + slot.y);
         }
@@ -205,15 +225,24 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
     }
 
     // Render sub-titles
-    guiGraphics.drawString(this.font,
+    guiGraphics.drawString(
+        this.font,
         Component.translatable(Constants.TEXT_PREFIX + "daily_rewards.title", this.rewardedDays),
-        leftPos + 50, topPos + 29 + shiftTopPos, 4210752, false);
+        leftPos + 50,
+        topPos + 29 + shiftTopPos,
+        4210752,
+        false);
 
     // Render special rewards sub-title, if available.
     if (this.hasSpecialReward) {
-      guiGraphics.drawString(this.font, Component
-          .translatable(Constants.TEXT_PREFIX + "special_rewards.title", this.rewardedSpecialDays),
-          leftPos + 30, topPos + 94, 4210752, false);
+      guiGraphics.drawString(
+          this.font,
+          Component.translatable(
+              Constants.TEXT_PREFIX + "special_rewards.title", this.rewardedSpecialDays),
+          leftPos + 30,
+          topPos + 94,
+          4210752,
+          false);
     }
 
     // Render next reward time, if automatic reward is enabled.
@@ -231,10 +260,20 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
 
   @Override
   protected void renderLabels(GuiGraphics guiGraphics, int x, int y) {
-    guiGraphics.drawString(this.font, rewardScreenTitle, this.titleLabelX + 42,
-        this.titleLabelY - 1, Constants.FONT_COLOR_WHITE, true);
-    guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX,
-        this.inventoryLabelY, 4210752, false);
+    guiGraphics.drawString(
+        this.font,
+        rewardScreenTitle,
+        this.titleLabelX + 42,
+        this.titleLabelY - 1,
+        Constants.FONT_COLOR_WHITE,
+        true);
+    guiGraphics.drawString(
+        this.font,
+        this.playerInventoryTitle,
+        this.inventoryLabelX,
+        this.inventoryLabelY,
+        4210752,
+        false);
   }
 
   @Override
@@ -246,5 +285,4 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
     guiGraphics.blit(this.rewardScreenBackground, leftPos + 1, topPos, 0, 0, 256, 256);
     guiGraphics.pose().popPose();
   }
-
 }
