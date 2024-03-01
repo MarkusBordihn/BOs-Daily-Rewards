@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -23,8 +23,6 @@ import net.minecraft.resources.ResourceLocation;
 
 public final class Constants {
 
-  protected Constants() {}
-
   // General Mod definitions
   public static final String LOG_NAME = "Daily Rewards";
   public static final String LOG_ICON = "💰";
@@ -34,11 +32,9 @@ public final class Constants {
   public static final String MOD_ID = "daily_rewards";
   public static final String MOD_NAME = "Daily Rewards";
   public static final String MOD_URL = "https://www.curseforge.com/minecraft/mc-mods/daily-rewards";
-
   // Prefixes
   public static final String MINECRAFT_PREFIX = "minecraft";
   public static final String TEXT_PREFIX = "text.daily_rewards.";
-
   // Colors
   public static final int FONT_COLOR_BLACK = 0;
   public static final int FONT_COLOR_DARK_GREEN = 43520;
@@ -48,12 +44,12 @@ public final class Constants {
   public static final int FONT_COLOR_WARNING = FONT_COLOR_RED;
   public static final int FONT_COLOR_YELLOW = 16777045;
   public static final int FONT_COLOR_WHITE = 16777215;
-
   // Textures
   public static final ResourceLocation TEXTURE_COMPACT_SCREEN =
-      new ResourceLocation(Constants.MOD_ID, "textures/container/compact_screen.png");;
+      new ResourceLocation(Constants.MOD_ID, "textures/container/compact_screen.png");
   public static final ResourceLocation TEXTURE_COMPACT_SCREEN_COMBINED =
       new ResourceLocation(Constants.MOD_ID, "textures/container/compact_screen_combined.png");
+  ;
   public static final ResourceLocation TEXTURE_GENERIC_54 =
       new ResourceLocation(MINECRAFT_PREFIX, "textures/gui/container/generic_54.png");
   public static final ResourceLocation TEXTURE_TABS =
@@ -64,4 +60,6 @@ public final class Constants {
       new ResourceLocation(Constants.MOD_ID, "textures/container/overview_screen.png");
   public static final ResourceLocation TEXTURE_SPECIAL_OVERVIEW_SCREEN =
       new ResourceLocation(Constants.MOD_ID, "textures/container/special_overview_screen.png");
+  protected Constants() {
+  }
 }

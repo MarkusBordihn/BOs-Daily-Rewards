@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,22 +19,19 @@
 
 package de.markusbordihn.dailyrewards.client.screen;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.data.RewardScreenType;
+import de.markusbordihn.dailyrewards.menu.RewardSpecialOverviewMenu;
+import de.markusbordihn.dailyrewards.network.NetworkMessage;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-
-import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.data.RewardScreenType;
-import de.markusbordihn.dailyrewards.menu.RewardSpecialOverviewMenu;
-import de.markusbordihn.dailyrewards.network.NetworkMessage;
 
 @OnlyIn(Dist.CLIENT)
 public class RewardSpecialOverviewScreen extends RewardOverviewScreen<RewardSpecialOverviewMenu> {
@@ -52,16 +49,15 @@ public class RewardSpecialOverviewScreen extends RewardOverviewScreen<RewardSpec
     super.init();
 
     if (this.hasSpecialReward) {
-      Button.OnTooltip openDefaultRewardsOverviewButtonTooltip = (button, poseStack, x, y) -> {
-        renderTooltip(poseStack,
-            Component.translatable(Constants.TEXT_PREFIX + "open_default_reward_screen.info"), x,
-            y);
-      };
+      Button.OnTooltip openDefaultRewardsOverviewButtonTooltip = (button, poseStack, x, y) -> renderTooltip(
+          poseStack,
+          Component.translatable(Constants.TEXT_PREFIX + "open_default_reward_screen.info"), x,
+          y);
       this.openDefaultRewardsOverviewButton =
           this.addRenderableWidget(new ImageButton(this.leftPos + 172, this.topPos + 18, 32, 28, 96,
-              64, 28, Constants.TEXTURE_TABS, 256, 256, button -> {
-                NetworkMessage.openRewardScreen(RewardScreenType.DEFAULT_OVERVIEW);
-              }, openDefaultRewardsOverviewButtonTooltip, CommonComponents.EMPTY));
+              64, 28, Constants.TEXTURE_TABS, 256, 256,
+              button -> NetworkMessage.openRewardScreen(RewardScreenType.DEFAULT_OVERVIEW),
+              openDefaultRewardsOverviewButtonTooltip, CommonComponents.EMPTY));
     }
 
   }
