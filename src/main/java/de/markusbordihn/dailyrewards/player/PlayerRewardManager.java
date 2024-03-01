@@ -131,7 +131,7 @@ public class PlayerRewardManager {
     int daysLeftCurrentMonth = Rewards.getDaysLeftCurrentMonth();
 
     // Check if player has any unclaimed rewards.
-    if (COMMON.showUnclaimedRewardsOnPlayerJoin.get()
+    if (Boolean.TRUE.equals(COMMON.showUnclaimedRewardsOnPlayerJoin.get())
         && RewardUserData.get().hasUnclaimedRewardsForCurrentMonth(uuid)) {
       if (daysLeftCurrentMonth > 0) {
         player.sendMessage(
@@ -151,7 +151,7 @@ public class PlayerRewardManager {
     }
 
     // Check if player has any unclaimed special rewards.
-    if (COMMON.showUnclaimedRewardsOnPlayerJoin.get()
+    if (Boolean.TRUE.equals(COMMON.showUnclaimedRewardsSpecialOnPlayerJoin.get())
         && SpecialRewardUserData.get().hasUnclaimedRewardsForCurrentMonth(uuid)) {
       if (daysLeftCurrentMonth > 0) {
         player.sendMessage(
@@ -187,9 +187,10 @@ public class PlayerRewardManager {
           RewardsScreen.openRewardOverviewMenuForPlayer(player);
           break;
       }
-    } else if ((COMMON.showUnclaimedRewardsOnPlayerJoin.get()
-            || COMMON.showUnclaimedRewardsSpecialOnPlayerJoin.get())
-        && COMMON.showRewardClaimCommandMessage.get()
+    } else if (Boolean.TRUE.equals(
+            (COMMON.showUnclaimedRewardsOnPlayerJoin.get()
+                    || COMMON.showUnclaimedRewardsSpecialOnPlayerJoin.get())
+                && COMMON.showRewardClaimCommandMessage.get())
         && hasUnclaimedRewards) {
       player.sendMessage(
           new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
@@ -231,7 +232,7 @@ public class PlayerRewardManager {
         // Reward player if he has not been rewarded today.
         RewardUserData rewardUserData = RewardUserData.get();
         if (!automaticRewardPlayers) {
-          log.debug("Player {} will not be automatically rewarded for day {}.", player);
+          log.debug("Player {} will not be automatically rewarded.", player);
         } else if (!rewardUserData.hasRewardedToday(uuid)) {
           // Update stored data
           rewardUserData.setLastRewardedDayForCurrentMonth(uuid);
@@ -243,7 +244,7 @@ public class PlayerRewardManager {
             log.error("Reward {} for day {} for current month was empty!", itemStack, rewardedDays);
           } else {
             rewardUserData.addRewardForCurrentMonth(rewardedDays, uuid, itemStack);
-            if (COMMON.showReceivedRewardMessage.get()) {
+            if (Boolean.TRUE.equals(COMMON.showReceivedRewardMessage.get())) {
               player.sendMessage(
                   new TranslatableComponent(
                       Constants.TEXT_PREFIX + "rewarded_item",
@@ -281,7 +282,7 @@ public class PlayerRewardManager {
                 rewardedDays);
           } else {
             specialRewardUserData.addRewardForCurrentMonth(rewardedDays, uuid, itemStack);
-            if (COMMON.showReceivedRewardSpecialMessage.get()) {
+            if (Boolean.TRUE.equals(COMMON.showReceivedRewardSpecialMessage.get())) {
               player.sendMessage(
                   new TranslatableComponent(
                       Constants.TEXT_PREFIX + "rewarded_item",
@@ -301,7 +302,8 @@ public class PlayerRewardManager {
         }
 
         // Show reward command if player has any unclaimed rewards.
-        if (COMMON.showRewardClaimCommandMessage.get() && showRewardClaimCommand) {
+        if (Boolean.TRUE.equals(COMMON.showRewardClaimCommandMessage.get())
+            && showRewardClaimCommand) {
           player.sendMessage(
               new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
               Util.NIL_UUID);

@@ -131,7 +131,7 @@ dependencies {
   // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
   // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
   // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-  minecraft 'net.minecraftforge:forge:1.18.2-40.2.10'
+  minecraft 'net.minecraftforge:forge:1.18.2-40.2.17'
 
   // Jade: Integration
   compileOnly fg.deobf("curse.maven:jade-324717:3761542")
@@ -183,7 +183,7 @@ curseforge {
   apiKey = "${credentials.forKey('curseforge_api_token')}"
   project {
     id = "${curseforge_project_id}"
-    changelog = 'See https://github.com/MarkusBordihn/BOs-Daily-Rewards/commits/main'
+    changelog = 'See https://github.com/MarkusBordihn/BOs-Daily-Rewards/commits/1.18.2'
     changelogType = 'markdown'
     releaseType = "${curseforge_release_type}"
     addGameVersion("${mc_version}")
