@@ -34,11 +34,10 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraftforge.network.NetworkHooks;
 
 public class RewardsScreen {
 
-  public static void openRewardCompactMenuForPlayer(ServerPlayer player) {
+  public static void openRewardCompactMenuForPlayer(ServerPlayer serverPlayer) {
     MenuProvider provider =
         new MenuProvider() {
           @Override
@@ -54,11 +53,10 @@ public class RewardsScreen {
           }
         };
 
-    NetworkHooks.openScreen(
-        player,
+    serverPlayer.openMenu(
         provider,
         buffer -> {
-          UUID uuid = player.getUUID();
+          UUID uuid = serverPlayer.getUUID();
 
           // Get user rewards
           int rewardedDays = RewardUserData.get().getRewardedDaysForCurrentMonth(uuid);
@@ -94,7 +92,7 @@ public class RewardsScreen {
         });
   }
 
-  public static void openRewardOverviewMenuForPlayer(ServerPlayer player) {
+  public static void openRewardOverviewMenuForPlayer(ServerPlayer serverPlayer) {
     MenuProvider provider =
         new MenuProvider() {
           @Override
@@ -110,11 +108,10 @@ public class RewardsScreen {
           }
         };
 
-    NetworkHooks.openScreen(
-        player,
+    serverPlayer.openMenu(
         provider,
         buffer -> {
-          UUID uuid = player.getUUID();
+          UUID uuid = serverPlayer.getUUID();
 
           // Get user rewards
           int rewardedDays = RewardUserData.get().getRewardedDaysForCurrentMonth(uuid);
@@ -134,7 +131,7 @@ public class RewardsScreen {
         });
   }
 
-  public static void openRewardSpecialOverviewMenuForPlayer(ServerPlayer player) {
+  public static void openRewardSpecialOverviewMenuForPlayer(ServerPlayer serverPlayer) {
     MenuProvider provider =
         new MenuProvider() {
           @Override
@@ -150,11 +147,10 @@ public class RewardsScreen {
           }
         };
 
-    NetworkHooks.openScreen(
-        player,
+    serverPlayer.openMenu(
         provider,
         buffer -> {
-          UUID uuid = player.getUUID();
+          UUID uuid = serverPlayer.getUUID();
 
           // Get special user rewards
           int specialRewardedDays =

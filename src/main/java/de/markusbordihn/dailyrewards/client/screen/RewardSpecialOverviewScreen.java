@@ -26,7 +26,9 @@ import de.markusbordihn.dailyrewards.network.NetworkMessage;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -34,6 +36,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class RewardSpecialOverviewScreen extends RewardOverviewScreen<RewardSpecialOverviewMenu> {
 
+  public static final WidgetSprites TAB_SPRITES =
+      new WidgetSprites(
+          new ResourceLocation(Constants.MINECRAFT_PREFIX, "advancements/tab_right_top"),
+          new ResourceLocation(Constants.MINECRAFT_PREFIX, "advancements/tab_right_top_selected"));
   // Button
   protected ImageButton openDefaultRewardsOverviewButton;
 
@@ -54,12 +60,7 @@ public class RewardSpecialOverviewScreen extends RewardOverviewScreen<RewardSpec
                   this.topPos + 18,
                   32,
                   28,
-                  96,
-                  64,
-                  28,
-                  Constants.TEXTURE_TABS,
-                  256,
-                  256,
+                  TAB_SPRITES,
                   button -> NetworkMessage.openRewardScreen(RewardScreenType.DEFAULT_OVERVIEW)));
       this.openDefaultRewardsOverviewButton.setTooltip(
           Tooltip.create(

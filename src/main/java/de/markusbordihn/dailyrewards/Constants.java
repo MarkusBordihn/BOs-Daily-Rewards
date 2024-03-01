@@ -51,8 +51,6 @@ public final class Constants {
       new ResourceLocation(Constants.MOD_ID, "textures/container/compact_screen_combined.png");
   public static final ResourceLocation TEXTURE_GENERIC_54 =
       new ResourceLocation(MINECRAFT_PREFIX, "textures/gui/container/generic_54.png");
-  public static final ResourceLocation TEXTURE_TABS =
-      new ResourceLocation(MINECRAFT_PREFIX, "textures/gui/advancements/tabs.png");
   public static final ResourceLocation TEXTURE_ICONS =
       new ResourceLocation(Constants.MOD_ID, "textures/container/icons.png");
   public static final ResourceLocation TEXTURE_OVERVIEW_SCREEN =

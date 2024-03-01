@@ -166,7 +166,7 @@ dependencies {
   // runtimeOnly fg.deobf("curse.maven:loot-bag-mod-356236:3699372")
 
   // Additional helpful Mods for development (dev depenedency)
-  runtimeOnly fg.deobf("curse.maven:jei-238222:4597711")
+  runtimeOnly fg.deobf("curse.maven:jei-238222:5101374")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -211,7 +211,7 @@ curseforge {
   apiKey = "${credentials.forKey('curseforge_api_token')}"
   project {
     id = "${curseforge_project_id}"
-    changelog = 'See https://github.com/MarkusBordihn/BOs-Daily-Rewards/commits/1.20.1'
+    changelog = 'See https://github.com/MarkusBordihn/BOs-Daily-Rewards/commits/1.20.2'
     changelogType = 'markdown'
     releaseType = "${curseforge_release_type}"
     addGameVersion("${mc_version}")

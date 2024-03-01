@@ -119,7 +119,7 @@ public class RewardScreen<T extends RewardMenu> extends AbstractContainerScreen<
 
   @Override
   public void render(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
-    this.renderBackground(guiGraphics);
+    this.renderBackground(guiGraphics, x, y, partialTicks);
     super.render(guiGraphics, x, y, partialTicks);
   }
 

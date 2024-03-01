@@ -22,10 +22,9 @@ package de.markusbordihn.dailyrewards.network.message;
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.data.RewardScreenType;
 import de.markusbordihn.dailyrewards.rewards.RewardsScreen;
-import java.util.function.Supplier;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -47,14 +46,13 @@ public class MessageOpenRewardScreen {
     return new MessageOpenRewardScreen(buffer.readEnum(RewardScreenType.class));
   }
 
-  public static void handle(
-      MessageOpenRewardScreen message, Supplier<NetworkEvent.Context> contextSupplier) {
-    NetworkEvent.Context context = contextSupplier.get();
+  public static void handle(MessageOpenRewardScreen message, CustomPayloadEvent.Context context) {
     context.enqueueWork(() -> handlePacket(message, context));
     context.setPacketHandled(true);
   }
 
-  public static void handlePacket(MessageOpenRewardScreen message, NetworkEvent.Context context) {
+  public static void handlePacket(
+      MessageOpenRewardScreen message, CustomPayloadEvent.Context context) {
     // Validate player
     ServerPlayer player = context.getSender();
     if (player == null) {

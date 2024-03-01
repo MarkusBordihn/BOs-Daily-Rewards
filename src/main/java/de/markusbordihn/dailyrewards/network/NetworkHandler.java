@@ -25,9 +25,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.ChannelBuilder;
+import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.minecraftforge.network.SimpleChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,13 +37,11 @@ public class NetworkHandler {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  private static final String PROTOCOL_VERSION = "1";
-  public static final SimpleChannel INSTANCE =
-      NetworkRegistry.newSimpleChannel(
-          new ResourceLocation(Constants.MOD_ID, "network"),
-          () -> PROTOCOL_VERSION,
-          PROTOCOL_VERSION::equals,
-          PROTOCOL_VERSION::equals);
+  private static final int PROTOCOL_VERSION = 1;
+  private static final SimpleChannel SIMPLE_CHANNEL =
+      ChannelBuilder.named(new ResourceLocation(Constants.MOD_ID, "network"))
+          .networkProtocolVersion(PROTOCOL_VERSION)
+          .simpleChannel();
 
   private static int id = 0;
 
@@ -51,25 +50,24 @@ public class NetworkHandler {
     log.info(
         "{} Network Handler for {} with version {} ...",
         Constants.LOG_REGISTER_PREFIX,
-        INSTANCE,
+        SIMPLE_CHANNEL,
         PROTOCOL_VERSION);
 
     event.enqueueWork(
         () -> {
-
           // Open Reward Screen: Client -> Server
-          INSTANCE.registerMessage(
-              id++,
-              MessageOpenRewardScreen.class,
-              MessageOpenRewardScreen::encode,
-              MessageOpenRewardScreen::decode,
-              MessageOpenRewardScreen::handle);
+          SIMPLE_CHANNEL
+              .messageBuilder(MessageOpenRewardScreen.class, id++, NetworkDirection.PLAY_TO_SERVER)
+              .encoder(MessageOpenRewardScreen::encode)
+              .decoder(MessageOpenRewardScreen::decode)
+              .consumerNetworkThread(MessageOpenRewardScreen::handle)
+              .add();
         });
   }
 
   public static <M> void sendToServer(M message) {
     try {
-      INSTANCE.sendToServer(message);
+      SIMPLE_CHANNEL.send(message, PacketDistributor.SERVER.noArg());
     } catch (Exception e) {
       log.error("Failed to send {} to server, got error: {}", message, e.getMessage());
     }
@@ -77,7 +75,7 @@ public class NetworkHandler {
 
   public static <M> void sendToPlayer(M message, ServerPlayer serverPlayer) {
     try {
-      INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), message);
+      SIMPLE_CHANNEL.send(message, PacketDistributor.PLAYER.with(serverPlayer));
     } catch (Exception e) {
       log.error(
           "Failed to send {} to player {}, got error: {}",

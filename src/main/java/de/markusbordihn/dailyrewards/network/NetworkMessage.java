@@ -32,7 +32,7 @@ public class NetworkMessage {
   /** Open Reward Screen */
   public static void openRewardScreen(RewardScreenType rewardScreenType) {
     if (rewardScreenType != null) {
-      NetworkHandler.INSTANCE.sendToServer(new MessageOpenRewardScreen(rewardScreenType));
+      NetworkHandler.sendToServer(new MessageOpenRewardScreen(rewardScreenType));
     }
   }
 }

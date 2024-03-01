@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -64,8 +64,13 @@ public class SpecialRewardUserData extends SavedData {
     this.setDirty();
   }
 
+  public static SavedData.Factory<SpecialRewardUserData> savedDataFactory() {
+    return new SavedData.Factory<>(
+        SpecialRewardUserData::new, SpecialRewardUserData::load, DataFixTypes.LEVEL);
+  }
+
   public static void prepare(MinecraftServer server) {
-    // Make sure we preparing the data only once for the same server!
+    // Make sure we're preparing the data only once for the same server!
     if (server == null
         || server == SpecialRewardUserData.server && SpecialRewardUserData.data != null) {
       return;
@@ -75,19 +80,11 @@ public class SpecialRewardUserData extends SavedData {
     SpecialRewardUserData.server = server;
 
     // Using a global approach and storing relevant data in the overworld only!
-    ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
-    if (serverLevel != null) {
-      SpecialRewardUserData.data =
-          serverLevel
-              .getDataStorage()
-              .computeIfAbsent(
-                  SpecialRewardUserData::load,
-                  SpecialRewardUserData::new,
-                  SpecialRewardUserData.getFileId());
-    } else {
-      log.error(
-          "{} unable to get server level {} for storing data!", Constants.LOG_NAME, serverLevel);
-    }
+    SpecialRewardUserData.data =
+        server
+            .getLevel(Level.OVERWORLD)
+            .getDataStorage()
+            .computeIfAbsent(savedDataFactory(), SpecialRewardUserData.getFileId());
   }
 
   public static boolean available() {
