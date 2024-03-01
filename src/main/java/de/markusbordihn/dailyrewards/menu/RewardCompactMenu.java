@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,10 +19,17 @@
 
 package de.markusbordihn.dailyrewards.menu;
 
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.data.RewardData;
+import de.markusbordihn.dailyrewards.data.RewardUserData;
+import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
+import de.markusbordihn.dailyrewards.menu.slots.EmptyRewardSlot;
+import de.markusbordihn.dailyrewards.menu.slots.HiddenRewardSlot;
+import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
+import de.markusbordihn.dailyrewards.rewards.Rewards;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
@@ -32,33 +39,21 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.data.RewardData;
-import de.markusbordihn.dailyrewards.data.RewardUserData;
-import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
-import de.markusbordihn.dailyrewards.menu.slots.EmptyRewardSlot;
-import de.markusbordihn.dailyrewards.menu.slots.HiddenRewardSlot;
-import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
-import de.markusbordihn.dailyrewards.rewards.Rewards;
-
 public class RewardCompactMenu extends RewardMenu {
 
   // Define Slot index for easier access
   public static final int PLAYER_SLOT_START = 9;
   public static final int PLAYER_INVENTORY_SLOT_START = PLAYER_SLOT_START;
   public static final int PLAYER_SLOT_STOP = 3 * 9 + PLAYER_INVENTORY_SLOT_START + 8;
-
-  // Defining basic layout options
-  private static int containerSize = 32;
-  private static int slotSize = 18;
-
   // Container layout
   public static final float REWARD_SLOT_SIZE_X = 20.5f;
   public static final int REWARD_SLOT_SIZE_Y = 31;
   public static final int REWARD_SLOT_START_POSITION_X = 10;
   public static final int REWARD_SLOT_START_POSITION_Y = 45;
   public static final int REWARD_SLOT_SPACE_X = 2;
-
+  // Defining basic layout options
+  private static int containerSize = 32;
+  private static int slotSize = 18;
   // Container
   private Container rewardsContainer = new SimpleContainer(containerSize);
   private Container rewardsUserContainer = new SimpleContainer(containerSize);
@@ -72,7 +67,10 @@ public class RewardCompactMenu extends RewardMenu {
   private List<ItemStack> userSpecialRewardsForCurrentMonth = new ArrayList<>();
 
   public RewardCompactMenu(final int windowId, final Inventory playerInventory) {
-    this(windowId, playerInventory, ModMenuTypes.REWARD_COMPACT_MENU.get(),
+    this(
+        windowId,
+        playerInventory,
+        ModMenuTypes.REWARD_COMPACT_MENU.get(),
         playerInventory.player.getUUID(),
         RewardUserData.get().getRewardedDaysForCurrentMonth(playerInventory.player.getUUID()),
         RewardUserData.get().getLastRewardedDayForCurrentMonth(playerInventory.player.getUUID()),
@@ -88,23 +86,45 @@ public class RewardCompactMenu extends RewardMenu {
   }
 
   public RewardCompactMenu(int windowId, Inventory playerInventory, FriendlyByteBuf data) {
-    this(windowId, playerInventory, ModMenuTypes.REWARD_COMPACT_MENU.get(), data.readUUID(),
-        data.readInt(), data.readUtf(), data.readNbt(), data.readNbt(), data.readInt(),
-        data.readUtf(), data.readNbt(), data.readNbt());
+    this(
+        windowId,
+        playerInventory,
+        ModMenuTypes.REWARD_COMPACT_MENU.get(),
+        data.readUUID(),
+        data.readInt(),
+        data.readUtf(),
+        data.readNbt(),
+        data.readNbt(),
+        data.readInt(),
+        data.readUtf(),
+        data.readNbt(),
+        data.readNbt());
   }
 
-  public RewardCompactMenu(final int windowId, final Inventory playerInventory,
-      MenuType<?> menuType, UUID playerUUID, int rewardedDays, String lastRewardedDay,
-      CompoundTag userRewardsForCurrentMonth, CompoundTag rewardsForCurrentMonth,
-      int specialRewardedDays, String lastSpecialRewardedDay,
-      CompoundTag specialUserRewardsForCurrentMonth, CompoundTag specialRewardsForCurrentMonth) {
+  public RewardCompactMenu(
+      final int windowId,
+      final Inventory playerInventory,
+      MenuType<?> menuType,
+      UUID playerUUID,
+      int rewardedDays,
+      String lastRewardedDay,
+      CompoundTag userRewardsForCurrentMonth,
+      CompoundTag rewardsForCurrentMonth,
+      int specialRewardedDays,
+      String lastSpecialRewardedDay,
+      CompoundTag specialUserRewardsForCurrentMonth,
+      CompoundTag specialRewardsForCurrentMonth) {
     super(menuType, windowId, playerInventory);
 
     // Check if we have a valid player with the given UUID
     this.playerUUID = playerUUID;
-    if (this.playerUUID == null || this.player.getUUID() == null
+    if (this.playerUUID == null
+        || this.player.getUUID() == null
         || !this.playerUUID.equals(this.player.getUUID())) {
-      log.error("{} Unable to verify player {} with UUID {}!", Constants.LOG_NAME, this.player,
+      log.error(
+          "{} Unable to verify player {} with UUID {}!",
+          Constants.LOG_NAME,
+          this.player,
           this.playerUUID);
       return;
     }
@@ -149,8 +169,8 @@ public class RewardCompactMenu extends RewardMenu {
         SpecialRewardUserData.getRewardsForCurrentMonthSyncData(specialUserRewardsForCurrentMonth);
     if (!this.userSpecialRewardsForCurrentMonth.isEmpty()) {
       for (int index = 0; index < this.userSpecialRewardsForCurrentMonth.size(); index++) {
-        this.specialRewardsUserContainer.setItem(index,
-            this.userSpecialRewardsForCurrentMonth.get(index));
+        this.specialRewardsUserContainer.setItem(
+            index, this.userSpecialRewardsForCurrentMonth.get(index));
       }
     }
 
@@ -199,22 +219,31 @@ public class RewardCompactMenu extends RewardMenu {
         } catch (Exception e) {
           itemStack = ItemStack.EMPTY;
         }
-        this.addSlot(this.createRewardSlot(itemStack, rewardedDays, this.rewardsUserContainer,
-            slotIndex, slotStartPositionX, slotStartPositionY));
+        this.addSlot(
+            this.createRewardSlot(
+                itemStack,
+                rewardedDays,
+                this.rewardsUserContainer,
+                slotIndex,
+                slotStartPositionX,
+                slotStartPositionY));
       } else if (this.rewardsForCurrentMonth.size() > slotIndex) {
         if (Boolean.TRUE.equals(COMMON.previewRewardsItems.get())) {
           // If the reward was not taken yet preview the reward slot.
-          this.addSlot(new RewardSlot(this.rewardsContainer, slotIndex, slotStartPositionX,
-              slotStartPositionY));
+          this.addSlot(
+              new RewardSlot(
+                  this.rewardsContainer, slotIndex, slotStartPositionX, slotStartPositionY));
         } else {
           // Hide the reward slot.
-          this.addSlot(new HiddenRewardSlot(this.rewardsContainer, slotIndex, slotStartPositionX,
-              slotStartPositionY));
+          this.addSlot(
+              new HiddenRewardSlot(
+                  this.rewardsContainer, slotIndex, slotStartPositionX, slotStartPositionY));
         }
       } else if (numberOfDays > slotIndex) {
         // If there is no reward show the empty reward slot.
-        this.addSlot(new EmptyRewardSlot(this.rewardsContainer, slotIndex, slotStartPositionX,
-            slotStartPositionY));
+        this.addSlot(
+            new EmptyRewardSlot(
+                this.rewardsContainer, slotIndex, slotStartPositionX, slotStartPositionY));
       }
       slotStartPositionX += REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X;
     }
@@ -241,8 +270,9 @@ public class RewardCompactMenu extends RewardMenu {
       }
 
       // Special User Reward Slot
-      for (int slotIndex =
-          specialRewardIndexStart; slotIndex <= specialRewardIndexStop; slotIndex++) {
+      for (int slotIndex = specialRewardIndexStart;
+          slotIndex <= specialRewardIndexStop;
+          slotIndex++) {
         if (this.userSpecialRewardsForCurrentMonth.size() > slotIndex) {
           ItemStack itemStack;
           try {
@@ -251,22 +281,39 @@ public class RewardCompactMenu extends RewardMenu {
             itemStack = ItemStack.EMPTY;
           }
           this.addSlot(
-              this.createRewardSlot(itemStack, rewardedDays, this.specialRewardsUserContainer,
-                  slotIndex, specialSlotStartPositionX, specialSlotStartPositionY));
+              this.createRewardSlot(
+                  itemStack,
+                  rewardedDays,
+                  this.specialRewardsUserContainer,
+                  slotIndex,
+                  specialSlotStartPositionX,
+                  specialSlotStartPositionY));
         } else if (this.rewardsForCurrentMonth.size() > slotIndex) {
           if (Boolean.TRUE.equals(COMMON.previewRewardsSpecialItems.get())) {
             // If the reward was not taken yet preview the reward slot.
-            this.addSlot(new RewardSlot(this.specialRewardsContainer, slotIndex,
-                specialSlotStartPositionX, specialSlotStartPositionY));
+            this.addSlot(
+                new RewardSlot(
+                    this.specialRewardsContainer,
+                    slotIndex,
+                    specialSlotStartPositionX,
+                    specialSlotStartPositionY));
           } else {
             // Hide the reward slot.
-            this.addSlot(new HiddenRewardSlot(this.specialRewardsContainer, slotIndex,
-                specialSlotStartPositionX, specialSlotStartPositionY));
+            this.addSlot(
+                new HiddenRewardSlot(
+                    this.specialRewardsContainer,
+                    slotIndex,
+                    specialSlotStartPositionX,
+                    specialSlotStartPositionY));
           }
         } else if (numberOfDays > slotIndex) {
           // If there is no reward show the empty reward slot.
-          this.addSlot(new EmptyRewardSlot(this.specialRewardsContainer, slotIndex,
-              specialSlotStartPositionX, specialSlotStartPositionY));
+          this.addSlot(
+              new EmptyRewardSlot(
+                  this.specialRewardsContainer,
+                  slotIndex,
+                  specialSlotStartPositionX,
+                  specialSlotStartPositionY));
         }
         specialSlotStartPositionX += REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X;
       }
@@ -277,9 +324,12 @@ public class RewardCompactMenu extends RewardMenu {
     int playerInventoryStartPositionX = 8;
     for (int inventoryRow = 0; inventoryRow < 3; ++inventoryRow) {
       for (int inventoryColumn = 0; inventoryColumn < 9; ++inventoryColumn) {
-        this.addSlot(new Slot(playerInventory, inventoryColumn + inventoryRow * 9 + 9,
-            playerInventoryStartPositionX + inventoryColumn * slotSize,
-            playerInventoryStartPositionY + inventoryRow * slotSize));
+        this.addSlot(
+            new Slot(
+                playerInventory,
+                inventoryColumn + inventoryRow * 9 + 9,
+                playerInventoryStartPositionX + inventoryColumn * slotSize,
+                playerInventoryStartPositionY + inventoryRow * slotSize));
       }
     }
 
@@ -287,8 +337,12 @@ public class RewardCompactMenu extends RewardMenu {
     int hotbarStartPositionY = 218;
     int hotbarStartPositionX = 8;
     for (int playerInventorySlot = 0; playerInventorySlot < 9; ++playerInventorySlot) {
-      this.addSlot(new Slot(playerInventory, playerInventorySlot,
-          hotbarStartPositionX + playerInventorySlot * slotSize, hotbarStartPositionY));
+      this.addSlot(
+          new Slot(
+              playerInventory,
+              playerInventorySlot,
+              hotbarStartPositionX + playerInventorySlot * slotSize,
+              hotbarStartPositionY));
     }
   }
 
@@ -331,5 +385,4 @@ public class RewardCompactMenu extends RewardMenu {
   public List<ItemStack> getUserSpecialRewardsForCurrentMonth() {
     return this.userSpecialRewardsForCurrentMonth;
   }
-
 }

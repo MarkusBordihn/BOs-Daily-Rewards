@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,20 +19,16 @@
 
 package de.markusbordihn.dailyrewards.rewards;
 
+import de.markusbordihn.dailyrewards.Constants;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-
 import net.minecraftforge.registries.ForgeRegistries;
-
-import de.markusbordihn.dailyrewards.Constants;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RewardsItems {
 
@@ -74,5 +70,4 @@ public class RewardsItems {
 
     return items;
   }
-
 }

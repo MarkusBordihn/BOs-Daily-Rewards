@@ -84,5 +84,5 @@
     "org.springframework.lang.NonNull",
     "javax.annotation.Nonnull",
     "org.eclipse.jdt.annotation.NonNull"
-  ],
+  ]
 }

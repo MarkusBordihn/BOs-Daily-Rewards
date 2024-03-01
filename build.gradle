@@ -51,7 +51,7 @@ minecraft {
 
       mods {
         "${mod_id}" {
-            source sourceSets.main
+          source sourceSets.main
         }
       }
 
@@ -78,7 +78,7 @@ minecraft {
 
       mods {
         "${mod_id}" {
-            source sourceSets.main
+          source sourceSets.main
         }
       }
     }
@@ -104,7 +104,7 @@ minecraft {
 
       mods {
         "${mod_id}" {
-            source sourceSets.main
+          source sourceSets.main
         }
       }
     }
@@ -127,7 +127,7 @@ minecraft {
 
       mods {
         "${mod_id}" {
-            source sourceSets.main
+          source sourceSets.main
         }
       }
     }
@@ -172,13 +172,13 @@ dependencies {
 jar {
   manifest {
     attributes([
-      "Specification-Title": "${mod_name}",
-      "Specification-Vendor": "${vendor_name}",
-      "Specification-Version": "1", // We are version 1 of ourselves
-      "Implementation-Title": project.name,
-      "Implementation-Version": "${version}",
-      "Implementation-Vendor" :"${mod_id}",
-      "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        "Specification-Title"     : "${mod_name}",
+        "Specification-Vendor"    : "${vendor_name}",
+        "Specification-Version"   : "1", // We are version 1 of ourselves
+        "Implementation-Title"    : project.name,
+        "Implementation-Version"  : "${version}",
+        "Implementation-Vendor"   : "${mod_id}",
+        "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
     ])
   }
 }
