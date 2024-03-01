@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,10 +19,15 @@
 
 package de.markusbordihn.dailyrewards.menu;
 
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.data.RewardData;
+import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
+import de.markusbordihn.dailyrewards.menu.slots.EmptyRewardSlot;
+import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
+import de.markusbordihn.dailyrewards.rewards.SpecialRewards;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
@@ -32,30 +37,20 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.data.RewardData;
-import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
-import de.markusbordihn.dailyrewards.menu.slots.EmptyRewardSlot;
-import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
-import de.markusbordihn.dailyrewards.rewards.SpecialRewards;
-
 public class RewardSpecialOverviewMenu extends RewardMenu {
 
   // Define Slot index for easier access
   public static final int PLAYER_SLOT_START = 9;
   public static final int PLAYER_INVENTORY_SLOT_START = PLAYER_SLOT_START;
   public static final int PLAYER_SLOT_STOP = 3 * 9 + PLAYER_INVENTORY_SLOT_START + 8;
-
-  // Defining basic layout options
-  private static int containerSize = 32;
-  private static int slotSize = 18;
-
   // Container layout
   public static final float REWARD_SLOT_SIZE_X = 20.5f;
   public static final int REWARD_SLOT_SIZE_Y = 30;
   public static final int REWARD_SLOT_START_POSITION_X = 8;
   public static final int REWARD_SLOT_START_POSITION_Y = 20;
-
+  // Defining basic layout options
+  private static int containerSize = 32;
+  private static int slotSize = 18;
   // Container
   private Container specialRewardsContainer = new SimpleContainer(containerSize);
   private Container specialRewardsUserContainer = new SimpleContainer(containerSize);

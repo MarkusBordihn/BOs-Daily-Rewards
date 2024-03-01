@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,33 +19,27 @@
 
 package de.markusbordihn.dailyrewards.config;
 
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.data.RewardScreenType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.commons.lang3.tuple.Pair;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
-
-import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.data.RewardScreenType;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class CommonConfig {
 
-  protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
-
   public static final ForgeConfigSpec commonSpec;
   public static final Config COMMON;
-
+  protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
   private static final String JANUARY = "January";
   private static final String FEBRUARY = "February";
   private static final String MARCH = "March";
@@ -59,8 +53,6 @@ public class CommonConfig {
   private static final String NOVEMBER = "November";
   private static final String DECEMBER = "December";
 
-  protected CommonConfig() {}
-
   static {
     com.electronwill.nightconfig.core.Config.setInsertionOrderPreserved(true);
     final Pair<Config, ForgeConfigSpec> specPair =
@@ -69,6 +61,16 @@ public class CommonConfig {
     COMMON = specPair.getLeft();
     log.info("{} Common config ...", Constants.LOG_REGISTER_PREFIX);
     ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, commonSpec);
+  }
+
+  protected CommonConfig() {
+  }
+
+  @SubscribeEvent
+  public static void onConfigReloading(final ModConfigEvent.Reloading configEvent) {
+    if (configEvent.getConfig().getSpec() == CommonConfig.commonSpec) {
+      log.debug("{} Common config reloaded ...", Constants.LOG_REGISTER_PREFIX);
+    }
   }
 
   public static class Config {
@@ -139,37 +141,22 @@ public class CommonConfig {
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsDecemberSpecialItems;
     public final ForgeConfigSpec.ConfigValue<List<String>> rewardsDecemberSpecialUsers;
 
-    private static final String getListOfRewardsItemsText(String month) {
-      return "List of rewards items for " + month;
-    }
-
-    private static final String getSpecialRewardsItemsText(String month) {
-      return "Single reward item or list of special streak rewards items for " + month
-          + ". (Only used if rewards" + month + "SpecialItemsNeededDays is greater than 0)";
-    }
-
-    private static final String getSpecialRewardsUsersText(String month) {
-      return "List of users which will get the special rewards items for " + month
-          + ". (Use empty list to allow all players to get special rewards items for " + month
-          + ")";
-    }
-
     Config(ForgeConfigSpec.Builder builder) {
 
       builder.comment("Daily Rewards (General configuration)");
 
       builder.push("General");
       automaticRewardPlayers = builder.comment(
-          "Automatically reward players after the rewardTimePerDay is reached. (e.g. 30 minutes). If disabled the reward command needs to be executed manually to reward the players.")
+              "Automatically reward players after the rewardTimePerDay is reached. (e.g. 30 minutes). If disabled the reward command needs to be executed manually to reward the players.")
           .define("automaticRewardPlayers", true);
       automaticRewardSpecialPlayers = builder.comment(
-          "Automatically reward players with specials after the rewardTimePerDay is reached. (e.g. 30 minutes). If disabled the reward command needs to be executed manually to reward the players.")
+              "Automatically reward players with specials after the rewardTimePerDay is reached. (e.g. 30 minutes). If disabled the reward command needs to be executed manually to reward the players.")
           .define("automaticRewardSpecialPlayers", true);
       rewardTimePerDay = builder.comment(
-          "Time in minutes the players needs to be online on the server before receiving a reward for the day.")
+              "Time in minutes the players needs to be online on the server before receiving a reward for the day.")
           .defineInRange("rewardTimePerDay", 30, 1, 1440);
       showRewardMenuOnPlayerJoin = builder.comment(
-          "Shows the rewards menu when a player joins the server (if there are unclaimed rewards).")
+              "Shows the rewards menu when a player joins the server (if there are unclaimed rewards).")
           .define("showRewardMenuOnPlayerJoin", false);
       rewardScreenType = builder.comment("Type of the reward screen.")
           .defineEnum("rewardScreenType", RewardScreenType.COMPACT);
@@ -177,26 +164,26 @@ public class CommonConfig {
 
       builder.push("Fill Items");
       useFillItems = builder.comment(
-          "Use fill items if there are not enough valid items for a month. (e.g. if there are only 2 items for a month and the player claims 3 rewards, the 3rd reward will be a fill item)")
+              "Use fill items if there are not enough valid items for a month. (e.g. if there are only 2 items for a month and the player claims 3 rewards, the 3rd reward will be a fill item)")
           .define("useFillItems", true);
       normalFillItems = builder.comment(
-          "List of normal fill items which are used in the case we have not enough valid items for a month.")
-          .define("normalFillItems", new ArrayList<String>(Arrays.asList("minecraft:cooked_beef:16",
+              "List of normal fill items which are used in the case we have not enough valid items for a month.")
+          .define("normalFillItems", new ArrayList<>(Arrays.asList("minecraft:cooked_beef:16",
               "minecraft:iron_ingot:8", "minecraft:oak_log:16", "minecraft:white_wool:4",
               "minecraft:gold_ingot:8", "minecraft:wheat_seeds:16", "minecraft:pumpkin_seeds:16",
               "minecraft:melon_seeds:16", "minecraft:beetroot_seeds:16", "minecraft:arrow:32")));
       rareFillItems = builder.comment(
-          "List of rare fill items which are used in the case we have not enough valid items for a month.")
-          .define("rareFillItems", new ArrayList<String>(
+              "List of rare fill items which are used in the case we have not enough valid items for a month.")
+          .define("rareFillItems", new ArrayList<>(
               Arrays.asList("minecraft:diamond", "minecraft:quartz:3", "minecraft:spyglass")));
       rareFillItemsChance = builder.comment(
-          "The chance to use a rare item instead of a regular one. e.g. 7 means every 7th items could be a rare item. (0 = disabled)")
+              "The chance to use a rare item instead of a regular one. e.g. 7 means every 7th items could be a rare item. (0 = disabled)")
           .defineInRange("rareFillItemsChance", 7, 0, 100);
       lootBagFillItems = builder.comment(
-          "List of loot bag fill items which are used in the case we have not enough valid items for a month.")
-          .define("lootBagFillItems", new ArrayList<String>(Arrays.asList("lootbagmod:lootbag")));
+              "List of loot bag fill items which are used in the case we have not enough valid items for a month.")
+          .define("lootBagFillItems", new ArrayList<>(Arrays.asList("lootbagmod:lootbag")));
       lootBagFillItemsChance = builder.comment(
-          "The chance to use a loot bag item instead of a regular one. e.g. 15 means every 15th items could be a loot bag item. (0 = disabled)")
+              "The chance to use a loot bag item instead of a regular one. e.g. 15 means every 15th items could be a loot bag item. (0 = disabled)")
           .defineInRange("lootBagFillItemsChance", 15, 0, 100);
       builder.pop();
 
@@ -215,134 +202,142 @@ public class CommonConfig {
 
       builder.push("January Rewards Items");
       rewardsJanuaryItems = builder.comment(getListOfRewardsItemsText(JANUARY))
-          .define("rewardsJanuaryItems", new ArrayList<String>(Arrays.asList("minecraft:oak_log:32",
+          .define("rewardsJanuaryItems", new ArrayList<>(Arrays.asList("minecraft:oak_log:32",
               "minecraft:cooked_salmon:16", "minecraft:white_wool:16", "minecraft:cake:1")));
       rewardsJanuarySpecialItems = builder.comment(getSpecialRewardsItemsText(JANUARY))
-          .define("rewardsJanuarySpecialItems", new ArrayList<String>(Arrays
+          .define("rewardsJanuarySpecialItems", new ArrayList<>(Arrays
               .asList("minecraft:cooked_salmon:1", "minecraft:cake:1", "minecraft:cookie:1")));
       rewardsJanuarySpecialUsers = builder.comment(getSpecialRewardsUsersText(JANUARY))
-          .define("rewardsJanuarySpecialUsers", new ArrayList<String>(Arrays.asList("")));
+          .define("rewardsJanuarySpecialUsers", new ArrayList<>(Arrays.asList("")));
       builder.pop();
 
       builder.push("February Rewards Items");
       rewardsFebruaryItems = builder.comment(getListOfRewardsItemsText(FEBRUARY))
-          .define("rewardsFebruaryItems", new ArrayList<String>(Arrays.asList()));
+          .define("rewardsFebruaryItems", new ArrayList<>(Arrays.asList()));
       rewardsFebruarySpecialItems = builder.comment(getSpecialRewardsItemsText(FEBRUARY)).define(
           "rewardsFebruarySpecialItems",
-          new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+          new ArrayList<>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
       rewardsFebruarySpecialUsers = builder.comment(getSpecialRewardsUsersText(FEBRUARY))
-          .define("rewardsFebruarySpecialUsers", new ArrayList<String>(Arrays.asList("")));
+          .define("rewardsFebruarySpecialUsers", new ArrayList<>(Arrays.asList("")));
       builder.pop();
 
       builder.push("March Rewards Items");
       rewardsMarchItems = builder.comment(getListOfRewardsItemsText(MARCH))
-          .define("rewardsMarchItems", new ArrayList<String>(Arrays.asList()));
+          .define("rewardsMarchItems", new ArrayList<>(Arrays.asList()));
       rewardsMarchSpecialItems =
           builder.comment(getSpecialRewardsItemsText(MARCH)).define("rewardsMarchSpecialItems",
-              new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+              new ArrayList<>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
       rewardsMarchSpecialUsers = builder.comment(getSpecialRewardsUsersText(MARCH))
-          .define("rewardsMarchSpecialUsers", new ArrayList<String>(Arrays.asList("")));
+          .define("rewardsMarchSpecialUsers", new ArrayList<>(Arrays.asList("")));
       builder.pop();
 
       builder.push("April Rewards Items");
       rewardsAprilItems = builder.comment(getListOfRewardsItemsText(APRIL))
-          .define("rewardsAprilItems", new ArrayList<String>(Arrays.asList()));
+          .define("rewardsAprilItems", new ArrayList<>(Arrays.asList()));
       rewardsAprilSpecialItems = builder.comment(getSpecialRewardsItemsText(APRIL))
-          .define("rewardsAprilSpecialItems", new ArrayList<String>(
+          .define("rewardsAprilSpecialItems", new ArrayList<>(
               Arrays.asList("minecraft:eggs:1", "minecraft:cake:1", "minecraft:cookie:1")));
       rewardsAprilSpecialUsers = builder.comment(getSpecialRewardsUsersText(APRIL))
-          .define("rewardsAprilSpecialUsers", new ArrayList<String>(Arrays.asList("")));
+          .define("rewardsAprilSpecialUsers", new ArrayList<>(Arrays.asList("")));
       builder.pop();
 
       builder.push("May Rewards Items");
       rewardsMayItems = builder.comment(getListOfRewardsItemsText(MAY)).define("rewardsMayItems",
-          new ArrayList<String>(Arrays.asList("minecraft:egg:16")));
+          new ArrayList<>(Arrays.asList("minecraft:egg:16")));
       rewardsMaySpecialItems =
           builder.comment(getSpecialRewardsItemsText(MAY)).define("rewardsMaySpecialItems",
-              new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+              new ArrayList<>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
       rewardsMaySpecialUsers = builder.comment(getSpecialRewardsUsersText(MAY))
-          .define("rewardsMaySpecialUsers", new ArrayList<String>(Arrays.asList("")));
+          .define("rewardsMaySpecialUsers", new ArrayList<>(Arrays.asList("")));
       builder.pop();
 
       builder.push("June Rewards Items");
       rewardsJuneItems = builder.comment(getListOfRewardsItemsText(JUNE)).define("rewardsJuneItems",
-          new ArrayList<String>(Arrays.asList()));
+          new ArrayList<>(Arrays.asList()));
       rewardsJuneSpecialItems =
           builder.comment(getSpecialRewardsItemsText(JUNE)).define("rewardsJuneSpecialItems",
-              new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+              new ArrayList<>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
       rewardsJuneSpecialUsers = builder.comment(getSpecialRewardsUsersText(JUNE))
-          .define("rewardsJuneSpecialUsers", new ArrayList<String>(Arrays.asList("")));
+          .define("rewardsJuneSpecialUsers", new ArrayList<>(Arrays.asList("")));
       builder.pop();
 
       builder.push("July Rewards Items");
       rewardsJulyItems = builder.comment(getListOfRewardsItemsText(JULY)).define("rewardsJulyItems",
-          new ArrayList<String>(Arrays.asList()));
+          new ArrayList<>(Arrays.asList()));
       rewardsJulySpecialItems =
           builder.comment(getSpecialRewardsItemsText(JULY)).define("rewardsJulySpecialItems",
-              new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+              new ArrayList<>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
       rewardsJulySpecialUsers = builder.comment(getSpecialRewardsUsersText(JULY))
-          .define("rewardsJulySpecialUsers", new ArrayList<String>(Arrays.asList("")));
+          .define("rewardsJulySpecialUsers", new ArrayList<>(Arrays.asList("")));
       builder.pop();
 
       builder.push("August Rewards Items");
       rewardsAugustItems = builder.comment(getListOfRewardsItemsText(AUGUST))
-          .define("rewardsAugustItems", new ArrayList<String>(Arrays.asList()));
+          .define("rewardsAugustItems", new ArrayList<>(Arrays.asList()));
       rewardsAugustSpecialItems =
           builder.comment(getSpecialRewardsItemsText(AUGUST)).define("rewardsAugustSpecialItems",
-              new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+              new ArrayList<>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
       rewardsAugustSpecialUsers = builder.comment(getSpecialRewardsUsersText(AUGUST))
-          .define("rewardsAugustSpecialUsers", new ArrayList<String>(Arrays.asList("")));
+          .define("rewardsAugustSpecialUsers", new ArrayList<>(Arrays.asList("")));
       builder.pop();
 
       builder.push("September Rewards Items");
       rewardsSeptemberItems = builder.comment(getListOfRewardsItemsText(SEPTEMBER))
-          .define("rewardsSeptemberItems", new ArrayList<String>(Arrays.asList()));
+          .define("rewardsSeptemberItems", new ArrayList<>(Arrays.asList()));
       rewardsSeptemberSpecialItems = builder.comment(getSpecialRewardsItemsText(SEPTEMBER)).define(
           "rewardsSeptemberSpecialItems",
-          new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+          new ArrayList<>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
       rewardsSeptemberSpecialUsers = builder.comment(getSpecialRewardsUsersText(SEPTEMBER))
-          .define("rewardsSeptemberSpecialUsers", new ArrayList<String>(Arrays.asList("")));
+          .define("rewardsSeptemberSpecialUsers", new ArrayList<>(Arrays.asList("")));
       builder.pop();
 
       builder.push("October Rewards Items");
       rewardsOctoberItems = builder.comment(getListOfRewardsItemsText(OCTOBER))
-          .define("rewardsOctoberItems", new ArrayList<String>(Arrays.asList()));
+          .define("rewardsOctoberItems", new ArrayList<>(Arrays.asList()));
       rewardsOctoberSpecialItems =
           builder.comment(getSpecialRewardsItemsText(OCTOBER)).define("rewardsOctoberSpecialItems",
-              new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+              new ArrayList<>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
       rewardsOctoberSpecialUsers = builder.comment(getSpecialRewardsUsersText(OCTOBER))
-          .define("rewardsOctoberSpecialUsers", new ArrayList<String>(Arrays.asList("")));
+          .define("rewardsOctoberSpecialUsers", new ArrayList<>(Arrays.asList("")));
       builder.pop();
 
       builder.push("November Rewards Items");
       rewardsNovemberItems = builder.comment(getListOfRewardsItemsText(NOVEMBER))
-          .define("rewardsNovemberItems", new ArrayList<String>(Arrays.asList()));
+          .define("rewardsNovemberItems", new ArrayList<>(Arrays.asList()));
       rewardsNovemberSpecialItems = builder.comment(getSpecialRewardsItemsText(NOVEMBER)).define(
           "rewardsNovemberSpecialItems",
-          new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+          new ArrayList<>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
       rewardsNovemberSpecialUsers = builder.comment(getSpecialRewardsUsersText(NOVEMBER))
-          .define("rewardsNovemberSpecialUsers", new ArrayList<String>(Arrays.asList("")));
+          .define("rewardsNovemberSpecialUsers", new ArrayList<>(Arrays.asList("")));
       builder.pop();
 
       builder.push("December Rewards Items");
       rewardsDecemberItems =
           builder.comment(getListOfRewardsItemsText(DECEMBER)).define("rewardsDecemberItems",
-              new ArrayList<String>(Arrays.asList("minecraft:firework_rocket:32")));
+              new ArrayList<>(Arrays.asList("minecraft:firework_rocket:32")));
       rewardsDecemberSpecialItems = builder.comment(getSpecialRewardsItemsText(DECEMBER)).define(
           "rewardsDecemberSpecialItems",
-          new ArrayList<String>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
+          new ArrayList<>(Arrays.asList("minecraft:cake:1", "minecraft:cookie:1")));
       rewardsDecemberSpecialUsers = builder.comment(getSpecialRewardsUsersText(DECEMBER))
-          .define("rewardsDecemberSpecialUsers", new ArrayList<String>(Arrays.asList("")));
+          .define("rewardsDecemberSpecialUsers", new ArrayList<>(Arrays.asList("")));
       builder.pop();
 
       builder.pop();
     }
-  }
 
-  @SubscribeEvent
-  public static void onConfigReloading(final ModConfigEvent.Reloading configEvent) {
-    if (configEvent.getConfig().getSpec() == CommonConfig.commonSpec) {
-      log.debug("{} Common config reloaded ...", Constants.LOG_REGISTER_PREFIX);
+    private static final String getListOfRewardsItemsText(String month) {
+      return "List of rewards items for " + month;
+    }
+
+    private static final String getSpecialRewardsItemsText(String month) {
+      return "Single reward item or list of special streak rewards items for " + month
+          + ". (Only used if rewards" + month + "SpecialItemsNeededDays is greater than 0)";
+    }
+
+    private static final String getSpecialRewardsUsersText(String month) {
+      return "List of users which will get the special rewards items for " + month
+          + ". (Use empty list to allow all players to get special rewards items for " + month
+          + ")";
     }
   }
 

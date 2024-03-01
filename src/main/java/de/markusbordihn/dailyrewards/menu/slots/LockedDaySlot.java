@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,12 +19,11 @@
 
 package de.markusbordihn.dailyrewards.menu.slots;
 
+import de.markusbordihn.dailyrewards.item.ModItems;
+import de.markusbordihn.dailyrewards.menu.RewardMenu;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-
-import de.markusbordihn.dailyrewards.item.ModItems;
-import de.markusbordihn.dailyrewards.menu.RewardMenu;
 
 public class LockedDaySlot extends DailyRewardSlot {
 

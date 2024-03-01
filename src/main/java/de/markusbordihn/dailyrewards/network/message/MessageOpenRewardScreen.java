@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,19 +19,15 @@
 
 package de.markusbordihn.dailyrewards.network.message;
 
-import java.util.function.Supplier;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-
-import net.minecraftforge.network.NetworkEvent;
-
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.data.RewardScreenType;
 import de.markusbordihn.dailyrewards.rewards.RewardsScreen;
+import java.util.function.Supplier;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.NetworkEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class MessageOpenRewardScreen {
 

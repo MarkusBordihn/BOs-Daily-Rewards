@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -22,7 +22,7 @@ package de.markusbordihn.dailyrewards.menu.slots;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.Slot;
 
-public class DailyRewardSlot extends Slot{
+public class DailyRewardSlot extends Slot {
 
   public DailyRewardSlot(Container container, int index, int x, int y) {
     super(container, index, x, y);

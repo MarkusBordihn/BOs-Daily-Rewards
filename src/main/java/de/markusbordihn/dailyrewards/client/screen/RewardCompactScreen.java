@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,25 +19,8 @@
 
 package de.markusbordihn.dailyrewards.client.screen;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
-
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.menu.RewardCompactMenu;
@@ -50,6 +33,19 @@ import de.markusbordihn.dailyrewards.menu.slots.SkippedDaySlot;
 import de.markusbordihn.dailyrewards.menu.slots.TakeableRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.UnlockedDaySlot;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
@@ -113,9 +109,9 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
       String lastRewardedDay = this.menu.getLastRewardedDay();
       long nextRewardTime = Rewards.getCurrentYearMonthDay().equals(lastRewardedDay)
           ? Duration
-              .between(LocalDateTime.now(),
-                  LocalDateTime.now().withHour(23).withMinute(59).withSecond(59))
-              .toSeconds() + this.rewardTimePerDayInSeconds
+          .between(LocalDateTime.now(),
+              LocalDateTime.now().withHour(23).withMinute(59).withSecond(59))
+          .toSeconds() + this.rewardTimePerDayInSeconds
           : this.rewardTimePerDayInSeconds - (localPlayerTickCount / 20);
       // Adding 60 seconds, because the server is only checking every 60 seconds for rewards.
       this.nextRewardTimeString = LocalTime.MIN.plusSeconds(nextRewardTime + 60).toString();
@@ -158,9 +154,9 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
       String lastRewardedSpecialDay = this.menu.getLastRewardedSpecialDay();
       long nextRewardTime = Rewards.getCurrentYearMonthDay().equals(lastRewardedSpecialDay)
           ? Duration
-              .between(LocalDateTime.now(),
-                  LocalDateTime.now().withHour(23).withMinute(59).withSecond(59))
-              .toSeconds() + this.rewardTimePerDayInSeconds
+          .between(LocalDateTime.now(),
+              LocalDateTime.now().withHour(23).withMinute(59).withSecond(59))
+          .toSeconds() + this.rewardTimePerDayInSeconds
           : this.rewardTimePerDayInSeconds - (localPlayerTickCount / 20);
       // Adding 60 seconds, because the server is only checking every 60 seconds for rewards.
       this.nextRewardSpecialTimeString = LocalTime.MIN.plusSeconds(nextRewardTime + 60).toString();
