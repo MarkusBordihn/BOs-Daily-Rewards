@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,6 +19,8 @@
 
 package de.markusbordihn.dailyrewards.rewards;
 
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.config.CommonConfig;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -26,14 +28,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
-
+import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import net.minecraft.world.item.ItemStack;
-
-import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.config.CommonConfig;
 
 public class SpecialRewards {
 
@@ -59,8 +56,11 @@ public class SpecialRewards {
 
     // Early return if we have matching items.
     if (rewardItemsForMonth.size() >= numberOfDays) {
-      log.info("Found {} special reward items for month {} with {} days ...",
-          rewardItemsForMonth.size(), month, numberOfDays);
+      log.info(
+          "Found {} special reward items for month {} with {} days ...",
+          rewardItemsForMonth.size(),
+          month,
+          numberOfDays);
       List<ItemStack> rewardItems =
           rewardItemsForMonth.stream().limit(numberOfDays).collect(Collectors.toList());
       if (Boolean.TRUE.equals(COMMON.shuffleRewardsSpecialItems.get())) {
@@ -73,8 +73,8 @@ public class SpecialRewards {
     // If we have only one item for the month we will use it for all days.
     // No need to shuffle here with only one item.
     if (rewardItemsForMonth.size() == 1) {
-      log.info("Found only one special reward item for month {} with {} days ...", month,
-          numberOfDays);
+      log.info(
+          "Found only one special reward item for month {} with {} days ...", month, numberOfDays);
       List<ItemStack> rewardItems = new ArrayList<>();
       for (int i = 0; i < numberOfDays; i++) {
         rewardItems.add(rewardItemsForMonth.get(0));
@@ -83,8 +83,11 @@ public class SpecialRewards {
     }
 
     // If we have not enough items for the month we will use them in the defined order.
-    log.info("Found only {} special reward items for month {} with {} days ...",
-        rewardItemsForMonth.size(), month, numberOfDays);
+    log.info(
+        "Found only {} special reward items for month {} with {} days ...",
+        rewardItemsForMonth.size(),
+        month,
+        numberOfDays);
     List<ItemStack> rewardItems = new ArrayList<>();
     for (int i = 0; i < numberOfDays; i++) {
       rewardItems.add(rewardItemsForMonth.get(i % rewardItemsForMonth.size()));
@@ -100,34 +103,21 @@ public class SpecialRewards {
   }
 
   public static List<ItemStack> getSpecialRewardItemForMonth(int month) {
-    switch (month) {
-      case 1:
-        return RewardsItems.parseConfigItems(COMMON.rewardsJanuarySpecialItems.get());
-      case 2:
-        return RewardsItems.parseConfigItems(COMMON.rewardsFebruarySpecialItems.get());
-      case 3:
-        return RewardsItems.parseConfigItems(COMMON.rewardsMarchSpecialItems.get());
-      case 4:
-        return RewardsItems.parseConfigItems(COMMON.rewardsAprilSpecialItems.get());
-      case 5:
-        return RewardsItems.parseConfigItems(COMMON.rewardsMaySpecialItems.get());
-      case 6:
-        return RewardsItems.parseConfigItems(COMMON.rewardsJuneSpecialItems.get());
-      case 7:
-        return RewardsItems.parseConfigItems(COMMON.rewardsJulySpecialItems.get());
-      case 8:
-        return RewardsItems.parseConfigItems(COMMON.rewardsAugustSpecialItems.get());
-      case 9:
-        return RewardsItems.parseConfigItems(COMMON.rewardsSeptemberSpecialItems.get());
-      case 10:
-        return RewardsItems.parseConfigItems(COMMON.rewardsOctoberSpecialItems.get());
-      case 11:
-        return RewardsItems.parseConfigItems(COMMON.rewardsNovemberSpecialItems.get());
-      case 12:
-        return RewardsItems.parseConfigItems(COMMON.rewardsDecemberSpecialItems.get());
-      default:
-        return new ArrayList<>();
-    }
+    return switch (month) {
+      case 1 -> RewardsItems.parseConfigItems(COMMON.rewardsJanuarySpecialItems.get());
+      case 2 -> RewardsItems.parseConfigItems(COMMON.rewardsFebruarySpecialItems.get());
+      case 3 -> RewardsItems.parseConfigItems(COMMON.rewardsMarchSpecialItems.get());
+      case 4 -> RewardsItems.parseConfigItems(COMMON.rewardsAprilSpecialItems.get());
+      case 5 -> RewardsItems.parseConfigItems(COMMON.rewardsMaySpecialItems.get());
+      case 6 -> RewardsItems.parseConfigItems(COMMON.rewardsJuneSpecialItems.get());
+      case 7 -> RewardsItems.parseConfigItems(COMMON.rewardsJulySpecialItems.get());
+      case 8 -> RewardsItems.parseConfigItems(COMMON.rewardsAugustSpecialItems.get());
+      case 9 -> RewardsItems.parseConfigItems(COMMON.rewardsSeptemberSpecialItems.get());
+      case 10 -> RewardsItems.parseConfigItems(COMMON.rewardsOctoberSpecialItems.get());
+      case 11 -> RewardsItems.parseConfigItems(COMMON.rewardsNovemberSpecialItems.get());
+      case 12 -> RewardsItems.parseConfigItems(COMMON.rewardsDecemberSpecialItems.get());
+      default -> new ArrayList<>();
+    };
   }
 
   public static boolean hasSpecialRewardItemsForMonth(int month) {
@@ -164,34 +154,21 @@ public class SpecialRewards {
   }
 
   public static List<String> getSpecialRewardUsersForMonth(int month) {
-    switch (month) {
-      case 1:
-        return COMMON.rewardsJanuarySpecialUsers.get();
-      case 2:
-        return COMMON.rewardsFebruarySpecialUsers.get();
-      case 3:
-        return COMMON.rewardsMarchSpecialUsers.get();
-      case 4:
-        return COMMON.rewardsAprilSpecialUsers.get();
-      case 5:
-        return COMMON.rewardsMaySpecialUsers.get();
-      case 6:
-        return COMMON.rewardsJuneSpecialUsers.get();
-      case 7:
-        return COMMON.rewardsJulySpecialUsers.get();
-      case 8:
-        return COMMON.rewardsAugustSpecialUsers.get();
-      case 9:
-        return COMMON.rewardsSeptemberSpecialUsers.get();
-      case 10:
-        return COMMON.rewardsOctoberSpecialUsers.get();
-      case 11:
-        return COMMON.rewardsNovemberSpecialUsers.get();
-      case 12:
-        return COMMON.rewardsDecemberSpecialUsers.get();
-      default:
-        return new ArrayList<>();
-    }
+    return switch (month) {
+      case 1 -> COMMON.rewardsJanuarySpecialUsers.get();
+      case 2 -> COMMON.rewardsFebruarySpecialUsers.get();
+      case 3 -> COMMON.rewardsMarchSpecialUsers.get();
+      case 4 -> COMMON.rewardsAprilSpecialUsers.get();
+      case 5 -> COMMON.rewardsMaySpecialUsers.get();
+      case 6 -> COMMON.rewardsJuneSpecialUsers.get();
+      case 7 -> COMMON.rewardsJulySpecialUsers.get();
+      case 8 -> COMMON.rewardsAugustSpecialUsers.get();
+      case 9 -> COMMON.rewardsSeptemberSpecialUsers.get();
+      case 10 -> COMMON.rewardsOctoberSpecialUsers.get();
+      case 11 -> COMMON.rewardsNovemberSpecialUsers.get();
+      case 12 -> COMMON.rewardsDecemberSpecialUsers.get();
+      default -> new ArrayList<>();
+    };
   }
 
   public static List<String> getSpecialRewardUsersForCurrentMonth() {
@@ -200,10 +177,10 @@ public class SpecialRewards {
 
   public static boolean isSpecialRewardUserForCurrentMonth(String playerName) {
     List<String> specialRewardUsersForCurrentMonth = getSpecialRewardUsersForCurrentMonth();
-    return specialRewardUsersForCurrentMonth == null || specialRewardUsersForCurrentMonth.isEmpty()
+    return specialRewardUsersForCurrentMonth == null
+        || specialRewardUsersForCurrentMonth.isEmpty()
         || (getSpecialRewardUsersForCurrentMonth().size() == 1
             && specialRewardUsersForCurrentMonth.get(0).isEmpty())
         || specialRewardUsersForCurrentMonth.contains(playerName);
   }
-
 }

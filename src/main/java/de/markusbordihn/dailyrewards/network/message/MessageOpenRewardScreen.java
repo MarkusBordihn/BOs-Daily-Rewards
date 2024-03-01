@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,19 +19,15 @@
 
 package de.markusbordihn.dailyrewards.network.message;
 
-import java.util.function.Supplier;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-
-import net.minecraftforge.network.NetworkEvent;
-
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.data.RewardScreenType;
 import de.markusbordihn.dailyrewards.rewards.RewardsScreen;
+import java.util.function.Supplier;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.NetworkEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class MessageOpenRewardScreen {
 
@@ -51,8 +47,8 @@ public class MessageOpenRewardScreen {
     return new MessageOpenRewardScreen(buffer.readEnum(RewardScreenType.class));
   }
 
-  public static void handle(MessageOpenRewardScreen message,
-      Supplier<NetworkEvent.Context> contextSupplier) {
+  public static void handle(
+      MessageOpenRewardScreen message, Supplier<NetworkEvent.Context> contextSupplier) {
     NetworkEvent.Context context = contextSupplier.get();
     context.enqueueWork(() -> handlePacket(message, context));
     context.setPacketHandled(true);
@@ -69,8 +65,8 @@ public class MessageOpenRewardScreen {
     // Validate reward screen type
     RewardScreenType rewardScreenType = message.rewardScreenType;
     if (rewardScreenType == null) {
-      log.warn("Unable to open reward screen for player {} due to missing reward screen type!",
-          player);
+      log.warn(
+          "Unable to open reward screen for player {} due to missing reward screen type!", player);
       return;
     }
 
@@ -87,10 +83,10 @@ public class MessageOpenRewardScreen {
         RewardsScreen.openRewardSpecialOverviewMenuForPlayer(player);
         break;
       default:
-        log.warn("Unable to open reward screen for player {} due to unknown reward screen type {}!",
-            player, rewardScreenType);
-        return;
+        log.warn(
+            "Unable to open reward screen for player {} due to unknown reward screen type {}!",
+            player,
+            rewardScreenType);
     }
   }
-
 }

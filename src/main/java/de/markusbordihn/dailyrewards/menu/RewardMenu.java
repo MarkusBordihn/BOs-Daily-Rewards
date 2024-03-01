@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,23 +19,6 @@
 
 package de.markusbordihn.dailyrewards.menu;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.config.CommonConfig;
 import de.markusbordihn.dailyrewards.data.RewardUserData;
@@ -48,6 +31,20 @@ import de.markusbordihn.dailyrewards.menu.slots.SkippedDaySlot;
 import de.markusbordihn.dailyrewards.menu.slots.TakeableRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.UnlockedDaySlot;
 import de.markusbordihn.dailyrewards.rewards.SpecialRewards;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RewardMenu extends AbstractContainerMenu {
 
@@ -61,31 +58,29 @@ public class RewardMenu extends AbstractContainerMenu {
   private static final Container REWARD_USER_CONTAINER = new SimpleContainer(0);
   private static final Container SPECIAL_REWARD_CONTAINER = new SimpleContainer(0);
   private static final Container SPECIAL_REWARD_USER_CONTAINER = new SimpleContainer(0);
-
+  private static final List<ItemStack> REWARDS_FOR_CURRENT_MONTH = new ArrayList<>();
+  private static final List<ItemStack> USER_REWARDS_FOR_CURRENT_MONTH = new ArrayList<>();
+  private static final List<ItemStack> SPECIAL_REWARDS_FOR_CURRENT_MONTH = new ArrayList<>();
+  private static final List<ItemStack> USER_SPECIAL_REWARDS_FOR_CURRENT_MONTH = new ArrayList<>();
+  protected final Level level;
+  protected final Player player;
   // Reward Data
   protected int rewardedDays = 0;
   protected String lastRewardedDay;
-  private static final List<ItemStack> REWARDS_FOR_CURRENT_MONTH = new ArrayList<>();
-  private static final List<ItemStack> USER_REWARDS_FOR_CURRENT_MONTH = new ArrayList<>();
-
   // Special Reward Data
   protected int rewardedSpecialDays = 0;
   protected String lastRewardedSpecialDay;
   protected boolean specialRewardAvailable = true;
-  private static final List<ItemStack> SPECIAL_REWARDS_FOR_CURRENT_MONTH = new ArrayList<>();
-  private static final List<ItemStack> USER_SPECIAL_REWARDS_FOR_CURRENT_MONTH = new ArrayList<>();
-
   // Misc
   protected UUID playerUUID;
-  protected final Level level;
-  protected final Player player;
 
   public RewardMenu(MenuType<?> menuType, int windowId, Inventory playerInventory) {
     super(menuType, windowId);
     this.player = playerInventory.player;
     this.level = this.player.getLevel();
-    this.specialRewardAvailable = SpecialRewards.hasSpecialRewardItemsForCurrentMonth()
-        && SpecialRewards.isSpecialRewardUserForCurrentMonth(this.player.getName().getString());
+    this.specialRewardAvailable =
+        SpecialRewards.hasSpecialRewardItemsForCurrentMonth()
+            && SpecialRewards.isSpecialRewardUserForCurrentMonth(this.player.getName().getString());
   }
 
   public void syncRewardContainer(Player player) {
@@ -182,8 +177,8 @@ public class RewardMenu extends AbstractContainerMenu {
     return USER_SPECIAL_REWARDS_FOR_CURRENT_MONTH;
   }
 
-  public DailyRewardSlot createRewardSlot(ItemStack itemStack, int rewardedDays,
-      Container container, int index, int x, int y) {
+  public DailyRewardSlot createRewardSlot(
+      ItemStack itemStack, int rewardedDays, Container container, int index, int x, int y) {
     if (itemStack.is(ModItems.SKIP_DAY.get())) {
       // Check if we have already skipped this day and show the skipped day slot.
       if (index < rewardedDays) {
@@ -231,5 +226,4 @@ public class RewardMenu extends AbstractContainerMenu {
   public boolean stillValid(Player player) {
     return player != null && player.isAlive();
   }
-
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,20 +19,17 @@
 
 package de.markusbordihn.dailyrewards.network;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.network.message.MessageOpenRewardScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
-
-import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.network.message.MessageOpenRewardScreen;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @EventBusSubscriber
 public class NetworkHandler {
@@ -41,22 +38,33 @@ public class NetworkHandler {
 
   private static final String PROTOCOL_VERSION = "1";
   public static final SimpleChannel INSTANCE =
-      NetworkRegistry.newSimpleChannel(new ResourceLocation(Constants.MOD_ID, "network"),
-          () -> PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals);
+      NetworkRegistry.newSimpleChannel(
+          new ResourceLocation(Constants.MOD_ID, "network"),
+          () -> PROTOCOL_VERSION,
+          PROTOCOL_VERSION::equals,
+          PROTOCOL_VERSION::equals);
 
   private static int id = 0;
 
   public static void registerNetworkHandler(final FMLCommonSetupEvent event) {
 
-    log.info("{} Network Handler for {} with version {} ...", Constants.LOG_REGISTER_PREFIX,
-        INSTANCE, PROTOCOL_VERSION);
+    log.info(
+        "{} Network Handler for {} with version {} ...",
+        Constants.LOG_REGISTER_PREFIX,
+        INSTANCE,
+        PROTOCOL_VERSION);
 
-    event.enqueueWork(() -> {
+    event.enqueueWork(
+        () -> {
 
-      // Open Reward Screen: Client -> Server
-      INSTANCE.registerMessage(id++, MessageOpenRewardScreen.class, MessageOpenRewardScreen::encode,
-          MessageOpenRewardScreen::decode, MessageOpenRewardScreen::handle);
-    });
+          // Open Reward Screen: Client -> Server
+          INSTANCE.registerMessage(
+              id++,
+              MessageOpenRewardScreen.class,
+              MessageOpenRewardScreen::encode,
+              MessageOpenRewardScreen::decode,
+              MessageOpenRewardScreen::handle);
+        });
   }
 
   public static <M> void sendToServer(M message) {
@@ -71,9 +79,11 @@ public class NetworkHandler {
     try {
       INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), message);
     } catch (Exception e) {
-      log.error("Failed to send {} to player {}, got error: {}", message,
-          serverPlayer.getName().getString(), e.getMessage());
+      log.error(
+          "Failed to send {} to player {}, got error: {}",
+          message,
+          serverPlayer.getName().getString(),
+          e.getMessage());
     }
   }
-
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,15 +19,12 @@
 
 package de.markusbordihn.dailyrewards.client.screen;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import net.minecraft.client.gui.screens.MenuScreens;
-
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.menu.ModMenuTypes;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ClientScreens {
 
@@ -38,12 +35,13 @@ public class ClientScreens {
   public static void registerScreens(final FMLClientSetupEvent event) {
     log.info("{} Client Screens ...", Constants.LOG_REGISTER_PREFIX);
 
-    event.enqueueWork(() -> {
-      MenuScreens.register(ModMenuTypes.REWARD_COMPACT_MENU.get(), RewardCompactScreen::new);
-      MenuScreens.register(ModMenuTypes.REWARD_OVERVIEW_MENU.get(),
-          RewardDefaultOverviewScreen::new);
-      MenuScreens.register(ModMenuTypes.REWARD_SPECIAL_OVERVIEW_MENU.get(),
-          RewardSpecialOverviewScreen::new);
-    });
+    event.enqueueWork(
+        () -> {
+          MenuScreens.register(ModMenuTypes.REWARD_COMPACT_MENU.get(), RewardCompactScreen::new);
+          MenuScreens.register(
+              ModMenuTypes.REWARD_OVERVIEW_MENU.get(), RewardDefaultOverviewScreen::new);
+          MenuScreens.register(
+              ModMenuTypes.REWARD_SPECIAL_OVERVIEW_MENU.get(), RewardSpecialOverviewScreen::new);
+        });
   }
 }

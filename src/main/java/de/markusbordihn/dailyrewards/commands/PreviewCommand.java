@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,24 +19,23 @@
 
 package de.markusbordihn.dailyrewards.commands;
 
-import java.util.List;
-
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
+import de.markusbordihn.dailyrewards.rewards.Rewards;
+import java.util.List;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.world.item.ItemStack;
-
-import de.markusbordihn.dailyrewards.rewards.Rewards;
 
 public class PreviewCommand extends CustomCommand {
   private static final PreviewCommand command = new PreviewCommand();
 
   public static ArgumentBuilder<CommandSourceStack, ?> register() {
-    return Commands.literal("preview").requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS))
-        .executes(command).then(Commands.literal("January").executes(command::showJanuary))
+    return Commands.literal("preview")
+        .requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS))
+        .executes(command)
+        .then(Commands.literal("January").executes(command::showJanuary))
         .then(Commands.literal("February").executes(command::showFebruary))
         .then(Commands.literal("March").executes(command::showMarch))
         .then(Commands.literal("April").executes(command::showApril))
@@ -138,8 +137,14 @@ public class PreviewCommand extends CustomCommand {
     sendFeedback(context, "Note: The preview could be different from the actually result.");
     int day = 1;
     for (ItemStack rewardItem : rewardItems) {
-      sendFeedback(context, String.format("Day %s: %sx%s (%s)", day++, rewardItem.getCount(),
-          rewardItem.getDisplayName().getString(), rewardItem.getItem().getRegistryName()));
+      sendFeedback(
+          context,
+          String.format(
+              "Day %s: %sx%s (%s)",
+              day++,
+              rewardItem.getCount(),
+              rewardItem.getDisplayName().getString(),
+              rewardItem.getItem().getRegistryName()));
     }
   }
 }

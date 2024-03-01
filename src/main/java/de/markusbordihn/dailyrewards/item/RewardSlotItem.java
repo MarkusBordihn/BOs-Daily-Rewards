@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,18 +19,15 @@
 
 package de.markusbordihn.dailyrewards.item;
 
+import de.markusbordihn.dailyrewards.Constants;
 import java.util.List;
-
 import javax.annotation.Nullable;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-
-import de.markusbordihn.dailyrewards.Constants;
 
 public class RewardSlotItem extends Item {
 
@@ -42,12 +39,14 @@ public class RewardSlotItem extends Item {
   }
 
   @Override
-  public void appendHoverText(ItemStack itemStack, @Nullable Level level,
-      List<Component> tooltipList, TooltipFlag tooltipFlag) {
+  public void appendHoverText(
+      ItemStack itemStack,
+      @Nullable Level level,
+      List<Component> tooltipList,
+      TooltipFlag tooltipFlag) {
     if (this.descriptionTextId == null || this.descriptionTextId.isEmpty()) {
       return;
     }
     tooltipList.add(new TranslatableComponent(Constants.TEXT_PREFIX + this.descriptionTextId));
   }
-
 }

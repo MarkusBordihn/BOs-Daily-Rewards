@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,44 +19,51 @@
 
 package de.markusbordihn.dailyrewards.commands;
 
-import java.util.List;
-
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import net.minecraft.world.item.ItemStack;
-
 import de.markusbordihn.dailyrewards.config.CommonConfig;
 import de.markusbordihn.dailyrewards.data.RewardData;
 import de.markusbordihn.dailyrewards.data.RewardUserData;
 import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
+import java.util.List;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.world.item.ItemStack;
 
 public class ConfigCommand extends CustomCommand {
   private static final ConfigCommand command = new ConfigCommand();
 
   public static ArgumentBuilder<CommandSourceStack, ?> register() {
-    return Commands.literal("config").requires(cs -> cs.hasPermission(Commands.LEVEL_ADMINS))
-        .executes(command).then(Commands.literal("reload").executes(command::reloadConfig))
+    return Commands.literal("config")
+        .requires(cs -> cs.hasPermission(Commands.LEVEL_ADMINS))
+        .executes(command)
+        .then(Commands.literal("reload").executes(command::reloadConfig))
         .then(Commands.literal("reset").executes(command::resetConfig))
         .then(Commands.literal("clear").executes(command::clearConfig));
   }
 
   @Override
   public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-    sendFeedback(context,
-        "Usage: /dailyrewards config [OPTION]\n\n" + "- reload   Reloads the config file!\n"
-            + "- reset    Resets the config file and clean the data!!.\n"
-            + "- clear    Cleans the config file and clear all data!!!\n");
+    sendFeedback(
+        context,
+        """
+            Usage: /dailyrewards config [OPTION]
+
+            - reload   Reloads the config file!
+            - reset    Resets the config file and clean the data!!.
+            - clear    Cleans the config file and clear all data!!!
+            """);
     return 0;
   }
 
   public int reloadConfig(CommandContext<CommandSourceStack> context) {
-    sendFeedback(context, "Reset caching after reload config ...\n"
-        + "If your changes are not visible, please try to save the file 2-3 times again to trigger the automatic reload!\n"
-        + "If this is still not working, please restart the game / server instead.");
+    sendFeedback(
+        context,
+        """
+            Reset caching after reload config ...
+            If your changes are not visible, please try to save the file 2-3 times again to trigger the automatic reload!
+            If this is still not working, please restart the game / server instead.""");
     CommonConfig.commonSpec.afterReload();
     return 0;
   }
@@ -103,5 +110,4 @@ public class ConfigCommand extends CustomCommand {
 
     return 0;
   }
-
 }

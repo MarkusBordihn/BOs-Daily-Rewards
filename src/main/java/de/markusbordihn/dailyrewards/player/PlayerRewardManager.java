@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,13 +19,17 @@
 
 package de.markusbordihn.dailyrewards.player;
 
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.config.CommonConfig;
+import de.markusbordihn.dailyrewards.data.RewardData;
+import de.markusbordihn.dailyrewards.data.RewardUserData;
+import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
+import de.markusbordihn.dailyrewards.rewards.Rewards;
+import de.markusbordihn.dailyrewards.rewards.RewardsScreen;
+import de.markusbordihn.dailyrewards.rewards.SpecialRewards;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.network.chat.ClickEvent;
@@ -35,22 +39,14 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.server.ServerLifecycleHooks;
-
-import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.config.CommonConfig;
-import de.markusbordihn.dailyrewards.data.RewardData;
-import de.markusbordihn.dailyrewards.data.RewardUserData;
-import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
-import de.markusbordihn.dailyrewards.rewards.Rewards;
-import de.markusbordihn.dailyrewards.rewards.RewardsScreen;
-import de.markusbordihn.dailyrewards.rewards.SpecialRewards;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @EventBusSubscriber
 public class PlayerRewardManager {
@@ -58,16 +54,18 @@ public class PlayerRewardManager {
   private static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
   private static final CommonConfig.Config COMMON = CommonConfig.COMMON;
+  private static final short REWARD_CHECK_TICK = 20 * 60; // every 1 Minute
+  private static final MutableComponent claimCommand =
+      new TextComponent("/DailyRewards claim")
+          .setStyle(
+              Style.EMPTY
+                  .withColor(ChatFormatting.GREEN)
+                  .withClickEvent(
+                      new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/DailyRewards claim")));
   private static boolean automaticRewardPlayers = true;
   private static boolean automaticRewardSpecialPlayers = true;
   private static int rewardTimePerDay = 30;
   private static int rewardTimePerDayTicks = rewardTimePerDay * 60 * 20;
-
-  private static final short REWARD_CHECK_TICK = 20 * 60; // every 1 Minute
-  private static final MutableComponent claimCommand = new TextComponent("/DailyRewards claim")
-      .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(
-          new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/DailyRewards claim")));
-
   private static short ticker = 0;
   private static Set<ServerPlayer> playerList = ConcurrentHashMap.newKeySet();
 
@@ -85,7 +83,8 @@ public class PlayerRewardManager {
     if (automaticRewardPlayers) {
       log.info(
           "Daily rewards will be automatically granted after {} min ({} ticks) a player is online.",
-          rewardTimePerDay, rewardTimePerDayTicks);
+          rewardTimePerDay,
+          rewardTimePerDayTicks);
     } else {
       log.warn(
           "Daily rewards will not be automatically granted. Use `/DailyRewards reward today <player>` to manually grant rewards.");
@@ -94,7 +93,8 @@ public class PlayerRewardManager {
     if (automaticRewardSpecialPlayers) {
       log.info(
           "Special daily rewards will be automatically granted after {} min ({} ticks) a player is online.",
-          rewardTimePerDay, rewardTimePerDayTicks);
+          rewardTimePerDay,
+          rewardTimePerDayTicks);
     } else {
       log.warn(
           "Special daily rewards will not be automatically granted. Use `/DailyRewards reward_special today <player>` to manually grant rewards.");
@@ -134,13 +134,16 @@ public class PlayerRewardManager {
     if (RewardUserData.get().hasUnclaimedRewardsForCurrentMonth(uuid)) {
       if (daysLeftCurrentMonth > 0) {
         player.sendMessage(
-            new TranslatableComponent(Constants.TEXT_PREFIX + "unclaimed_rewarded_item",
-                player.getName(), daysLeftCurrentMonth),
+            new TranslatableComponent(
+                Constants.TEXT_PREFIX + "unclaimed_rewarded_item",
+                player.getName(),
+                daysLeftCurrentMonth),
             Util.NIL_UUID);
       } else {
         player.sendMessage(
-            new TranslatableComponent(Constants.TEXT_PREFIX + "unclaimed_rewarded_item_today",
-                player.getName()).withStyle(ChatFormatting.RED),
+            new TranslatableComponent(
+                    Constants.TEXT_PREFIX + "unclaimed_rewarded_item_today", player.getName())
+                .withStyle(ChatFormatting.RED),
             Util.NIL_UUID);
       }
       hasUnclaimedRewards = true;
@@ -150,12 +153,16 @@ public class PlayerRewardManager {
     if (SpecialRewardUserData.get().hasUnclaimedRewardsForCurrentMonth(uuid)) {
       if (daysLeftCurrentMonth > 0) {
         player.sendMessage(
-            new TranslatableComponent(Constants.TEXT_PREFIX + "unclaimed_special_rewarded_item",
-                player.getName(), daysLeftCurrentMonth),
+            new TranslatableComponent(
+                Constants.TEXT_PREFIX + "unclaimed_special_rewarded_item",
+                player.getName(),
+                daysLeftCurrentMonth),
             Util.NIL_UUID);
       } else {
-        player.sendMessage(new TranslatableComponent(
-            Constants.TEXT_PREFIX + "unclaimed_special_rewarded_item_today", player.getName())
+        player.sendMessage(
+            new TranslatableComponent(
+                    Constants.TEXT_PREFIX + "unclaimed_special_rewarded_item_today",
+                    player.getName())
                 .withStyle(ChatFormatting.RED),
             Util.NIL_UUID);
       }
@@ -204,7 +211,8 @@ public class PlayerRewardManager {
     // we have no players online.
     if (event.phase == TickEvent.Phase.END
         || (!automaticRewardPlayers && !automaticRewardSpecialPlayers)
-        || ticker++ < REWARD_CHECK_TICK || playerList.isEmpty()) {
+        || ticker++ < REWARD_CHECK_TICK
+        || playerList.isEmpty()) {
       return;
     }
 
@@ -230,12 +238,20 @@ public class PlayerRewardManager {
             log.error("Reward {} for day {} for current month was empty!", itemStack, rewardedDays);
           } else {
             rewardUserData.addRewardForCurrentMonth(rewardedDays, uuid, itemStack);
-            player.sendMessage(new TranslatableComponent(Constants.TEXT_PREFIX + "rewarded_item",
-                player.getName(), itemStack, rewardedDays), Util.NIL_UUID);
+            player.sendMessage(
+                new TranslatableComponent(
+                    Constants.TEXT_PREFIX + "rewarded_item",
+                    player.getName(),
+                    itemStack,
+                    rewardedDays),
+                Util.NIL_UUID);
             showRewardClaimCommand = true;
           }
 
-          log.info("Reward player {} daily reward for {} days with {} ...", player, rewardedDays,
+          log.info(
+              "Reward player {} daily reward for {} days with {} ...",
+              player,
+              rewardedDays,
               itemStack);
         }
 
@@ -252,17 +268,27 @@ public class PlayerRewardManager {
           // Add reward for rewarded Days.
           ItemStack itemStack = RewardData.get().getSpecialRewardForCurrentMonth(rewardedDays);
           if (itemStack.isEmpty()) {
-            log.error("Special Reward {} for day {} for current month was empty!", itemStack,
+            log.error(
+                "Special Reward {} for day {} for current month was empty!",
+                itemStack,
                 rewardedDays);
           } else {
             specialRewardUserData.addRewardForCurrentMonth(rewardedDays, uuid, itemStack);
-            player.sendMessage(new TranslatableComponent(Constants.TEXT_PREFIX + "rewarded_item",
-                player.getName(), itemStack, rewardedDays), Util.NIL_UUID);
+            player.sendMessage(
+                new TranslatableComponent(
+                    Constants.TEXT_PREFIX + "rewarded_item",
+                    player.getName(),
+                    itemStack,
+                    rewardedDays),
+                Util.NIL_UUID);
             showRewardClaimCommand = true;
           }
 
-          log.info("Special Reward player {} daily reward for {} days with {} ...", player,
-              rewardedDays, itemStack);
+          log.info(
+              "Special Reward player {} daily reward for {} days with {} ...",
+              player,
+              rewardedDays,
+              itemStack);
         }
 
         // Show reward command if player has any unclaimed rewards.
@@ -271,11 +297,9 @@ public class PlayerRewardManager {
               new TranslatableComponent(Constants.TEXT_PREFIX + "claim_rewards", claimCommand),
               Util.NIL_UUID);
         }
-
       }
     }
 
     ticker = 0;
   }
-
 }

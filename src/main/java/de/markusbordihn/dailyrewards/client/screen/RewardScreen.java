@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,27 +19,22 @@
 
 package de.markusbordihn.dailyrewards.client.screen;
 
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.config.CommonConfig;
+import de.markusbordihn.dailyrewards.menu.RewardMenu;
+import de.markusbordihn.dailyrewards.rewards.Rewards;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.config.CommonConfig;
-import de.markusbordihn.dailyrewards.menu.RewardMenu;
-import de.markusbordihn.dailyrewards.rewards.Rewards;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @OnlyIn(Dist.CLIENT)
 public class RewardScreen<T extends RewardMenu> extends AbstractContainerScreen<T> {
@@ -119,5 +114,4 @@ public class RewardScreen<T extends RewardMenu> extends AbstractContainerScreen<
     this.blit(poseStack, leftPos, topPos + 8, 0, 0, 176, 139);
     blit(poseStack, leftPos + 5, topPos + 15, 3, 64, 165, 130, 255, 4096);
   }
-
 }

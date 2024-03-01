@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -22,19 +22,17 @@ package de.markusbordihn.dailyrewards.commands;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
+import de.markusbordihn.dailyrewards.rewards.RewardsScreen;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-
 import net.minecraft.server.level.ServerPlayer;
-
-import de.markusbordihn.dailyrewards.rewards.RewardsScreen;
 
 public class ClaimCommand extends CustomCommand {
   private static final ClaimCommand command = new ClaimCommand();
 
   public static ArgumentBuilder<CommandSourceStack, ?> register() {
-    return Commands.literal("claim").requires(cs -> cs.hasPermission(Commands.LEVEL_ALL))
+    return Commands.literal("claim")
+        .requires(cs -> cs.hasPermission(Commands.LEVEL_ALL))
         .executes(command);
   }
 
@@ -59,5 +57,4 @@ public class ClaimCommand extends CustomCommand {
     }
     return 0;
   }
-
 }

@@ -23,10 +23,12 @@ Please report issues over the issue link above.
 
 ## License
 
-The MIT [LICENSE.md](LICENSE.md) applies only to the code in this repository. Images, models and other assets are explicitly excluded.
+The MIT [LICENSE.md](LICENSE.md) applies only to the code in this repository. Images, models and
+other assets are explicitly excluded.
 
 ## ℹ️ More Information
 
-Please check the wiki <https://github.com/MarkusBordihn/BOs-Daily-Rewards/wiki> for additional information.
+Please check the wiki <https://github.com/MarkusBordihn/BOs-Daily-Rewards/wiki> for additional
+information.
 
 [logo]: https://github.com/MarkusBordihn/BOs-Daily-Rewards/wiki/logo_header.png
