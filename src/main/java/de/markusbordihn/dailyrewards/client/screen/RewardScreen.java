@@ -68,6 +68,17 @@ public class RewardScreen<T extends RewardMenu> extends AbstractContainerScreen<
     this.hasSpecialReward = this.menu.isSpecialRewardAvailable();
   }
 
+  public static String mergeComponentStyleCodeWithText(Component component, String text) {
+    if (component == null || component.getString().length() < 2 || text == null || text.isEmpty()) {
+      return text;
+    }
+    String styleString = component.getString(2);
+    if (!styleString.isEmpty() && styleString.charAt(0) == '§') {
+      return component.getString(2) + text;
+    }
+    return text;
+  }
+
   public void close() {
     if (this.minecraft != null) {
       this.minecraft.setScreen(null);

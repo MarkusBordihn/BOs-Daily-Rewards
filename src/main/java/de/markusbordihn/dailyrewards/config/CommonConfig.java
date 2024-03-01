@@ -78,6 +78,11 @@ public class CommonConfig {
     public final ForgeConfigSpec.BooleanValue automaticRewardPlayers;
     public final ForgeConfigSpec.BooleanValue automaticRewardSpecialPlayers;
     public final ForgeConfigSpec.IntValue rewardTimePerDay;
+    public final ForgeConfigSpec.BooleanValue showUnclaimedRewardsOnPlayerJoin;
+    public final ForgeConfigSpec.BooleanValue showUnclaimedRewardsSpecialOnPlayerJoin;
+    public final ForgeConfigSpec.BooleanValue showReceivedRewardMessage;
+    public final ForgeConfigSpec.BooleanValue showReceivedRewardSpecialMessage;
+    public final ForgeConfigSpec.BooleanValue showRewardClaimCommandMessage;
     public final ForgeConfigSpec.BooleanValue showRewardMenuOnPlayerJoin;
     public final ForgeConfigSpec.EnumValue<RewardScreenType> rewardScreenType;
 
@@ -155,6 +160,28 @@ public class CommonConfig {
       rewardTimePerDay = builder.comment(
               "Time in minutes the players needs to be online on the server before receiving a reward for the day.")
           .defineInRange("rewardTimePerDay", 30, 1, 1440);
+      showUnclaimedRewardsOnPlayerJoin =
+          builder
+              .comment(
+                  "Shows a unclaimed rewards message when a player joins the server (if there are unclaimed rewards).")
+              .define("showUnclaimedRewardsOnPlayerJoin", true);
+      showUnclaimedRewardsSpecialOnPlayerJoin =
+          builder
+              .comment(
+                  "Shows a unclaimed special rewards message when a player joins the server (if there are unclaimed special rewards).")
+              .define("showUnclaimedRewardsSpecialOnPlayerJoin", true);
+      showReceivedRewardMessage =
+          builder
+              .comment("Shows a message when a player receives a reward.")
+              .define("showReceivedRewardMessage", true);
+      showReceivedRewardSpecialMessage =
+          builder
+              .comment("Shows a message when a player receives a special reward.")
+              .define("showReceivedRewardSpecialMessage", true);
+      showRewardClaimCommandMessage =
+          builder
+              .comment("Shows a message with the reward claim command to claim rewards.")
+              .define("showRewardClaimCommandMessage", true);
       showRewardMenuOnPlayerJoin = builder.comment(
               "Shows the rewards menu when a player joins the server (if there are unclaimed rewards).")
           .define("showRewardMenuOnPlayerJoin", false);

@@ -114,6 +114,12 @@ public class RewardOverviewScreen<T extends RewardMenu> extends RewardScreen<T> 
       }
     }
 
+    // Merge color codes for the next reward time, if any.
+    this.nextRewardTimeString =
+        mergeComponentStyleCodeWithText(
+            Component.translatable(Constants.TEXT_PREFIX + "next_reward.in"),
+            this.nextRewardTimeString);
+
     // Display next reward time.
     Component component = Component.translatable(Constants.TEXT_PREFIX + "next_reward.in",
         this.nextRewardTimeString);
