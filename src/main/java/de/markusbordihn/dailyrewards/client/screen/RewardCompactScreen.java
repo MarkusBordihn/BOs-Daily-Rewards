@@ -127,6 +127,12 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
       }
     }
 
+    // Merge color codes for the next reward time, if any.
+    this.nextRewardTimeString =
+        mergeComponentStyleCodeWithText(
+            Component.translatable(Constants.TEXT_PREFIX + "next_reward.in"),
+            this.nextRewardTimeString);
+
     // Display next reward time.
     Component component =
         Component.translatable(Constants.TEXT_PREFIX + "next_reward.in", this.nextRewardTimeString);
@@ -181,6 +187,12 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
         this.updateSpecialTicker = 0;
       }
     }
+
+    // Merge color codes for the next reward time, if any.
+    this.nextRewardSpecialTimeString =
+        mergeComponentStyleCodeWithText(
+            Component.translatable(Constants.TEXT_PREFIX + "next_special_reward.in"),
+            this.nextRewardSpecialTimeString);
 
     // Display next reward time.
     Component component =

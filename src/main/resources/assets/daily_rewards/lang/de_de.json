@@ -10,7 +10,7 @@
   "text.daily_rewards.reward_screen": "Belohnte Tage: %1$s Tag(e)",
   "text.daily_rewards.reward_screen_none": "Daily Rewards",
   "text.daily_rewards.rewarded_item_empty": "Die Belohnung ist leer, bitte prüfe die Logfiles und die entsprechende Konfiguration!",
-  "text.daily_rewards.rewarded_item": "Herzlichen Glückwunsch %1$s, du hast %2$s als Anerkenung für %3$s Tag(e) auf dieser Welt (für diesen Monat) erhalten.",
+  "text.daily_rewards.rewarded_item": "Herzlichen Glückwunsch %1$s, du hast %2$s als Anerkennung für %3$s Tag(e) auf dieser Welt (für diesen Monat) erhalten.",
   "text.daily_rewards.unclaimed_rewarded_item": "%1$s du hast nicht eingeforderte Tagesbelohnungen, bitte stelle sicher, dass du diese in den nächsten %2$s Tagen einforderst!",
   "text.daily_rewards.unclaimed_rewarded_item_today": "%1$s, du hast nicht beanspruchte Belohnungen, bitte stelle sicher, dass du diese noch heute anforderst!!!",
   "text.daily_rewards.unclaimed_special_rewarded_item": "%1$s du hast nicht eingeforderte spezielle Tagesbelohnungen, bitte stelle sicher, dass du diese in den nächsten %2$s Tagen einforderst!",
