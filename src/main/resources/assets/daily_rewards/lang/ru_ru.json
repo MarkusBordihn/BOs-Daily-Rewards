@@ -9,14 +9,12 @@
   "text.daily_rewards.rewarded_item": "Поздравляю %1$s ты получил %2$s в качестве регонизации за %3$s дня(ей) в этом мире за этот месяц.",
   "text.daily_rewards.unclaimed_rewarded_item": "%1$s, у тебя есть не утверждённые ежедневные награды, обязательно забери их в течении следующих %2$s дней!",
   "text.daily_rewards.unclaimed_rewarded_item_today": "%1$s, у тебя не утверждённые ежедневные награды, обязательно сегодня их забери!!!",
-
   "text.daily_rewards.empty_reward.description": "В этом месяце ежедневных наград за этот день нет.",
   "text.daily_rewards.lock_day.description": "Этот день заблокирован, вы не можете получить свои ежедневные награды за этот день в этом месяце.",
   "text.daily_rewards.skip_day.description": "Этот день пропущен, вы не можете получить ежедневные награды за этот день в этом месяце.",
   "text.daily_rewards.skipped_day.description": "Этот день был пропущен, небольшой шаг к получению следующих ежедневных наград в этом месяце.",
   "text.daily_rewards.taken_reward.description": "Вы уже получили ежедневные награды за этот день в этом месяце.",
   "text.daily_rewards.unlock_day.description": "Этот день был разблокирован, это небольшой шаг к получению следующих ежедневных наград в этом месяце.",
-
   "text.daily_rewards.claim_today.info": "\u2714 Вы можете получить эту награду сегодня.",
   "text.daily_rewards.claimable_in_days.info": "\u2139 Вы сможете получить эти награды примерно через %1$s дней!",
   "text.daily_rewards.claimable_reward.info": "\u2714 Эту награду можно запросить!",
@@ -27,7 +25,6 @@
   "text.daily_rewards.skip_today.info": "\u2714 Этот день можно пропустить сегодня.",
   "text.daily_rewards.skipped_day.info": "\u2714 Этот день уже был пропущен!",
   "text.daily_rewards.unlocked_day.info": "\u2714 Этот день уже разблокирован!",
-
   "item.daily_rewards.empty_reward": "Без вознаграждения",
   "item.daily_rewards.lock_day": "Заблокированный день",
   "item.daily_rewards.skip_day": "Пропустить день",

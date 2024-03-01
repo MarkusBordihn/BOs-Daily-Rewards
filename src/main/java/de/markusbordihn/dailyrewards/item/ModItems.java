@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,42 +19,33 @@
 
 package de.markusbordihn.dailyrewards.item;
 
+import de.markusbordihn.dailyrewards.Constants;
 import net.minecraft.world.item.Item;
-
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-import de.markusbordihn.dailyrewards.Constants;
-
 public class ModItems {
+
+  public static final DeferredRegister<Item> ITEMS =
+      DeferredRegister.create(ForgeRegistries.ITEMS, Constants.MOD_ID);
+  public static final RegistryObject<Item> HIDDEN_REWARD = ITEMS.register("hidden_reward",
+      () -> new RewardSlotItem(new Item.Properties(), "hidden_reward.description"));
+  public static final RegistryObject<Item> TAKEN_REWARD = ITEMS.register("taken_reward",
+      () -> new RewardSlotItem(new Item.Properties(), "taken_reward.description"));
+  public static final RegistryObject<Item> EMPTY_REWARD = ITEMS.register("empty_reward",
+      () -> new RewardSlotItem(new Item.Properties(), "empty_reward.description"));
+  // Special reward items
+  public static final RegistryObject<Item> SKIP_DAY = ITEMS.register("skip_day",
+      () -> new RewardSlotItem(new Item.Properties(), "skip_day.description"));
+  public static final RegistryObject<Item> SKIPPED_DAY = ITEMS.register("skipped_day",
+      () -> new RewardSlotItem(new Item.Properties(), "skipped_day.description"));
+  public static final RegistryObject<Item> LOCK_DAY = ITEMS.register("lock_day",
+      () -> new RewardSlotItem(new Item.Properties(), "lock_day.description"));
+  public static final RegistryObject<Item> UNLOCK_DAY = ITEMS.register("unlock_day",
+      () -> new RewardSlotItem(new Item.Properties(), "unlock_day.description"));
 
   protected ModItems() {
 
   }
-
-  public static final DeferredRegister<Item> ITEMS =
-      DeferredRegister.create(ForgeRegistries.ITEMS, Constants.MOD_ID);
-
-  public static final RegistryObject<Item> HIDDEN_REWARD = ITEMS.register("hidden_reward",
-      () -> new RewardSlotItem(new Item.Properties(), "hidden_reward.description"));
-
-  public static final RegistryObject<Item> TAKEN_REWARD = ITEMS.register("taken_reward",
-      () -> new RewardSlotItem(new Item.Properties(), "taken_reward.description"));
-
-  public static final RegistryObject<Item> EMPTY_REWARD = ITEMS.register("empty_reward",
-      () -> new RewardSlotItem(new Item.Properties(), "empty_reward.description"));
-
-  // Special reward items
-  public static final RegistryObject<Item> SKIP_DAY = ITEMS.register("skip_day",
-      () -> new RewardSlotItem(new Item.Properties(), "skip_day.description"));
-
-  public static final RegistryObject<Item> SKIPPED_DAY = ITEMS.register("skipped_day",
-      () -> new RewardSlotItem(new Item.Properties(), "skipped_day.description"));
-
-  public static final RegistryObject<Item> LOCK_DAY = ITEMS.register("lock_day",
-      () -> new RewardSlotItem(new Item.Properties(), "lock_day.description"));
-
-  public static final RegistryObject<Item> UNLOCK_DAY = ITEMS.register("unlock_day",
-      () -> new RewardSlotItem(new Item.Properties(), "unlock_day.description"));
 }

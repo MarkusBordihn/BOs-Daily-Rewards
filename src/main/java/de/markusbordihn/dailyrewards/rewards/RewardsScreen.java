@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,10 +19,14 @@
 
 package de.markusbordihn.dailyrewards.rewards;
 
+import de.markusbordihn.dailyrewards.data.RewardData;
+import de.markusbordihn.dailyrewards.data.RewardUserData;
+import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
+import de.markusbordihn.dailyrewards.menu.RewardCompactMenu;
+import de.markusbordihn.dailyrewards.menu.RewardOverviewMenu;
+import de.markusbordihn.dailyrewards.menu.RewardSpecialOverviewMenu;
 import java.util.UUID;
-
 import javax.annotation.Nullable;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,15 +34,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-
 import net.minecraftforge.network.NetworkHooks;
-
-import de.markusbordihn.dailyrewards.data.RewardData;
-import de.markusbordihn.dailyrewards.data.RewardUserData;
-import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
-import de.markusbordihn.dailyrewards.menu.RewardCompactMenu;
-import de.markusbordihn.dailyrewards.menu.RewardOverviewMenu;
-import de.markusbordihn.dailyrewards.menu.RewardSpecialOverviewMenu;
 
 public class RewardsScreen {
 

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,19 +19,17 @@
 
 package de.markusbordihn.dailyrewards.commands;
 
-import java.util.List;
-
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
+import de.markusbordihn.dailyrewards.rewards.Rewards;
+import java.util.List;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.world.item.ItemStack;
 
-import de.markusbordihn.dailyrewards.rewards.Rewards;
-
 public class PreviewCommand extends CustomCommand {
+
   private static final PreviewCommand command = new PreviewCommand();
 
   public static ArgumentBuilder<CommandSourceStack, ?> register() {

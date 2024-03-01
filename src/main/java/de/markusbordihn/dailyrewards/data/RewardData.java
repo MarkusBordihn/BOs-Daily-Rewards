@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,14 +19,13 @@
 
 package de.markusbordihn.dailyrewards.data;
 
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.rewards.Rewards;
+import de.markusbordihn.dailyrewards.rewards.SpecialRewards;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
@@ -34,12 +33,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
-
 import net.minecraftforge.server.ServerLifecycleHooks;
-
-import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.rewards.SpecialRewards;
-import de.markusbordihn.dailyrewards.rewards.Rewards;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RewardData extends SavedData {
 
@@ -105,46 +101,6 @@ public class RewardData extends SavedData {
     return year + "-" + month;
   }
 
-  public List<ItemStack> getRewardsFor(int year, int month) {
-    String key = getKeyId(year, month);
-    List<ItemStack> rewards = rewardItemsMap.get(key);
-    if (rewards != null && rewards.isEmpty()) {
-      rewardItemsMap.remove(key);
-    }
-    return rewardItemsMap.computeIfAbsent(key, id -> Rewards.calculateRewardItemsForMonth(month));
-  }
-
-  public List<ItemStack> getRewardsForMonth(int month) {
-    return getRewardsFor(Rewards.getCurrentYear(), month);
-  }
-
-  public List<ItemStack> getRewardsForCurrentMonth() {
-    return getRewardsFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth());
-  }
-
-  public List<ItemStack> getRewardsForTheNextDays(int rewardedDay, int nextDays) {
-    List<ItemStack> rewardItems = getRewardsForCurrentMonth();
-    List<ItemStack> rewardItemsForNextDays = new ArrayList<>();
-    for (int i = rewardedDay; i < rewardedDay + nextDays && i < rewardItems.size(); i++) {
-      rewardItemsForNextDays.add(rewardItems.get(i));
-    }
-    return rewardItemsForNextDays;
-  }
-
-  public CompoundTag getRewardsForCurrentMonthSyncData() {
-    List<ItemStack> rewardItems = getRewardsForCurrentMonth();
-    CompoundTag syncData = new CompoundTag();
-    ListTag itemListTag = new ListTag();
-    for (int i = 0; i < rewardItems.size(); ++i) {
-      ItemStack itemStack = rewardItems.get(i);
-      CompoundTag itemStackTag = new CompoundTag();
-      itemStack.save(itemStackTag);
-      itemListTag.add(itemStackTag);
-    }
-    syncData.put(ITEM_LIST_TAG, itemListTag);
-    return syncData;
-  }
-
   public static List<ItemStack> getRewardsForCurrentMonthSyncData(CompoundTag compoundTag) {
     List<ItemStack> rewardItems = new ArrayList<>();
     if (compoundTag.contains(ITEM_LIST_TAG)) {
@@ -159,47 +115,6 @@ public class RewardData extends SavedData {
     return rewardItems;
   }
 
-  public ItemStack getRewardForCurrentMonth(int day) {
-    List<ItemStack> rewards = getRewardsForCurrentMonth();
-    int rewardIndex = --day;
-    if (rewardIndex >= 0 && rewards.size() > rewardIndex) {
-      return rewards.get(rewardIndex).copy();
-    }
-    return ItemStack.EMPTY;
-  }
-
-  public List<ItemStack> getSpecialRewardsFor(int year, int month) {
-    String key = getKeyId(year, month);
-    List<ItemStack> specialRewards = specialRewardItemsMap.get(key);
-    if (specialRewards != null && specialRewards.isEmpty()) {
-      specialRewardItemsMap.remove(key);
-    }
-    return specialRewardItemsMap.computeIfAbsent(key,
-        id -> SpecialRewards.calculateSpecialRewardItemsForMonth(month));
-  }
-
-  public List<ItemStack> getSpecialRewardsForMonth(int month) {
-    return getSpecialRewardsFor(Rewards.getCurrentYear(), month);
-  }
-
-  public List<ItemStack> getSpecialRewardsForCurrentMonth() {
-    return getSpecialRewardsFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth());
-  }
-
-  public CompoundTag getSpecialRewardsForCurrentMonthSyncData() {
-    List<ItemStack> rewardItems = getSpecialRewardsForCurrentMonth();
-    CompoundTag syncData = new CompoundTag();
-    ListTag itemListTag = new ListTag();
-    for (int i = 0; i < rewardItems.size(); ++i) {
-      ItemStack itemStack = rewardItems.get(i);
-      CompoundTag itemStackTag = new CompoundTag();
-      itemStack.save(itemStackTag);
-      itemListTag.add(itemStackTag);
-    }
-    syncData.put(ITEM_LIST_TAG, itemListTag);
-    return syncData;
-  }
-
   public static List<ItemStack> getSpecialRewardsForCurrentMonthSyncData(CompoundTag compoundTag) {
     List<ItemStack> rewardItems = new ArrayList<>();
     if (compoundTag.contains(ITEM_LIST_TAG)) {
@@ -212,41 +127,6 @@ public class RewardData extends SavedData {
       log.error("Unable to load special rewards for current month data from {}!", compoundTag);
     }
     return rewardItems;
-  }
-
-  public ItemStack getSpecialRewardForCurrentMonth(int day) {
-    List<ItemStack> rewards = getSpecialRewardsForCurrentMonth();
-    int rewardIndex = --day;
-    if (rewardIndex >= 0 && rewards.size() > rewardIndex) {
-      return rewards.get(rewardIndex).copy();
-    }
-    return ItemStack.EMPTY;
-  }
-
-  public List<ItemStack> getSpecialRewardsForTheNextDays(int rewardedDay, int nextDays) {
-    List<ItemStack> rewardItems = getSpecialRewardsForCurrentMonth();
-    List<ItemStack> rewardItemsForNextDays = new ArrayList<>();
-    for (int i = rewardedDay; i < rewardedDay + nextDays && i < rewardItems.size(); i++) {
-      rewardItemsForNextDays.add(rewardItems.get(i));
-    }
-    return rewardItemsForNextDays;
-  }
-
-  public void resetRewardDataFor(int year, int month) {
-    log.debug("{} Resetting reward data for {}-{} ...", Constants.LOG_NAME, year, month);
-    rewardItemsMap.get(getKeyId(year, month)).clear();
-    specialRewardItemsMap.get(getKeyId(year, month)).clear();
-  }
-
-  public void resetRewardDataForCurrentMonth() {
-    resetRewardDataFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth());
-  }
-
-  public void clearRewardData() {
-    log.debug("{} Clearing reward data ...", Constants.LOG_NAME);
-    rewardItemsMap.clear();
-    specialRewardItemsMap.clear();
-    this.setDirty();
   }
 
   public static RewardData load(CompoundTag compoundTag) {
@@ -296,6 +176,120 @@ public class RewardData extends SavedData {
     }
 
     return rewardData;
+  }
+
+  public List<ItemStack> getRewardsFor(int year, int month) {
+    String key = getKeyId(year, month);
+    List<ItemStack> rewards = rewardItemsMap.get(key);
+    if (rewards != null && rewards.isEmpty()) {
+      rewardItemsMap.remove(key);
+    }
+    return rewardItemsMap.computeIfAbsent(key, id -> Rewards.calculateRewardItemsForMonth(month));
+  }
+
+  public List<ItemStack> getRewardsForMonth(int month) {
+    return getRewardsFor(Rewards.getCurrentYear(), month);
+  }
+
+  public List<ItemStack> getRewardsForCurrentMonth() {
+    return getRewardsFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth());
+  }
+
+  public List<ItemStack> getRewardsForTheNextDays(int rewardedDay, int nextDays) {
+    List<ItemStack> rewardItems = getRewardsForCurrentMonth();
+    List<ItemStack> rewardItemsForNextDays = new ArrayList<>();
+    for (int i = rewardedDay; i < rewardedDay + nextDays && i < rewardItems.size(); i++) {
+      rewardItemsForNextDays.add(rewardItems.get(i));
+    }
+    return rewardItemsForNextDays;
+  }
+
+  public CompoundTag getRewardsForCurrentMonthSyncData() {
+    List<ItemStack> rewardItems = getRewardsForCurrentMonth();
+    CompoundTag syncData = new CompoundTag();
+    ListTag itemListTag = new ListTag();
+    for (ItemStack itemStack : rewardItems) {
+      CompoundTag itemStackTag = new CompoundTag();
+      itemStack.save(itemStackTag);
+      itemListTag.add(itemStackTag);
+    }
+    syncData.put(ITEM_LIST_TAG, itemListTag);
+    return syncData;
+  }
+
+  public ItemStack getRewardForCurrentMonth(int day) {
+    List<ItemStack> rewards = getRewardsForCurrentMonth();
+    int rewardIndex = --day;
+    if (rewardIndex >= 0 && rewards.size() > rewardIndex) {
+      return rewards.get(rewardIndex).copy();
+    }
+    return ItemStack.EMPTY;
+  }
+
+  public List<ItemStack> getSpecialRewardsFor(int year, int month) {
+    String key = getKeyId(year, month);
+    List<ItemStack> specialRewards = specialRewardItemsMap.get(key);
+    if (specialRewards != null && specialRewards.isEmpty()) {
+      specialRewardItemsMap.remove(key);
+    }
+    return specialRewardItemsMap.computeIfAbsent(key,
+        id -> SpecialRewards.calculateSpecialRewardItemsForMonth(month));
+  }
+
+  public List<ItemStack> getSpecialRewardsForMonth(int month) {
+    return getSpecialRewardsFor(Rewards.getCurrentYear(), month);
+  }
+
+  public List<ItemStack> getSpecialRewardsForCurrentMonth() {
+    return getSpecialRewardsFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth());
+  }
+
+  public CompoundTag getSpecialRewardsForCurrentMonthSyncData() {
+    List<ItemStack> rewardItems = getSpecialRewardsForCurrentMonth();
+    CompoundTag syncData = new CompoundTag();
+    ListTag itemListTag = new ListTag();
+    for (ItemStack itemStack : rewardItems) {
+      CompoundTag itemStackTag = new CompoundTag();
+      itemStack.save(itemStackTag);
+      itemListTag.add(itemStackTag);
+    }
+    syncData.put(ITEM_LIST_TAG, itemListTag);
+    return syncData;
+  }
+
+  public ItemStack getSpecialRewardForCurrentMonth(int day) {
+    List<ItemStack> rewards = getSpecialRewardsForCurrentMonth();
+    int rewardIndex = --day;
+    if (rewardIndex >= 0 && rewards.size() > rewardIndex) {
+      return rewards.get(rewardIndex).copy();
+    }
+    return ItemStack.EMPTY;
+  }
+
+  public List<ItemStack> getSpecialRewardsForTheNextDays(int rewardedDay, int nextDays) {
+    List<ItemStack> rewardItems = getSpecialRewardsForCurrentMonth();
+    List<ItemStack> rewardItemsForNextDays = new ArrayList<>();
+    for (int i = rewardedDay; i < rewardedDay + nextDays && i < rewardItems.size(); i++) {
+      rewardItemsForNextDays.add(rewardItems.get(i));
+    }
+    return rewardItemsForNextDays;
+  }
+
+  public void resetRewardDataFor(int year, int month) {
+    log.debug("{} Resetting reward data for {}-{} ...", Constants.LOG_NAME, year, month);
+    rewardItemsMap.get(getKeyId(year, month)).clear();
+    specialRewardItemsMap.get(getKeyId(year, month)).clear();
+  }
+
+  public void resetRewardDataForCurrentMonth() {
+    resetRewardDataFor(Rewards.getCurrentYear(), Rewards.getCurrentMonth());
+  }
+
+  public void clearRewardData() {
+    log.debug("{} Clearing reward data ...", Constants.LOG_NAME);
+    rewardItemsMap.clear();
+    specialRewardItemsMap.clear();
+    this.setDirty();
   }
 
   @Override

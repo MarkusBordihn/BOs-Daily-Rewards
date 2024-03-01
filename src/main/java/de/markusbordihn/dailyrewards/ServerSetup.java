@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,25 +19,22 @@
 
 package de.markusbordihn.dailyrewards;
 
-import java.util.List;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.item.ItemStack;
-
-import net.minecraftforge.event.server.ServerStartingEvent;
-
 import de.markusbordihn.dailyrewards.data.RewardData;
 import de.markusbordihn.dailyrewards.data.RewardUserData;
 import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
+import java.util.List;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.event.server.ServerStartingEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ServerSetup {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  protected ServerSetup() {}
+  protected ServerSetup() {
+  }
 
   public static void handleServerStartingEvent(ServerStartingEvent event) {
     MinecraftServer server = event.getServer();
