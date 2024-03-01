@@ -13,7 +13,8 @@ plugins {
   id 'eclipse'
   id 'maven-publish'
   id 'net.minecraftforge.gradle' version '5.1.+'
-  id 'nu.studer.credentials' version '1.0.7'
+  id 'nu.studer.credentials' version '3.0'
+  id "com.modrinth.minotaur" version "2.+"
 }
 
 version = "${version_major}.${version_minor}.${version_patch}"
@@ -171,17 +172,32 @@ publishing {
   }
 }
 
+tasks.withType(JavaCompile).configureEach {
+  options.encoding = 'UTF-8'
+}
+
 curseforge {
-  apiKey = "${credentials.curseforge_api_token}"
+  apiKey = "${credentials.forKey('curseforge_api_token')}"
   project {
     id = "${curseforge_project_id}"
-    changelog = 'See https://github.com/MarkusBordihn/BOs-Daily-Rewards/commits/main'
-    releaseType = 'beta'
-    addGameVersion("1.19.4")
+    changelog = 'See https://github.com/MarkusBordihn/BOs-Daily-Rewards/commits/1.19.3'
+    changelogType = 'markdown'
+    releaseType = "${curseforge_release_type}"
+    addGameVersion("${mc_version}")
     addGameVersion("Forge")
+  }
+  options {
+    forgeGradleIntegration = true
   }
 }
 
-tasks.withType(JavaCompile).configureEach {
-  options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+modrinth {
+  token = "${credentials.forKey('modrinth_api_token')}"
+  projectId = "${modrinth_project_id}"
+  versionNumber = "${version}"
+  versionType = "${modrinth_release_type}"
+  versionName = "${mod_name} ${version}"
+  uploadFile = jar
+  gameVersions = ["${mc_version}"]
+  loaders = ["forge"]
 }
