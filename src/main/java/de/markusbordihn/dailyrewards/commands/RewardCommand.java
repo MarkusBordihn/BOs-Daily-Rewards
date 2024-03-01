@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2022 Markus Bordihn
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,28 +19,25 @@
 
 package de.markusbordihn.dailyrewards.commands;
 
-import java.util.List;
-import java.util.UUID;
-
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
+import de.markusbordihn.dailyrewards.Constants;
+import de.markusbordihn.dailyrewards.data.RewardData;
+import de.markusbordihn.dailyrewards.data.RewardUserData;
+import de.markusbordihn.dailyrewards.rewards.Rewards;
+import java.util.List;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-
-import de.markusbordihn.dailyrewards.Constants;
-import de.markusbordihn.dailyrewards.data.RewardData;
-import de.markusbordihn.dailyrewards.data.RewardUserData;
-import de.markusbordihn.dailyrewards.rewards.Rewards;
 
 public class RewardCommand extends CustomCommand {
 
@@ -54,35 +51,25 @@ public class RewardCommand extends CustomCommand {
   public static ArgumentBuilder<CommandSourceStack, ?> register() {
     return Commands.literal("reward").requires(cs -> cs.hasPermission(Commands.LEVEL_GAMEMASTERS))
         .executes(command).then(Commands.literal("today")
-            .then(Commands.argument(PLAYER_ARGUMENT, EntityArgument.player()).executes(context -> {
-              return rewardPlayerToday(context.getSource(),
-                  EntityArgument.getPlayer(context, PLAYER_ARGUMENT));
-            })))
+            .then(Commands.argument(PLAYER_ARGUMENT, EntityArgument.player())
+                .executes(context -> rewardPlayerToday(context.getSource(),
+                    EntityArgument.getPlayer(context, PLAYER_ARGUMENT)))))
         .executes(command).then(Commands.literal("add")
-            .then(Commands.argument(PLAYER_ARGUMENT, EntityArgument.player()).executes(context -> {
-              return addRewardForPlayer(context.getSource(),
-                  EntityArgument.getPlayer(context, PLAYER_ARGUMENT));
-            })))
+            .then(Commands.argument(PLAYER_ARGUMENT, EntityArgument.player())
+                .executes(context -> addRewardForPlayer(context.getSource(),
+                    EntityArgument.getPlayer(context, PLAYER_ARGUMENT)))))
         .executes(command).then(Commands.literal("list")
-            .then(Commands.argument(PLAYER_ARGUMENT, EntityArgument.player()).executes(context -> {
-              return listRewardForPlayer(context.getSource(),
-                  EntityArgument.getPlayer(context, PLAYER_ARGUMENT));
-            })))
+            .then(Commands.argument(PLAYER_ARGUMENT, EntityArgument.player())
+                .executes(context -> listRewardForPlayer(context.getSource(),
+                    EntityArgument.getPlayer(context, PLAYER_ARGUMENT)))))
         .executes(command).then(Commands.literal("remove")
-            .then(Commands.argument(PLAYER_ARGUMENT, EntityArgument.player()).executes(context -> {
-              return removeRewardForPlayer(context.getSource(),
-                  EntityArgument.getPlayer(context, PLAYER_ARGUMENT));
-            })))
+            .then(Commands.argument(PLAYER_ARGUMENT, EntityArgument.player())
+                .executes(context -> removeRewardForPlayer(context.getSource(),
+                    EntityArgument.getPlayer(context, PLAYER_ARGUMENT)))))
         .executes(command).then(Commands.literal("clear")
-            .then(Commands.argument(PLAYER_ARGUMENT, EntityArgument.player()).executes(context -> {
-              return clearRewardForPlayer(context.getSource(),
-                  EntityArgument.getPlayer(context, PLAYER_ARGUMENT));
-            })));
-  }
-
-  @Override
-  public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-    return 0;
+            .then(Commands.argument(PLAYER_ARGUMENT, EntityArgument.player())
+                .executes(context -> clearRewardForPlayer(context.getSource(),
+                    EntityArgument.getPlayer(context, PLAYER_ARGUMENT)))));
   }
 
   private static int listRewardForPlayer(CommandSourceStack context, ServerPlayer player) {
@@ -207,6 +194,11 @@ public class RewardCommand extends CustomCommand {
 
     context.sendSuccess(Component.literal("Rewards cleared for ").append(player.getName()), true);
 
+    return 0;
+  }
+
+  @Override
+  public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     return 0;
   }
 

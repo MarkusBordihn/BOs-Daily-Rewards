@@ -15,7 +15,6 @@
   "text.daily_rewards.unclaimed_rewarded_item_today": "%1$s you have unclaimed daily rewards, please make sure to claim them today!!!",
   "text.daily_rewards.unclaimed_special_rewarded_item": "%1$s you have unclaimed daily special rewards, please make sure to claim them in the next %2$s days!",
   "text.daily_rewards.unclaimed_special_rewarded_item_today": "%1$s you have unclaimed daily special rewards, please make sure to claim them today!!!",
-
   "text.daily_rewards.empty_reward.description": "There is no daily rewards for this day for this month.",
   "text.daily_rewards.hidden_reward.description": "This reward is hidden, you can't claim it until you unlock it.",
   "text.daily_rewards.lock_day.description": "This day is locked, you can't claim your daily rewards for this day for this month.",
@@ -23,7 +22,6 @@
   "text.daily_rewards.skipped_day.description": "This day was skipped, a small step to claim your next daily rewards for this month.",
   "text.daily_rewards.taken_reward.description": "You have already taken your daily rewards for this day for this month.",
   "text.daily_rewards.unlock_day.description": "This day was unlocked, a small step to claim your next daily rewards for this month.",
-
   "text.daily_rewards.claim_today.info": "\u2714 You can claim this reward today.",
   "text.daily_rewards.claimable_in_days.info": "\u2139 You can claim this reward in about %1$s days!",
   "text.daily_rewards.claimable_reward.info": "\u2714 This reward can be claimed!",
@@ -36,7 +34,6 @@
   "text.daily_rewards.unlocked_day.info": "\u2714 This day was already unlocked!",
   "text.daily_rewards.open_special_reward_screen.info": "\u2714 Open the special reward screen!",
   "text.daily_rewards.open_default_reward_screen.info": "\u2714 Open the default reward screen!",
-
   "item.daily_rewards.empty_reward": "No reward",
   "item.daily_rewards.hidden_reward": "Hidden reward",
   "item.daily_rewards.lock_day": "Locked day",
