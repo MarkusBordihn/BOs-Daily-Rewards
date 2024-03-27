@@ -41,15 +41,18 @@ public class DailyRewards {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
+  public DailyRewards() {
+  }
+
   public static void init() {
-    StopModReposts.checkStopModReposts();
+    // StopModReposts.checkStopModReposts();
 
     log.info("Register Items ...");
     ModItems.ITEMS.register();
     log.info("{} Menu Types ...", Constants.LOG_REGISTER_PREFIX);
     ModMenuTypes.MENU_TYPES.register();
 
-    if(Platform.getEnvironment() == Env.CLIENT) {
+    if (Platform.getEnvironment() == Env.CLIENT) {
       ClientScreens.registerScreens();
     }
 
@@ -66,5 +69,4 @@ public class DailyRewards {
 
     LifecycleEvent.SERVER_BEFORE_START.register(Rewards::handleServerAboutToStartEvent);
   }
-
 }

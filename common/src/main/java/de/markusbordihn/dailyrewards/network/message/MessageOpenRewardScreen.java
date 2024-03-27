@@ -34,9 +34,7 @@ public class MessageOpenRewardScreen extends ModMessage<ServerGamePacketListener
 
   protected RewardScreenType rewardScreenType;
 
-  public MessageOpenRewardScreen() {
-
-  }
+  public MessageOpenRewardScreen() {}
 
   public MessageOpenRewardScreen(RewardScreenType rewardScreenType) {
     this.rewardScreenType = rewardScreenType;
@@ -60,7 +58,7 @@ public class MessageOpenRewardScreen extends ModMessage<ServerGamePacketListener
     RewardScreenType rewardScreenType = this.rewardScreenType;
     if (rewardScreenType == null) {
       log.warn(
-              "Unable to open reward screen for player {} due to missing reward screen type!", player);
+          "Unable to open reward screen for player {} due to missing reward screen type!", player);
       return;
     }
 
@@ -68,14 +66,14 @@ public class MessageOpenRewardScreen extends ModMessage<ServerGamePacketListener
     log.debug("Opening reward screen for player {} with type {} ...", player, rewardScreenType);
 
     switch (rewardScreenType) {
-        case COMPACT -> RewardsScreen.openRewardCompactMenuForPlayer(player);
-        case DEFAULT_OVERVIEW -> RewardsScreen.openRewardOverviewMenuForPlayer(player);
-        case SPECIAL_OVERVIEW -> RewardsScreen.openRewardSpecialOverviewMenuForPlayer(player);
-        default -> log.warn(
-                "Unable to open reward screen for player {} due to unknown reward screen type {}!",
-                player,
-                rewardScreenType);
+      case COMPACT -> RewardsScreen.openRewardCompactMenuForPlayer(player);
+      case DEFAULT_OVERVIEW -> RewardsScreen.openRewardOverviewMenuForPlayer(player);
+      case SPECIAL_OVERVIEW -> RewardsScreen.openRewardSpecialOverviewMenuForPlayer(player);
+      default ->
+          log.warn(
+              "Unable to open reward screen for player {} due to unknown reward screen type {}!",
+              player,
+              rewardScreenType);
     }
   }
-
 }

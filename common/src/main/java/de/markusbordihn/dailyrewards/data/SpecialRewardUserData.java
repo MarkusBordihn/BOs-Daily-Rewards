@@ -23,6 +23,12 @@ import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 import dev.architectury.utils.GameInstance;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
@@ -32,9 +38,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class SpecialRewardUserData extends SavedData {
 
@@ -47,15 +50,15 @@ public class SpecialRewardUserData extends SavedData {
   public static final String YEAR_MONTH_USER_TAG = "YearMonthUser";
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
   private static final String FILE_ID = Constants.MOD_ID + "_user_special";
-
+  private static final HashSet<UUID> rewardPlayers = new HashSet<>();
+  private static final ConcurrentHashMap<String, List<ItemStack>> rewardItemsMap =
+      new ConcurrentHashMap<>();
+  private static final ConcurrentHashMap<String, Integer> rewardedDaysMap =
+      new ConcurrentHashMap<>();
+  private static final ConcurrentHashMap<String, String> lastRewardedDayMap =
+      new ConcurrentHashMap<>();
   private static MinecraftServer server;
   private static SpecialRewardUserData data;
-
-  private static HashSet<UUID> rewardPlayers = new HashSet<>();
-  private static ConcurrentHashMap<String, List<ItemStack>> rewardItemsMap =
-      new ConcurrentHashMap<>();
-  private static ConcurrentHashMap<String, Integer> rewardedDaysMap = new ConcurrentHashMap<>();
-  private static ConcurrentHashMap<String, String> lastRewardedDayMap = new ConcurrentHashMap<>();
 
   public SpecialRewardUserData() {
     this.setDirty();

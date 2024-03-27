@@ -5,9 +5,8 @@ import net.fabricmc.api.ModInitializer;
 
 public class DailyRewardsFabric implements ModInitializer {
 
-    @Override
-    public void onInitialize() {
-        DailyRewards.init();
-    }
-
+  @Override
+  public void onInitialize() {
+    DailyRewards.init();
+  }
 }

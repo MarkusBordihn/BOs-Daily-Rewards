@@ -2,25 +2,19 @@
   "schemaVersion": 1,
   "id": "daily_rewards",
   "version": "${version}",
-
   "name": "Daily Rewards",
   "description": "Daily rewards is a very lightweight and simple Forge mod that rewards players daily.",
-  "authors": [ "Markus Bordihn" ],
+  "authors": ["Markus Bordihn"],
   "contact": {},
-
   "license": "MIT",
   "icon": "logo.png",
-
   "environment": "*",
   "entrypoints": {
     "main": [
       "de.markusbordihn.dailyrewards.fabric.DailyRewardsFabric"
     ]
   },
-  "mixins": [
-    "daily_rewards-common.mixins.json",
-    "daily_rewards-fabric.mixins.json"
-  ],
+  "mixins": [],
   "depends": {
     "fabricloader": ">=0.15.7",
     "minecraft": ">=1.20.1"

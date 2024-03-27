@@ -23,6 +23,6 @@ public enum RewardScreenType {
   // @formatter:off
   COMPACT,
   DEFAULT_OVERVIEW,
-  SPECIAL_OVERVIEW;
+  SPECIAL_OVERVIEW
   // @formatter:on
 }

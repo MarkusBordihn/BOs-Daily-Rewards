@@ -40,7 +40,7 @@ public class TestCommand extends CustomCommand {
   }
 
   @Override
-  public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+  public int run(CommandContext<CommandSourceStack> context) {
     sendFeedback(context, "This command allows you to test the different kind of reward screens.");
     return 0;
   }

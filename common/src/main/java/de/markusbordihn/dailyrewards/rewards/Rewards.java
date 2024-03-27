@@ -19,24 +19,23 @@
 
 package de.markusbordihn.dailyrewards.rewards;
 
+import static de.markusbordihn.dailyrewards.config.ModConfigs.COMMON;
+
 import de.markusbordihn.dailyrewards.Constants;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.*;
+import java.util.stream.Collectors;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static de.markusbordihn.dailyrewards.config.ModConfigs.COMMON;
-
 public class Rewards {
 
   protected static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
-  
+
   protected static final Random random = new Random();
 
   protected Rewards() {}
@@ -57,8 +56,7 @@ public class Rewards {
     List<ItemStack> rewardItemsForMonth = getRewardItemForMonth(month);
 
     // Early return if we have matching items without shuffle.
-    if (Boolean.TRUE.equals(!COMMON.useFillItems)
-        || rewardItemsForMonth.size() >= numberOfDays) {
+    if (Boolean.TRUE.equals(!COMMON.useFillItems) || rewardItemsForMonth.size() >= numberOfDays) {
       if (Boolean.FALSE.equals(COMMON.useFillItems)) {
         log.info(
             "Fill items are disabled, will use {} reward items for month {} with {} days ...",
@@ -92,8 +90,7 @@ public class Rewards {
 
     // Chances for different items types.
     int rareFillItemsChance = rareFillItems.isEmpty() ? 0 : COMMON.rareFillItemsChance;
-    int lootBackFillItemChance =
-        lootBagFillItems.isEmpty() ? 0 : COMMON.lootBagFillItemsChance;
+    int lootBackFillItemChance = lootBagFillItems.isEmpty() ? 0 : COMMON.lootBagFillItemsChance;
 
     // Fill missing reward items.
     log.warn(

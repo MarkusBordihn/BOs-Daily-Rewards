@@ -19,11 +19,9 @@
 
 package de.markusbordihn.dailyrewards.rewards;
 
-import de.markusbordihn.dailyrewards.Constants;
-import net.minecraft.world.item.ItemStack;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import static de.markusbordihn.dailyrewards.config.ModConfigs.COMMON;
 
+import de.markusbordihn.dailyrewards.Constants;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -31,8 +29,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
-
-import static de.markusbordihn.dailyrewards.config.ModConfigs.COMMON;
+import net.minecraft.world.item.ItemStack;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class SpecialRewards {
 

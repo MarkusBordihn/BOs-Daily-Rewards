@@ -21,11 +21,12 @@ package de.markusbordihn.dailyrewards.commands;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.data.RewardData;
 import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
+import java.util.List;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -36,9 +37,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.List;
-import java.util.UUID;
 
 public class RewardSpecialCommand extends CustomCommand {
 
@@ -122,7 +120,7 @@ public class RewardSpecialCommand extends CustomCommand {
         Component.literal("Special Rewards for ")
             .append(player.getName())
             .append(" (")
-            .append("" + rewardedDays + " of " + daysCurrentMonth + " days")
+            .append(rewardedDays + " of " + daysCurrentMonth + " days")
             .append(" / ")
             .append(lastRewardedDay)
             .append(")");
@@ -267,7 +265,7 @@ public class RewardSpecialCommand extends CustomCommand {
   }
 
   @Override
-  public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+  public int run(CommandContext<CommandSourceStack> context) {
     return 0;
   }
 }

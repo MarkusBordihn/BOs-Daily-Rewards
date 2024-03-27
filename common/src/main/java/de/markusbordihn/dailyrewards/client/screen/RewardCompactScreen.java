@@ -25,6 +25,9 @@ import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.menu.RewardCompactMenu;
 import de.markusbordihn.dailyrewards.menu.slots.*;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
@@ -32,10 +35,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
 
@@ -200,11 +199,6 @@ public class RewardCompactScreen extends RewardScreen<RewardCompactMenu> {
         y,
         0x666666,
         false);
-  }
-
-  @Override
-  public void init() {
-    super.init();
   }
 
   @Override

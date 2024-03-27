@@ -19,6 +19,8 @@
 
 package de.markusbordihn.dailyrewards.player;
 
+import static de.markusbordihn.dailyrewards.config.ModConfigs.COMMON;
+
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.data.RewardData;
 import de.markusbordihn.dailyrewards.data.RewardUserData;
@@ -26,6 +28,9 @@ import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 import de.markusbordihn.dailyrewards.rewards.RewardsScreen;
 import de.markusbordihn.dailyrewards.rewards.SpecialRewards;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -37,16 +42,10 @@ import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static de.markusbordihn.dailyrewards.config.ModConfigs.COMMON;
-
 public class PlayerRewardManager {
 
   private static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
-  
+
   private static final short REWARD_CHECK_TICK = 20 * 60; // every 1 Minute
   private static final MutableComponent claimCommand =
       Component.literal("/DailyRewards claim")

@@ -19,6 +19,8 @@
 
 package de.markusbordihn.dailyrewards.commands;
 
+import static de.markusbordihn.dailyrewards.config.ModConfigs.COMMON;
+
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -26,8 +28,6 @@ import de.markusbordihn.dailyrewards.rewards.RewardsScreen;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
-
-import static de.markusbordihn.dailyrewards.config.ModConfigs.COMMON;
 
 public class ClaimCommand extends CustomCommand {
   private static final ClaimCommand command = new ClaimCommand();

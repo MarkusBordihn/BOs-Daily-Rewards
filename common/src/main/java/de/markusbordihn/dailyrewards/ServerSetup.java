@@ -22,12 +22,11 @@ package de.markusbordihn.dailyrewards;
 import de.markusbordihn.dailyrewards.data.RewardData;
 import de.markusbordihn.dailyrewards.data.RewardUserData;
 import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
+import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.List;
 
 public class ServerSetup {
 
@@ -55,5 +54,4 @@ public class ServerSetup {
       log.info("Special Rewards for this Month: {}", specialRewardItems);
     }
   }
-
 }

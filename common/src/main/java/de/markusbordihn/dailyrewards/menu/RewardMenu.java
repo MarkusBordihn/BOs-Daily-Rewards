@@ -25,6 +25,9 @@ import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
 import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.menu.slots.*;
 import de.markusbordihn.dailyrewards.rewards.SpecialRewards;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -36,10 +39,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public class RewardMenu extends AbstractContainerMenu {
 
@@ -56,13 +55,13 @@ public class RewardMenu extends AbstractContainerMenu {
   private static final List<ItemStack> USER_SPECIAL_REWARDS_FOR_CURRENT_MONTH = new ArrayList<>();
   protected final Level level;
   protected final Player player;
+  protected final boolean specialRewardAvailable;
   // Reward Data
   protected int rewardedDays = 0;
   protected String lastRewardedDay;
   // Special Reward Data
   protected int rewardedSpecialDays = 0;
   protected String lastRewardedSpecialDay;
-  protected boolean specialRewardAvailable = true;
   // Misc
   protected UUID playerUUID;
 

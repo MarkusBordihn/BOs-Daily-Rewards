@@ -33,7 +33,10 @@ public class CommandManager {
 
   protected CommandManager() {}
 
-  public static void handleRegisterCommandsEvent(CommandDispatcher<CommandSourceStack> commandDispatcher, CommandBuildContext commandBuildContext, Commands.CommandSelection commandSelection) {
+  public static void handleRegisterCommandsEvent(
+      CommandDispatcher<CommandSourceStack> commandDispatcher,
+      CommandBuildContext commandBuildContext,
+      Commands.CommandSelection commandSelection) {
     log.info("Registering {} commands ...", Constants.MOD_COMMAND);
 
     commandDispatcher.register(
@@ -48,5 +51,4 @@ public class CommandManager {
         // @formatter:on
         );
   }
-
 }

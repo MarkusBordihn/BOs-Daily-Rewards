@@ -33,12 +33,15 @@ public class ClientScreens {
   protected ClientScreens() {}
 
   public static void registerScreens() {
-    ClientLifecycleEvent.CLIENT_SETUP.register(minecraft -> {
-      log.info("{} Client Screens ...", Constants.LOG_REGISTER_PREFIX);
-      MenuRegistry.registerScreenFactory(ModMenuTypes.REWARD_COMPACT_MENU.get(), RewardCompactScreen::new);
-      MenuRegistry.registerScreenFactory(ModMenuTypes.REWARD_OVERVIEW_MENU.get(), RewardDefaultOverviewScreen::new);
-      MenuRegistry.registerScreenFactory(ModMenuTypes.REWARD_SPECIAL_OVERVIEW_MENU.get(), RewardSpecialOverviewScreen::new);
-    });
+    ClientLifecycleEvent.CLIENT_SETUP.register(
+        minecraft -> {
+          log.info("{} Client Screens ...", Constants.LOG_REGISTER_PREFIX);
+          MenuRegistry.registerScreenFactory(
+              ModMenuTypes.REWARD_COMPACT_MENU.get(), RewardCompactScreen::new);
+          MenuRegistry.registerScreenFactory(
+              ModMenuTypes.REWARD_OVERVIEW_MENU.get(), RewardDefaultOverviewScreen::new);
+          MenuRegistry.registerScreenFactory(
+              ModMenuTypes.REWARD_SPECIAL_OVERVIEW_MENU.get(), RewardSpecialOverviewScreen::new);
+        });
   }
-
 }

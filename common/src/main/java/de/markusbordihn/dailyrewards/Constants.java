@@ -60,5 +60,5 @@ public final class Constants {
   public static final ResourceLocation TEXTURE_SPECIAL_OVERVIEW_SCREEN =
       new ResourceLocation(Constants.MOD_ID, "textures/container/special_overview_screen.png");
 
-  protected Constants() {}
+  private Constants() {}
 }

@@ -23,6 +23,10 @@ import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
 import de.markusbordihn.dailyrewards.rewards.SpecialRewards;
 import dev.architectury.utils.GameInstance;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
@@ -32,11 +36,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class RewardData extends SavedData {
 
@@ -49,14 +48,12 @@ public class RewardData extends SavedData {
   public static final String YEAR_MONTH_TAG = "YearMonth";
 
   private static final String FILE_ID = Constants.MOD_ID;
-
+  private static final ConcurrentHashMap<String, List<ItemStack>> rewardItemsMap =
+      new ConcurrentHashMap<>();
+  private static final ConcurrentHashMap<String, List<ItemStack>> specialRewardItemsMap =
+      new ConcurrentHashMap<>();
   private static MinecraftServer server;
   private static RewardData data;
-
-  private static ConcurrentHashMap<String, List<ItemStack>> rewardItemsMap =
-      new ConcurrentHashMap<>();
-  private static ConcurrentHashMap<String, List<ItemStack>> specialRewardItemsMap =
-      new ConcurrentHashMap<>();
 
   public RewardData() {
     this.setDirty();

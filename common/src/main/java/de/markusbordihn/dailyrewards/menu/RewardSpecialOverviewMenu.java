@@ -25,6 +25,9 @@ import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
 import de.markusbordihn.dailyrewards.menu.slots.EmptyRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
 import de.markusbordihn.dailyrewards.rewards.SpecialRewards;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
@@ -33,10 +36,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public class RewardSpecialOverviewMenu extends RewardMenu {
 
@@ -50,11 +49,11 @@ public class RewardSpecialOverviewMenu extends RewardMenu {
   public static final int REWARD_SLOT_START_POSITION_X = 8;
   public static final int REWARD_SLOT_START_POSITION_Y = 20;
   // Defining basic layout options
-  private static int containerSize = 32;
-  private static int slotSize = 18;
+  private static final int containerSize = 32;
+  private static final int slotSize = 18;
   // Container
-  private Container specialRewardsContainer = new SimpleContainer(containerSize);
-  private Container specialRewardsUserContainer = new SimpleContainer(containerSize);
+  private final Container specialRewardsContainer = new SimpleContainer(containerSize);
+  private final Container specialRewardsUserContainer = new SimpleContainer(containerSize);
 
   // Rewards Data
   private List<ItemStack> specialRewardsForCurrentMonth = new ArrayList<>();

@@ -9,9 +9,9 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 @Mod(Constants.MOD_ID)
 public class DailyRewardsForge {
 
-    public DailyRewardsForge() {
-        EventBuses.registerModEventBus(Constants.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
-        DailyRewards.init();
-    }
-
+  public DailyRewardsForge() {
+    EventBuses.registerModEventBus(
+        Constants.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
+    DailyRewards.init();
+  }
 }

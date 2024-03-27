@@ -19,6 +19,8 @@
 
 package de.markusbordihn.dailyrewards.menu;
 
+import static de.markusbordihn.dailyrewards.config.ModConfigs.COMMON;
+
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.data.RewardData;
 import de.markusbordihn.dailyrewards.data.RewardUserData;
@@ -27,6 +29,9 @@ import de.markusbordihn.dailyrewards.menu.slots.EmptyRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.HiddenRewardSlot;
 import de.markusbordihn.dailyrewards.menu.slots.RewardSlot;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
@@ -35,12 +40,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import static de.markusbordihn.dailyrewards.config.ModConfigs.COMMON;
 
 public class RewardCompactMenu extends RewardMenu {
 
@@ -55,13 +54,13 @@ public class RewardCompactMenu extends RewardMenu {
   public static final int REWARD_SLOT_START_POSITION_Y = 45;
   public static final int REWARD_SLOT_SPACE_X = 2;
   // Defining basic layout options
-  private static int containerSize = 32;
-  private static int slotSize = 18;
+  private static final int containerSize = 32;
+  private static final int slotSize = 18;
   // Container
-  private Container rewardsContainer = new SimpleContainer(containerSize);
-  private Container rewardsUserContainer = new SimpleContainer(containerSize);
-  private Container specialRewardsContainer = new SimpleContainer(containerSize);
-  private Container specialRewardsUserContainer = new SimpleContainer(containerSize);
+  private final Container rewardsContainer = new SimpleContainer(containerSize);
+  private final Container rewardsUserContainer = new SimpleContainer(containerSize);
+  private final Container specialRewardsContainer = new SimpleContainer(containerSize);
+  private final Container specialRewardsUserContainer = new SimpleContainer(containerSize);
 
   // Rewards Data
   private List<ItemStack> rewardsForCurrentMonth = new ArrayList<>();
@@ -248,7 +247,7 @@ public class RewardCompactMenu extends RewardMenu {
             new EmptyRewardSlot(
                 this.rewardsContainer, slotIndex, slotStartPositionX, slotStartPositionY));
       }
-      slotStartPositionX += REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X;
+      slotStartPositionX += (int) (REWARD_SLOT_SIZE_X + REWARD_SLOT_SPACE_X);
     }
 
     // Only show special rewards if we have any.

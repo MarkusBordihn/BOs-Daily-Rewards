@@ -22,11 +22,10 @@ package de.markusbordihn.dailyrewards.utils;
 import de.markusbordihn.dailyrewards.Constants;
 import de.markusbordihn.dailyrewards.DailyRewards;
 import dev.architectury.platform.Platform;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.net.URISyntaxException;
 import java.util.regex.Pattern;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class StopModReposts {
 
@@ -34,11 +33,11 @@ public class StopModReposts {
 
   private static final String STOP_MOD_REPOSTS_URL = "https://stopmodreposts.org/";
 
-  private static boolean isDevEnvironment = Platform.isDevelopmentEnvironment();
+  private static final boolean isDevEnvironment = Platform.isDevelopmentEnvironment();
 
-  private static String modFileFormatRegEx = Constants.MOD_ID + "_1.20.1-\\d+.\\d+.\\d+.jar";
+  private static final String modFileFormatRegEx = Constants.MOD_ID + "_1.20.1-\\d+.\\d+.\\d+.jar";
 
-  private static Pattern expectedFilePattern = Pattern.compile(modFileFormatRegEx);
+  private static final Pattern expectedFilePattern = Pattern.compile(modFileFormatRegEx);
 
   protected StopModReposts() {}
 

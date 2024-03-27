@@ -21,16 +21,14 @@ package de.markusbordihn.dailyrewards.commands;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.markusbordihn.dailyrewards.config.ModConfigs;
 import de.markusbordihn.dailyrewards.data.RewardData;
 import de.markusbordihn.dailyrewards.data.RewardUserData;
 import de.markusbordihn.dailyrewards.data.SpecialRewardUserData;
+import java.util.List;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.List;
 
 public class ConfigCommand extends CustomCommand {
   private static final ConfigCommand command = new ConfigCommand();
@@ -45,7 +43,7 @@ public class ConfigCommand extends CustomCommand {
   }
 
   @Override
-  public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+  public int run(CommandContext<CommandSourceStack> context) {
     sendFeedback(
         context,
         """

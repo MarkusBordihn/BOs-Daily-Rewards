@@ -25,6 +25,7 @@ import de.markusbordihn.dailyrewards.item.ModItems;
 import de.markusbordihn.dailyrewards.menu.RewardMenu;
 import de.markusbordihn.dailyrewards.menu.slots.*;
 import de.markusbordihn.dailyrewards.rewards.Rewards;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -36,8 +37,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.List;
 
 public class RewardScreen<T extends RewardMenu> extends AbstractContainerScreen<T> {
 

@@ -20,17 +20,16 @@
 package de.markusbordihn.dailyrewards.item;
 
 import de.markusbordihn.dailyrewards.Constants;
+import java.util.List;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
-import java.util.List;
-
 public class RewardSlotItem extends Item {
 
-  private String descriptionTextId;
+  private final String descriptionTextId;
 
   public RewardSlotItem(Properties properties, String descriptionTextId) {
     super(properties);
@@ -39,10 +38,7 @@ public class RewardSlotItem extends Item {
 
   @Override
   public void appendHoverText(
-      ItemStack itemStack,
-      Level level,
-      List<Component> tooltipList,
-      TooltipFlag tooltipFlag) {
+      ItemStack itemStack, Level level, List<Component> tooltipList, TooltipFlag tooltipFlag) {
     if (this.descriptionTextId == null || this.descriptionTextId.isEmpty()) {
       return;
     }

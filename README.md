@@ -21,6 +21,12 @@ Daily rewards is a very lightweight and simple Forge mod that rewards players da
 
 Please report issues over the issue link above.
 
+## Credits for the 6.x Fabric port
+
+Thanks a lot to [KaptainWutax](https://github.com/KaptainWutax) for converting the project to
+Architectury API to be able to provide a Fabric port.
+Please keep in mind that the 6.x Fabric version is currently in beta and might have some issues.
+
 ## License
 
 The MIT [LICENSE.md](LICENSE.md) applies only to the code in this repository. Images, models and

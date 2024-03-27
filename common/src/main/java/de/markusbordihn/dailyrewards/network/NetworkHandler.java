@@ -26,6 +26,8 @@ import dev.architectury.networking.NetworkChannel;
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.platform.Platform;
 import dev.architectury.utils.Env;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.PacketListener;
@@ -35,53 +37,40 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 public class NetworkHandler {
 
   public static final Logger log = LogManager.getLogger(Constants.LOG_NAME);
 
-  public static final NetworkChannel INSTANCE = NetworkChannel.create(new ResourceLocation(Constants.MOD_ID, "network"));
+  public static final NetworkChannel INSTANCE =
+      NetworkChannel.create(new ResourceLocation(Constants.MOD_ID, "network"));
 
   public static void registerNetworkHandler() {
     log.info("{} Network Handler...", Constants.LOG_REGISTER_PREFIX);
 
-    if(Platform.getEnvironment() == Env.CLIENT) {
+    if (Platform.getEnvironment() == Env.CLIENT) {
       Client.register();
     } else {
       Server.register();
     }
   }
 
-  public static class Client {
-    public static final Function<NetworkManager.PacketContext, ClientPacketListener> CLIENT_PLAY = context -> Minecraft.getInstance().getConnection();
-    public static final Function<NetworkManager.PacketContext, ServerGamePacketListenerImpl> SERVER_PLAY = context -> ((ServerPlayer)context.getPlayer()).connection;
-
-    public static void register() {
-      NetworkHandler.register(MessageOpenRewardScreen.class, MessageOpenRewardScreen::new, SERVER_PLAY);
-    }
-  }
-
-  public static class Server {
-    public static final Function<NetworkManager.PacketContext, ServerGamePacketListenerImpl> SERVER_PLAY = context -> ((ServerPlayer)context.getPlayer()).connection;
-
-    public static void register() {
-      NetworkHandler.register(MessageOpenRewardScreen.class, MessageOpenRewardScreen::new, SERVER_PLAY);
-    }
-  }
-
-  public static <R extends PacketListener, T extends ModMessage<R>> void register(Class<T> type, Supplier<T> packetSupplier,
-                                                                                  Function<NetworkManager.PacketContext, R> contextMapper) {
-    INSTANCE.register(type, ModMessage::write, packetByteBuf -> {
-      T packet = packetSupplier.get();
-      packet.read(packetByteBuf);
-      return packet;
-    }, (packet, contextSupplier) -> {
-      if(contextMapper != null) {
-        packet.handle(contextMapper.apply(contextSupplier.get()));
-      }
-    });
+  public static <R extends PacketListener, T extends ModMessage<R>> void register(
+      Class<T> type,
+      Supplier<T> packetSupplier,
+      Function<NetworkManager.PacketContext, R> contextMapper) {
+    INSTANCE.register(
+        type,
+        ModMessage::write,
+        packetByteBuf -> {
+          T packet = packetSupplier.get();
+          packet.read(packetByteBuf);
+          return packet;
+        },
+        (packet, contextSupplier) -> {
+          if (contextMapper != null) {
+            packet.handle(contextMapper.apply(contextSupplier.get()));
+          }
+        });
   }
 
   public static <M> void sendToServer(M message) {
@@ -101,6 +90,28 @@ public class NetworkHandler {
           message,
           serverPlayer.getName().getString(),
           e.getMessage());
+    }
+  }
+
+  public static class Client {
+    public static final Function<NetworkManager.PacketContext, ClientPacketListener> CLIENT_PLAY =
+        context -> Minecraft.getInstance().getConnection();
+    public static final Function<NetworkManager.PacketContext, ServerGamePacketListenerImpl>
+        SERVER_PLAY = context -> ((ServerPlayer) context.getPlayer()).connection;
+
+    public static void register() {
+      NetworkHandler.register(
+          MessageOpenRewardScreen.class, MessageOpenRewardScreen::new, SERVER_PLAY);
+    }
+  }
+
+  public static class Server {
+    public static final Function<NetworkManager.PacketContext, ServerGamePacketListenerImpl>
+        SERVER_PLAY = context -> ((ServerPlayer) context.getPlayer()).connection;
+
+    public static void register() {
+      NetworkHandler.register(
+          MessageOpenRewardScreen.class, MessageOpenRewardScreen::new, SERVER_PLAY);
     }
   }
 }
